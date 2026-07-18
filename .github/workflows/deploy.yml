@@ -59,3 +59,43 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  indexnow:
+    name: Notify IndexNow
+    runs-on: ubuntu-latest
+    permissions: {}
+    needs: deploy
+    steps:
+      - name: Submit home page to IndexNow
+        env:
+          INDEXNOW_KEY: 7e376ae76b808d7a3c3a957018d7da41
+        run: |
+          # Nudge IndexNow (Bing, Yandex, ...) to recrawl. The site is a single
+          # page whose data changes on each daily rebuild, so we submit the home
+          # URL. First wait for the deployed key file so validation succeeds.
+          for i in $(seq 1 20); do
+            if curl -sf "https://everycinema.london/${INDEXNOW_KEY}.txt" >/dev/null; then
+              echo "Key file live."; break
+            fi
+            echo "Attempt $i/20: key file not live yet..."; sleep 10
+          done
+          RESPONSE=$(curl -sS -w '\n%{http_code}' -X POST 'https://api.indexnow.org/indexnow' \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d @- <<JSON
+          {
+            "host": "everycinema.london",
+            "key": "${INDEXNOW_KEY}",
+            "keyLocation": "https://everycinema.london/${INDEXNOW_KEY}.txt",
+            "urlList": [
+              "https://everycinema.london/"
+            ]
+          }
+          JSON
+          )
+          STATUS=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "IndexNow response ($STATUS): ${BODY:-<empty>}"
+          case "$STATUS" in
+            200|202) echo "IndexNow submission accepted." ;;
+            *) echo "IndexNow submission failed with status $STATUS"; exit 1 ;;
+          esac

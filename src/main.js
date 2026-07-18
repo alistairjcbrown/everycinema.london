@@ -242,6 +242,11 @@ function applyView(view) {
   api.setGridOption("rowHeight", pivot ? 64 : 42);
   // row numbers only make sense over the flat (ungrouped) rows
   api.setGridOption("rowNumbers", view === "flat");
+  // pivot groups by venue only; grouped view groups by movie ▸ venue
+  api.setGridOption("autoGroupColumnDef", {
+    headerName: pivot ? "Venue" : "Movie ▸ Venue",
+    minWidth: 320, pinned: "left",
+  });
   document.querySelectorAll(".views button").forEach((b) =>
     b.classList.toggle("active", b.dataset.view === view)
   );
