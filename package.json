@@ -1,0 +1,19 @@
+{
+  "name": "everycinema-london",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "transform": "node transform.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "6.4.3"
+  },
+  "dependencies": {
+    "ag-grid-community": "36.0.1",
+    "ag-grid-enterprise": "36.0.1"
+  }
+}
