@@ -24,6 +24,7 @@ import {
   FiltersToolPanelModule, // side bar "Filters" tab
   ColumnMenuModule, // column header menu
   CellSelectionModule, // cellSelection
+  RowNumbersModule, // row-number column (flat view)
 } from "ag-grid-enterprise";
 
 // Dev-only: full-text validation messages if a used feature needs a module we
@@ -53,6 +54,7 @@ ModuleRegistry.registerModules([
   FiltersToolPanelModule,
   ColumnMenuModule,
   CellSelectionModule,
+  RowNumbersModule,
 ]);
 
 const theme = themeQuartz
@@ -229,6 +231,8 @@ function applyView(view) {
   api.setGridOption("columnDefs", columnDefs(view));
   // taller rows in pivot so a few showtimes are visible before the cell scrolls
   api.setGridOption("rowHeight", pivot ? 64 : 42);
+  // row numbers only make sense over the flat (ungrouped) rows
+  api.setGridOption("rowNumbers", view === "flat");
   document.querySelectorAll(".views button").forEach((b) =>
     b.classList.toggle("active", b.dataset.view === view)
   );
