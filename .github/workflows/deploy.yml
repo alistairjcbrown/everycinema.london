@@ -1,0 +1,61 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  # Rebuild daily around midday to pick up fresh Clusterflick data.
+  # GitHub cron is UTC (no DST): 12:00 UTC = 12:00 London in winter (GMT),
+  # ~13:00 in summer (BST).
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+# GitHub Pages: queue deploys rather than cancel an in-progress one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+# Deny all by default; each job grants only the scopes it needs.
+permissions: {}
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Download Clusterflick combined data
+        run: ./scripts/get-latest-combined-data.sh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Build compact data blob
+        run: npm run transform
+      - name: Build site
+        run: npm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

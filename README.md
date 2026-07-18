@@ -61,6 +61,28 @@ npm run dev                              # http://localhost:5173
 | `npm run preview` | Preview the production build |
 | `./scripts/get-latest-combined-data.sh` | Download the latest Clusterflick combined data |
 
+## Deployment
+
+Deployed to [GitHub Pages](https://pages.github.com) via GitHub Actions
+(`.github/workflows/deploy.yml`), modelled on `clusterflick.com`'s pipeline. On every
+push to `main`, daily on a schedule (to pick up fresh data), or on manual dispatch, CI:
+
+1. installs deps, then runs the fetch script + `npm run transform` to produce the data
+2. runs `npm run build`
+3. publishes `dist/` to GitHub Pages
+
+**One-time setup:**
+
+- **Repo → Settings → Pages → Source: _GitHub Actions_.**
+- **Custom domain:** `public/CNAME` pins `everycinema.london` on every deploy. At your DNS
+  provider, point the apex domain at GitHub Pages:
+  - `A` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+  - `AAAA` → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`
+  - then tick **Enforce HTTPS** in Settings → Pages.
+
+Because it's served from an apex custom domain, Vite's default `base: "/"` is correct — no
+base-path config needed.
+
 ## Attributions
 
 - **Performance data** — [Clusterflick](https://clusterflick.com)
@@ -74,8 +96,6 @@ See the in-app attributions page (`attributions.html`) for full details and logo
 
 - AG Grid Enterprise runs unlicensed here (evaluation watermark). Add a key via
   `LicenseManager.setLicenseKey(...)` in `src/main.js` to remove it.
-- **Deployment:** the build needs data present, so a deploy step should run the fetch
-  script + `npm run transform` before `npm run build`.
 - License: [MIT](LICENSE) — covers this project's own code. It does **not** cover
   third-party data or trademarks: cinema data belongs to Clusterflick, film metadata to
   TMDB, and the Clusterflick / TMDB / AG Grid names and logos to their respective owners.
