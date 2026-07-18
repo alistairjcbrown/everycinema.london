@@ -115,6 +115,37 @@ const bookRenderer = (p) =>
   p.value ? `<a class="book" href="${p.value}" target="_blank" rel="noopener">Book ↗</a>` : "";
 const yesNo = (p) => (p.value ? "✓" : "");
 
+const esc = (s) =>
+  String(s ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+// Custom pivot aggregation: instead of counting the performances in a
+// venue × date cell, collect them into one time-sorted list. `params.values`
+// are the per-row objects from the value column's valueGetter (leaf rows) or
+// already-aggregated arrays (higher levels) — flatten both.
+function collectShowings(params) {
+  const out = [];
+  for (const v of params.values) {
+    if (!v) continue;
+    if (Array.isArray(v)) out.push(...v);
+    else out.push(v);
+  }
+  out.sort((a, b) => a.t - b.t);
+  return out;
+}
+
+// Render that list as time chips; movie title on hover, sold-out styled.
+const showtimesRenderer = (p) => {
+  const items = p.value;
+  if (!Array.isArray(items) || !items.length) return "";
+  const chips = items
+    .map((i) => {
+      const title = `${i.title}${i.soldOut ? " — sold out" : ""}`;
+      return `<span class="tchip${i.soldOut ? " sold" : ""}" title="${esc(title)}">${i.label}</span>`;
+    })
+    .join("");
+  return `<div class="times-cell">${chips}</div>`;
+};
+
 function columnDefs(view) {
   const grouped = view === "grouped";
   const pivot = view === "pivot";
@@ -129,8 +160,18 @@ function columnDefs(view) {
       filter: "agSetColumnFilter", sort: grouped ? null : "asc" },
     { field: "weekday", headerName: "Day", width: 90, filter: "agSetColumnFilter", hide: pivot },
     { field: "time", width: 90, filter: "agSetColumnFilter", hide: pivot },
-    { field: "performanceId", headerName: "Showings", aggFunc: "count",
-      hide: !grouped && !pivot, filter: false, cellClass: "ag-right-aligned-cell", width: 110 },
+    // grouped view: count of showings per movie ▸ venue
+    { colId: "showings", field: "performanceId", headerName: "Showings",
+      aggFunc: grouped ? "count" : null, hide: !grouped, filter: false,
+      cellClass: "ag-right-aligned-cell", width: 110 },
+    // pivot view: the actual showtimes, aggregated into each venue × date cell
+    { colId: "showtimes", headerName: "Showtimes", hide: !pivot,
+      aggFunc: pivot ? collectShowings : null,
+      valueGetter: (p) =>
+        p.data
+          ? { t: p.data.timestamp, label: p.data.time, title: p.data.title, soldOut: p.data.soldOut }
+          : null,
+      cellRenderer: showtimesRenderer, sortable: false, filter: false, minWidth: 150 },
     { field: "genre", headerName: "Genre", filter: "agSetColumnFilter", hide: pivot,
       enableRowGroup: true, enablePivot: true },
     { field: "genres", headerName: "All genres", hide: true,
@@ -173,6 +214,8 @@ const gridOptions = {
   groupDefaultExpanded: 0,
   rowGroupPanelShow: "always",
   pivotPanelShow: "always",
+  // show the plain value header ("Showtimes") instead of "func(Showtimes)"
+  suppressAggFuncInHeader: true,
   sideBar: { toolPanels: ["columns", "filters"] },
   pivotMode: false,
   cellSelection: true,
@@ -181,8 +224,11 @@ const gridOptions = {
 const api = createGrid(document.querySelector("#grid"), gridOptions);
 
 function applyView(view) {
-  api.setGridOption("pivotMode", view === "pivot");
+  const pivot = view === "pivot";
+  api.setGridOption("pivotMode", pivot);
   api.setGridOption("columnDefs", columnDefs(view));
+  // taller rows in pivot so a few showtimes are visible before the cell scrolls
+  api.setGridOption("rowHeight", pivot ? 64 : 42);
   document.querySelectorAll(".views button").forEach((b) =>
     b.classList.toggle("active", b.dataset.view === view)
   );
