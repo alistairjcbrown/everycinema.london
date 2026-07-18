@@ -153,7 +153,7 @@ function columnDefs(view) {
   const pivot = view === "pivot";
   return [
     { field: "poster", headerName: "", width: 60, cellRenderer: posterRenderer,
-      sortable: false, filter: false, hide: pivot },
+      sortable: false, filter: false, hide: pivot, enableRowGroup: false, enablePivot: false },
     { field: "title", headerName: "Movie", minWidth: 240,
       rowGroup: grouped, hide: grouped || pivot, filter: "agTextColumnFilter" },
     { field: "venue", minWidth: 200, rowGroup: grouped || pivot,
@@ -165,6 +165,7 @@ function columnDefs(view) {
     // grouped view: count of showings per movie ▸ venue
     { colId: "showings", field: "performanceId", headerName: "Showings",
       aggFunc: grouped ? "count" : null, hide: !grouped, filter: false,
+      enableRowGroup: false, enablePivot: false,
       cellClass: "ag-right-aligned-cell", width: 110 },
     // pivot view: the actual showtimes, aggregated into each venue × date cell
     { colId: "showtimes", headerName: "Showtimes", hide: !pivot,
@@ -173,10 +174,12 @@ function columnDefs(view) {
         p.data
           ? { t: p.data.timestamp, label: p.data.time, title: p.data.title, soldOut: p.data.soldOut }
           : null,
-      cellRenderer: showtimesRenderer, sortable: false, filter: false, minWidth: 150 },
+      cellRenderer: showtimesRenderer, sortable: false, filter: false, minWidth: 150,
+      enableRowGroup: false, enablePivot: false },
     { field: "genre", headerName: "Genre", filter: "agSetColumnFilter", hide: pivot,
       enableRowGroup: true, enablePivot: true },
     { field: "genres", headerName: "All genres", hide: true,
+      enableRowGroup: false, enablePivot: false,
       valueFormatter: (p) => (p.value || []).join(", ") },
     { field: "category", filter: "agSetColumnFilter", width: 110, hide: pivot,
       enableRowGroup: true, enablePivot: true },
@@ -203,7 +206,8 @@ function columnDefs(view) {
     { field: "screen", hide: true },
     { field: "notes", minWidth: 220, hide: true },
     { field: "bookingUrl", headerName: "Book", cellRenderer: bookRenderer,
-      sortable: false, filter: false, width: 90, hide: pivot },
+      sortable: false, filter: false, width: 90, hide: pivot,
+      enableRowGroup: false, enablePivot: false },
   ];
 }
 
@@ -211,7 +215,12 @@ const gridOptions = {
   theme,
   rowData: [],
   columnDefs: columnDefs("grouped"),
-  defaultColDef: { sortable: true, resizable: true, filter: true, floatingFilter: true },
+  // group/pivot enabled everywhere by default; opted out per-column below where
+  // it's meaningless (images, links, the aggregated value columns)
+  defaultColDef: {
+    sortable: true, resizable: true, filter: true, floatingFilter: true,
+    enableRowGroup: true, enablePivot: true,
+  },
   autoGroupColumnDef: { headerName: "Movie ▸ Venue", minWidth: 320, pinned: "left" },
   groupDefaultExpanded: 0,
   rowGroupPanelShow: "always",
