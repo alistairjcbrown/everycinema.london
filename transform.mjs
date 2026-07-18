@@ -1,8 +1,4 @@
-// Build a COMPACT mapping blob for the wire, NOT a denormalized fact table.
-//
-// The old approach shipped one fat row per performance (~25 MB) with the movie
-// title, genres, poster, venue name etc. repeated on every one of the ~31k rows.
-// Instead we ship:
+// Build a compact mapping blob for the wire. We ship:
 //   - lookups (venues, genres) once
 //   - movie-level fields once per movie
 //   - performances as minimal records that reference venue/genre by id and omit
