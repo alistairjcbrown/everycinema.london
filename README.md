@@ -71,18 +71,6 @@ push to `main`, daily on a schedule (to pick up fresh data), or on manual dispat
 2. runs `npm run build`
 3. publishes `dist/` to GitHub Pages
 
-**One-time setup:**
-
-- **Repo → Settings → Pages → Source: _GitHub Actions_.**
-- **Custom domain:** `public/CNAME` pins `everycinema.london` on every deploy. At your DNS
-  provider, point the apex domain at GitHub Pages:
-  - `A` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-  - `AAAA` → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`
-  - then tick **Enforce HTTPS** in Settings → Pages.
-
-Because it's served from an apex custom domain, Vite's default `base: "/"` is correct — no
-base-path config needed.
-
 ## Attributions
 
 - **Performance data** — [Clusterflick](https://clusterflick.com)
