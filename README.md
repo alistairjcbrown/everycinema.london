@@ -76,4 +76,6 @@ See the in-app attributions page (`attributions.html`) for full details and logo
   `LicenseManager.setLicenseKey(...)` in `src/main.js` to remove it.
 - **Deployment:** the build needs data present, so a deploy step should run the fetch
   script + `npm run transform` before `npm run build`.
-- License: TBD.
+- License: [MIT](LICENSE) — covers this project's own code. It does **not** cover
+  third-party data or trademarks: cinema data belongs to Clusterflick, film metadata to
+  TMDB, and the Clusterflick / TMDB / AG Grid names and logos to their respective owners.
