@@ -1,0 +1,3197 @@
+{
+  "from": "2026-01-01T00:00:00Z",
+  "releases": [
+    {
+      "id": 273676890,
+      "tag": "20260101.054208",
+      "publishedAt": "2026-01-01T05:42:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260101.054208/combined-data.json",
+      "size": 16047676
+    },
+    {
+      "id": 273700662,
+      "tag": "20260101.130536",
+      "publishedAt": "2026-01-01T13:05:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260101.130536/combined-data.json",
+      "size": 16046816
+    },
+    {
+      "id": 273745236,
+      "tag": "20260102.010346",
+      "publishedAt": "2026-01-02T01:03:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260102.010346/combined-data.json",
+      "size": 14841975
+    },
+    {
+      "id": 273791568,
+      "tag": "20260102.103855",
+      "publishedAt": "2026-01-02T10:38:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260102.103855/combined-data.json",
+      "size": 14838206
+    },
+    {
+      "id": 273808161,
+      "tag": "20260102.122116",
+      "publishedAt": "2026-01-02T12:21:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260102.122116/combined-data.json",
+      "size": 14838206
+    },
+    {
+      "id": 273820298,
+      "tag": "20260102.135319",
+      "publishedAt": "2026-01-02T13:53:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260102.135319/combined-data.json",
+      "size": 14952841
+    },
+    {
+      "id": 273926454,
+      "tag": "20260103.045825",
+      "publishedAt": "2026-01-03T04:58:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260103.045825/combined-data.json",
+      "size": 13796552
+    },
+    {
+      "id": 274009462,
+      "tag": "20260103.232806",
+      "publishedAt": "2026-01-03T23:28:07Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260103.232806/combined-data.json",
+      "size": 13796020
+    },
+    {
+      "id": 274029798,
+      "tag": "20260104.055201",
+      "publishedAt": "2026-01-04T05:52:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260104.055201/combined-data.json",
+      "size": 11540494
+    },
+    {
+      "id": 274055809,
+      "tag": "20260104.132630",
+      "publishedAt": "2026-01-04T13:26:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260104.132630/combined-data.json",
+      "size": 12212101
+    },
+    {
+      "id": 274127046,
+      "tag": "20260105.051956",
+      "publishedAt": "2026-01-05T05:19:57Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260105.051956/combined-data.json",
+      "size": 11213172
+    },
+    {
+      "id": 274420426,
+      "tag": "20260106.060135",
+      "publishedAt": "2026-01-06T06:01:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260106.060135/combined-data.json",
+      "size": 15945283
+    },
+    {
+      "id": 274500393,
+      "tag": "20260106.121201",
+      "publishedAt": "2026-01-06T12:12:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260106.121201/combined-data.json",
+      "size": 15949292
+    },
+    {
+      "id": 274711752,
+      "tag": "20260107.051225",
+      "publishedAt": "2026-01-07T05:12:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260107.051225/combined-data.json",
+      "size": 15444797
+    },
+    {
+      "id": 274814887,
+      "tag": "20260107.130632",
+      "publishedAt": "2026-01-07T13:06:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260107.130632/combined-data.json",
+      "size": 15437485
+    },
+    {
+      "id": 274952912,
+      "tag": "20260107.204813",
+      "publishedAt": "2026-01-07T20:48:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260107.204813/combined-data.json",
+      "size": 15480147
+    },
+    {
+      "id": 274980229,
+      "tag": "20260107.221628",
+      "publishedAt": "2026-01-07T22:16:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260107.221628/combined-data.json",
+      "size": 15488669
+    },
+    {
+      "id": 275041891,
+      "tag": "20260108.054301",
+      "publishedAt": "2026-01-08T05:43:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260108.054301/combined-data.json",
+      "size": 15204739
+    },
+    {
+      "id": 275467202,
+      "tag": "20260109.114935",
+      "publishedAt": "2026-01-09T11:49:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260109.114935/combined-data.json",
+      "size": 14527191
+    },
+    {
+      "id": 275516469,
+      "tag": "20260109.144051",
+      "publishedAt": "2026-01-09T14:40:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260109.144051/combined-data.json",
+      "size": 14384386
+    },
+    {
+      "id": 275683766,
+      "tag": "20260110.053051",
+      "publishedAt": "2026-01-10T05:30:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260110.053051/combined-data.json",
+      "size": 13890860
+    },
+    {
+      "id": 275805280,
+      "tag": "20260111.100902",
+      "publishedAt": "2026-01-11T10:09:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260111.100902/combined-data.json",
+      "size": 12634056
+    },
+    {
+      "id": 275900389,
+      "tag": "20260112.055308",
+      "publishedAt": "2026-01-12T05:53:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260112.055308/combined-data.json",
+      "size": 11530298
+    },
+    {
+      "id": 276133367,
+      "tag": "20260112.194533",
+      "publishedAt": "2026-01-12T19:45:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260112.194533/combined-data.json",
+      "size": 11528104
+    },
+    {
+      "id": 276310304,
+      "tag": "20260113.104555",
+      "publishedAt": "2026-01-13T10:45:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260113.104555/combined-data.json",
+      "size": 17083340
+    },
+    {
+      "id": 276335329,
+      "tag": "20260113.121624",
+      "publishedAt": "2026-01-13T12:16:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260113.121624/combined-data.json",
+      "size": 17085069
+    },
+    {
+      "id": 276601404,
+      "tag": "20260114.055724",
+      "publishedAt": "2026-01-14T05:57:24Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260114.055724/combined-data.json",
+      "size": 16820952
+    },
+    {
+      "id": 276689560,
+      "tag": "20260114.113431",
+      "publishedAt": "2026-01-14T11:34:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260114.113431/combined-data.json",
+      "size": 16824706
+    },
+    {
+      "id": 276741422,
+      "tag": "20260114.142340",
+      "publishedAt": "2026-01-14T14:23:41Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260114.142340/combined-data.json",
+      "size": 16826845
+    },
+    {
+      "id": 276866744,
+      "tag": "20260114.210738",
+      "publishedAt": "2026-01-14T21:07:39Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260114.210738/combined-data.json",
+      "size": 16829180
+    },
+    {
+      "id": 276954266,
+      "tag": "20260115.065050",
+      "publishedAt": "2026-01-15T06:50:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260115.065050/combined-data.json",
+      "size": 16537577
+    },
+    {
+      "id": 277074482,
+      "tag": "20260115.143111",
+      "publishedAt": "2026-01-15T14:31:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260115.143111/combined-data.json",
+      "size": 16514046
+    },
+    {
+      "id": 277290631,
+      "tag": "20260116.055348",
+      "publishedAt": "2026-01-16T05:53:48Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260116.055348/combined-data.json",
+      "size": 15737771
+    },
+    {
+      "id": 277571119,
+      "tag": "20260117.013018",
+      "publishedAt": "2026-01-17T01:30:18Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260117.013018/combined-data.json",
+      "size": 15435793
+    },
+    {
+      "id": 277615460,
+      "tag": "20260117.124313",
+      "publishedAt": "2026-01-17T12:43:13Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260117.124313/combined-data.json",
+      "size": 15177498
+    },
+    {
+      "id": 277641518,
+      "tag": "20260117.183719",
+      "publishedAt": "2026-01-17T18:37:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260117.183719/combined-data.json",
+      "size": 14588716
+    },
+    {
+      "id": 277712533,
+      "tag": "20260118.131435",
+      "publishedAt": "2026-01-18T13:14:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260118.131435/combined-data.json",
+      "size": 13930354
+    },
+    {
+      "id": 277748202,
+      "tag": "20260118.202134",
+      "publishedAt": "2026-01-18T20:21:34Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260118.202134/combined-data.json",
+      "size": 13925230
+    },
+    {
+      "id": 277750756,
+      "tag": "20260118.205234",
+      "publishedAt": "2026-01-18T20:52:34Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260118.205234/combined-data.json",
+      "size": 13925191
+    },
+    {
+      "id": 277786220,
+      "tag": "20260119.025252",
+      "publishedAt": "2026-01-19T02:52:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260119.025252/combined-data.json",
+      "size": 12741629
+    },
+    {
+      "id": 277807867,
+      "tag": "20260119.054924",
+      "publishedAt": "2026-01-19T05:49:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260119.054924/combined-data.json",
+      "size": 12739652
+    },
+    {
+      "id": 278084176,
+      "tag": "20260120.005351",
+      "publishedAt": "2026-01-20T00:53:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260120.005351/combined-data.json",
+      "size": 18150483
+    },
+    {
+      "id": 278135270,
+      "tag": "20260120.054812",
+      "publishedAt": "2026-01-20T05:48:13Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260120.054812/combined-data.json",
+      "size": 18386630
+    },
+    {
+      "id": 278214269,
+      "tag": "20260120.105442",
+      "publishedAt": "2026-01-20T10:54:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260120.105442/combined-data.json",
+      "size": 18387710
+    },
+    {
+      "id": 278580788,
+      "tag": "20260121.104213",
+      "publishedAt": "2026-01-21T10:42:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260121.104213/combined-data.json",
+      "size": 18408973
+    },
+    {
+      "id": 278641750,
+      "tag": "20260121.140057",
+      "publishedAt": "2026-01-21T14:00:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260121.140057/combined-data.json",
+      "size": 18404738
+    },
+    {
+      "id": 278660871,
+      "tag": "20260121.144942",
+      "publishedAt": "2026-01-21T14:49:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260121.144942/combined-data.json",
+      "size": 18404977
+    },
+    {
+      "id": 278689971,
+      "tag": "20260121.160402",
+      "publishedAt": "2026-01-21T16:04:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260121.160402/combined-data.json",
+      "size": 18404622
+    },
+    {
+      "id": 278893831,
+      "tag": "20260122.073323",
+      "publishedAt": "2026-01-22T07:33:24Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260122.073323/combined-data.json",
+      "size": 17589437
+    },
+    {
+      "id": 279105459,
+      "tag": "20260122.175632",
+      "publishedAt": "2026-01-22T17:56:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260122.175632/combined-data.json",
+      "size": 17590141
+    },
+    {
+      "id": 279342714,
+      "tag": "20260123.121621",
+      "publishedAt": "2026-01-23T12:16:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260123.121621/combined-data.json",
+      "size": 16674091
+    },
+    {
+      "id": 279369011,
+      "tag": "20260123.133738",
+      "publishedAt": "2026-01-23T13:37:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260123.133738/combined-data.json",
+      "size": 16672908
+    },
+    {
+      "id": 279427769,
+      "tag": "20260123.160931",
+      "publishedAt": "2026-01-23T16:09:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260123.160931/combined-data.json",
+      "size": 16675531
+    },
+    {
+      "id": 279581002,
+      "tag": "20260124.052133",
+      "publishedAt": "2026-01-24T05:21:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260124.052133/combined-data.json",
+      "size": 16435942
+    },
+    {
+      "id": 279661565,
+      "tag": "20260124.203806",
+      "publishedAt": "2026-01-24T20:38:07Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260124.203806/combined-data.json",
+      "size": 16434750
+    },
+    {
+      "id": 279704465,
+      "tag": "20260125.070240",
+      "publishedAt": "2026-01-25T07:02:40Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260125.070240/combined-data.json",
+      "size": 15110269
+    },
+    {
+      "id": 279826681,
+      "tag": "20260126.060303",
+      "publishedAt": "2026-01-26T06:03:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260126.060303/combined-data.json",
+      "size": 13724284
+    },
+    {
+      "id": 280050897,
+      "tag": "20260126.195310",
+      "publishedAt": "2026-01-26T19:53:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260126.195310/combined-data.json",
+      "size": 16354138
+    },
+    {
+      "id": 280239006,
+      "tag": "20260127.102755",
+      "publishedAt": "2026-01-27T10:27:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.102755/combined-data.json",
+      "size": 19069108
+    },
+    {
+      "id": 280255407,
+      "tag": "20260127.112217",
+      "publishedAt": "2026-01-27T11:22:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.112217/combined-data.json",
+      "size": 19070446
+    },
+    {
+      "id": 280305528,
+      "tag": "20260127.134329",
+      "publishedAt": "2026-01-27T13:43:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.134329/combined-data.json",
+      "size": 19305083
+    },
+    {
+      "id": 280318501,
+      "tag": "20260127.141611",
+      "publishedAt": "2026-01-27T14:16:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.141611/combined-data.json",
+      "size": 19303206
+    },
+    {
+      "id": 280400354,
+      "tag": "20260127.173954",
+      "publishedAt": "2026-01-27T17:39:55Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.173954/combined-data.json",
+      "size": 19290950
+    },
+    {
+      "id": 280431803,
+      "tag": "20260127.191625",
+      "publishedAt": "2026-01-27T19:16:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.191625/combined-data.json",
+      "size": 19292669
+    },
+    {
+      "id": 280446818,
+      "tag": "20260127.200926",
+      "publishedAt": "2026-01-27T20:09:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.200926/combined-data.json",
+      "size": 19293651
+    },
+    {
+      "id": 280460011,
+      "tag": "20260127.205759",
+      "publishedAt": "2026-01-27T20:57:59Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260127.205759/combined-data.json",
+      "size": 19418244
+    },
+    {
+      "id": 280661072,
+      "tag": "20260128.110227",
+      "publishedAt": "2026-01-28T11:02:28Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260128.110227/combined-data.json",
+      "size": 19226419
+    },
+    {
+      "id": 280840361,
+      "tag": "20260128.190224",
+      "publishedAt": "2026-01-28T19:02:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260128.190224/combined-data.json",
+      "size": 19229981
+    },
+    {
+      "id": 281062995,
+      "tag": "20260129.112410",
+      "publishedAt": "2026-01-29T11:24:11Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260129.112410/combined-data.json",
+      "size": 18766458
+    },
+    {
+      "id": 281080764,
+      "tag": "20260129.121102",
+      "publishedAt": "2026-01-29T12:11:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260129.121102/combined-data.json",
+      "size": 18767593
+    },
+    {
+      "id": 281315770,
+      "tag": "20260129.232057",
+      "publishedAt": "2026-01-29T23:20:57Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260129.232057/combined-data.json",
+      "size": 18772044
+    },
+    {
+      "id": 281382490,
+      "tag": "20260130.062845",
+      "publishedAt": "2026-01-30T06:28:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260130.062845/combined-data.json",
+      "size": 17861120
+    },
+    {
+      "id": 281449410,
+      "tag": "20260130.102316",
+      "publishedAt": "2026-01-30T10:23:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260130.102316/combined-data.json",
+      "size": 17859118
+    },
+    {
+      "id": 281499886,
+      "tag": "20260130.131414",
+      "publishedAt": "2026-01-30T13:14:15Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260130.131414/combined-data.json",
+      "size": 17858546
+    },
+    {
+      "id": 281541010,
+      "tag": "20260130.150739",
+      "publishedAt": "2026-01-30T15:07:40Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260130.150739/combined-data.json",
+      "size": 17784788
+    },
+    {
+      "id": 281748580,
+      "tag": "20260131.054439",
+      "publishedAt": "2026-01-31T05:44:39Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260131.054439/combined-data.json",
+      "size": 17443460
+    },
+    {
+      "id": 281833688,
+      "tag": "20260131.202750",
+      "publishedAt": "2026-01-31T20:27:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260131.202750/combined-data.json",
+      "size": 17445112
+    },
+    {
+      "id": 281854273,
+      "tag": "20260201.002210",
+      "publishedAt": "2026-02-01T00:22:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260201.002210/combined-data.json",
+      "size": 16066248
+    },
+    {
+      "id": 281903507,
+      "tag": "20260201.112144",
+      "publishedAt": "2026-02-01T11:21:45Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260201.112144/combined-data.json",
+      "size": 16094943
+    },
+    {
+      "id": 281953130,
+      "tag": "20260201.185451",
+      "publishedAt": "2026-02-01T18:54:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260201.185451/combined-data.json",
+      "size": 16097915
+    },
+    {
+      "id": 282057235,
+      "tag": "20260202.063304",
+      "publishedAt": "2026-02-02T06:33:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260202.063304/combined-data.json",
+      "size": 14708525
+    },
+    {
+      "id": 282363110,
+      "tag": "20260203.004235",
+      "publishedAt": "2026-02-03T00:42:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260203.004235/combined-data.json",
+      "size": 18489541
+    },
+    {
+      "id": 282427997,
+      "tag": "20260203.061005",
+      "publishedAt": "2026-02-03T06:10:06Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260203.061005/combined-data.json",
+      "size": 20864623
+    },
+    {
+      "id": 282739975,
+      "tag": "20260203.214918",
+      "publishedAt": "2026-02-03T21:49:18Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260203.214918/combined-data.json",
+      "size": 20858956
+    },
+    {
+      "id": 282785448,
+      "tag": "20260204.010308",
+      "publishedAt": "2026-02-04T01:03:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260204.010308/combined-data.json",
+      "size": 19737888
+    },
+    {
+      "id": 282857514,
+      "tag": "20260204.080252",
+      "publishedAt": "2026-02-04T08:02:53Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260204.080252/combined-data.json",
+      "size": 20239639
+    },
+    {
+      "id": 282913784,
+      "tag": "20260204.105052",
+      "publishedAt": "2026-02-04T10:50:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260204.105052/combined-data.json",
+      "size": 20238551
+    },
+    {
+      "id": 283319403,
+      "tag": "20260205.114623",
+      "publishedAt": "2026-02-05T11:46:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260205.114623/combined-data.json",
+      "size": 19345232
+    },
+    {
+      "id": 283371219,
+      "tag": "20260205.141200",
+      "publishedAt": "2026-02-05T14:12:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260205.141200/combined-data.json",
+      "size": 19337425
+    },
+    {
+      "id": 283639119,
+      "tag": "20260206.071239",
+      "publishedAt": "2026-02-06T07:12:40Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260206.071239/combined-data.json",
+      "size": 18406606
+    },
+    {
+      "id": 283698671,
+      "tag": "20260206.103707",
+      "publishedAt": "2026-02-06T10:37:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260206.103707/combined-data.json",
+      "size": 18407631
+    },
+    {
+      "id": 283717259,
+      "tag": "20260206.113534",
+      "publishedAt": "2026-02-06T11:35:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260206.113534/combined-data.json",
+      "size": 18419898
+    },
+    {
+      "id": 283730434,
+      "tag": "20260206.122022",
+      "publishedAt": "2026-02-06T12:20:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260206.122022/combined-data.json",
+      "size": 18419898
+    },
+    {
+      "id": 283819588,
+      "tag": "20260206.163514",
+      "publishedAt": "2026-02-06T16:35:15Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260206.163514/combined-data.json",
+      "size": 18419384
+    },
+    {
+      "id": 284029524,
+      "tag": "20260207.131444",
+      "publishedAt": "2026-02-07T13:14:45Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260207.131444/combined-data.json",
+      "size": 18316697
+    },
+    {
+      "id": 284046762,
+      "tag": "20260207.162755",
+      "publishedAt": "2026-02-07T16:27:55Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260207.162755/combined-data.json",
+      "size": 18311861
+    },
+    {
+      "id": 284075866,
+      "tag": "20260207.214335",
+      "publishedAt": "2026-02-07T21:43:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260207.214335/combined-data.json",
+      "size": 18397315
+    },
+    {
+      "id": 284138354,
+      "tag": "20260208.110745",
+      "publishedAt": "2026-02-08T11:07:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260208.110745/combined-data.json",
+      "size": 17027128
+    },
+    {
+      "id": 284153258,
+      "tag": "20260208.133504",
+      "publishedAt": "2026-02-08T13:35:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260208.133504/combined-data.json",
+      "size": 17021486
+    },
+    {
+      "id": 284331120,
+      "tag": "20260209.093149",
+      "publishedAt": "2026-02-09T09:31:49Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260209.093149/combined-data.json",
+      "size": 15532566
+    },
+    {
+      "id": 284606895,
+      "tag": "20260209.231000",
+      "publishedAt": "2026-02-09T23:10:00Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260209.231000/combined-data.json",
+      "size": 19543117
+    },
+    {
+      "id": 284635994,
+      "tag": "20260210.015351",
+      "publishedAt": "2026-02-10T01:53:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260210.015351/combined-data.json",
+      "size": 19358681
+    },
+    {
+      "id": 284698289,
+      "tag": "20260210.074400",
+      "publishedAt": "2026-02-10T07:44:00Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260210.074400/combined-data.json",
+      "size": 21071669
+    },
+    {
+      "id": 285191236,
+      "tag": "20260211.103447",
+      "publishedAt": "2026-02-11T10:34:48Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260211.103447/combined-data.json",
+      "size": 20899589
+    },
+    {
+      "id": 285346816,
+      "tag": "20260211.171241",
+      "publishedAt": "2026-02-11T17:12:42Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260211.171241/combined-data.json",
+      "size": 20897595
+    },
+    {
+      "id": 285624251,
+      "tag": "20260212.103718",
+      "publishedAt": "2026-02-12T10:37:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260212.103718/combined-data.json",
+      "size": 20335169
+    },
+    {
+      "id": 285713037,
+      "tag": "20260212.142951",
+      "publishedAt": "2026-02-12T14:29:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260212.142951/combined-data.json",
+      "size": 20341521
+    },
+    {
+      "id": 285820186,
+      "tag": "20260212.185859",
+      "publishedAt": "2026-02-12T18:58:59Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260212.185859/combined-data.json",
+      "size": 20174368
+    },
+    {
+      "id": 285970818,
+      "tag": "20260213.060916",
+      "publishedAt": "2026-02-13T06:09:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260213.060916/combined-data.json",
+      "size": 19522437
+    },
+    {
+      "id": 286060070,
+      "tag": "20260213.114223",
+      "publishedAt": "2026-02-13T11:42:24Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260213.114223/combined-data.json",
+      "size": 19521289
+    },
+    {
+      "id": 286183521,
+      "tag": "20260213.174339",
+      "publishedAt": "2026-02-13T17:43:40Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260213.174339/combined-data.json",
+      "size": 19240796
+    },
+    {
+      "id": 286368411,
+      "tag": "20260214.120145",
+      "publishedAt": "2026-02-14T12:01:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260214.120145/combined-data.json",
+      "size": 18688558
+    },
+    {
+      "id": 286512006,
+      "tag": "20260215.095413",
+      "publishedAt": "2026-02-15T09:54:13Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260215.095413/combined-data.json",
+      "size": 17177066
+    },
+    {
+      "id": 286557843,
+      "tag": "20260215.164941",
+      "publishedAt": "2026-02-15T16:49:42Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260215.164941/combined-data.json",
+      "size": 17196412
+    },
+    {
+      "id": 286567487,
+      "tag": "20260215.180654",
+      "publishedAt": "2026-02-15T18:06:55Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260215.180654/combined-data.json",
+      "size": 17194148
+    },
+    {
+      "id": 286581226,
+      "tag": "20260215.193109",
+      "publishedAt": "2026-02-15T19:31:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260215.193109/combined-data.json",
+      "size": 17180474
+    },
+    {
+      "id": 286599593,
+      "tag": "20260215.211259",
+      "publishedAt": "2026-02-15T21:12:59Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260215.211259/combined-data.json",
+      "size": 17178912
+    },
+    {
+      "id": 286783020,
+      "tag": "20260216.101948",
+      "publishedAt": "2026-02-16T10:19:49Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260216.101948/combined-data.json",
+      "size": 15998050
+    },
+    {
+      "id": 286803790,
+      "tag": "20260216.111552",
+      "publishedAt": "2026-02-16T11:15:53Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260216.111552/combined-data.json",
+      "size": 15999346
+    },
+    {
+      "id": 286962418,
+      "tag": "20260216.183642",
+      "publishedAt": "2026-02-16T18:36:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260216.183642/combined-data.json",
+      "size": 16000222
+    },
+    {
+      "id": 287034408,
+      "tag": "20260217.002120",
+      "publishedAt": "2026-02-17T00:21:21Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260217.002120/combined-data.json",
+      "size": 19342832
+    },
+    {
+      "id": 287102591,
+      "tag": "20260217.062652",
+      "publishedAt": "2026-02-17T06:26:53Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260217.062652/combined-data.json",
+      "size": 21386536
+    },
+    {
+      "id": 287418883,
+      "tag": "20260217.205643",
+      "publishedAt": "2026-02-17T20:56:44Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260217.205643/combined-data.json",
+      "size": 21287112
+    },
+    {
+      "id": 287462396,
+      "tag": "20260217.232719",
+      "publishedAt": "2026-02-17T23:27:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260217.232719/combined-data.json",
+      "size": 21296126
+    },
+    {
+      "id": 287474139,
+      "tag": "20260218.002947",
+      "publishedAt": "2026-02-18T00:29:48Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260218.002947/combined-data.json",
+      "size": 20964577
+    },
+    {
+      "id": 287535179,
+      "tag": "20260218.062534",
+      "publishedAt": "2026-02-18T06:25:34Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260218.062534/combined-data.json",
+      "size": 20968623
+    },
+    {
+      "id": 287628310,
+      "tag": "20260218.104840",
+      "publishedAt": "2026-02-18T10:48:41Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260218.104840/combined-data.json",
+      "size": 20969788
+    },
+    {
+      "id": 287824046,
+      "tag": "20260218.185102",
+      "publishedAt": "2026-02-18T18:51:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260218.185102/combined-data.json",
+      "size": 20484563
+    },
+    {
+      "id": 288116724,
+      "tag": "20260219.102513",
+      "publishedAt": "2026-02-19T10:25:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260219.102513/combined-data.json",
+      "size": 20080034
+    },
+    {
+      "id": 288411354,
+      "tag": "20260219.200036",
+      "publishedAt": "2026-02-19T20:00:37Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260219.200036/combined-data.json",
+      "size": 19379841
+    },
+    {
+      "id": 288668403,
+      "tag": "20260220.104343",
+      "publishedAt": "2026-02-20T10:43:44Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260220.104343/combined-data.json",
+      "size": 19354365
+    },
+    {
+      "id": 288688425,
+      "tag": "20260220.114624",
+      "publishedAt": "2026-02-20T11:46:24Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260220.114624/combined-data.json",
+      "size": 19347421
+    },
+    {
+      "id": 288823623,
+      "tag": "20260220.180914",
+      "publishedAt": "2026-02-20T18:09:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260220.180914/combined-data.json",
+      "size": 19470725
+    },
+    {
+      "id": 288924426,
+      "tag": "20260221.001959",
+      "publishedAt": "2026-02-21T00:20:00Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260221.001959/combined-data.json",
+      "size": 18787009
+    },
+    {
+      "id": 288975711,
+      "tag": "20260221.101145",
+      "publishedAt": "2026-02-21T10:11:45Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260221.101145/combined-data.json",
+      "size": 18791656
+    },
+    {
+      "id": 289029806,
+      "tag": "20260221.184735",
+      "publishedAt": "2026-02-21T18:47:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260221.184735/combined-data.json",
+      "size": 18065773
+    },
+    {
+      "id": 289099071,
+      "tag": "20260222.063103",
+      "publishedAt": "2026-02-22T06:31:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260222.063103/combined-data.json",
+      "size": 17301493
+    },
+    {
+      "id": 289164916,
+      "tag": "20260222.171128",
+      "publishedAt": "2026-02-22T17:11:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260222.171128/combined-data.json",
+      "size": 16474383
+    },
+    {
+      "id": 289366296,
+      "tag": "20260223.110101",
+      "publishedAt": "2026-02-23T11:01:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260223.110101/combined-data.json",
+      "size": 15719083
+    },
+    {
+      "id": 289505696,
+      "tag": "20260223.165856",
+      "publishedAt": "2026-02-23T16:58:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260223.165856/combined-data.json",
+      "size": 15636069
+    },
+    {
+      "id": 289599706,
+      "tag": "20260223.212108",
+      "publishedAt": "2026-02-23T21:21:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260223.212108/combined-data.json",
+      "size": 19473139
+    },
+    {
+      "id": 289647992,
+      "tag": "20260224.001405",
+      "publishedAt": "2026-02-24T00:14:05Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260224.001405/combined-data.json",
+      "size": 21848374
+    },
+    {
+      "id": 289712001,
+      "tag": "20260224.055557",
+      "publishedAt": "2026-02-24T05:55:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260224.055557/combined-data.json",
+      "size": 21849815
+    },
+    {
+      "id": 289786277,
+      "tag": "20260224.101112",
+      "publishedAt": "2026-02-24T10:11:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260224.101112/combined-data.json",
+      "size": 21850572
+    },
+    {
+      "id": 289793510,
+      "tag": "20260224.102726",
+      "publishedAt": "2026-02-24T10:27:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260224.102726/combined-data.json",
+      "size": 21849423
+    },
+    {
+      "id": 289983683,
+      "tag": "20260224.173921",
+      "publishedAt": "2026-02-24T17:39:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260224.173921/combined-data.json",
+      "size": 21778858
+    },
+    {
+      "id": 290062937,
+      "tag": "20260224.210754",
+      "publishedAt": "2026-02-24T21:07:55Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260224.210754/combined-data.json",
+      "size": 21774066
+    },
+    {
+      "id": 290357135,
+      "tag": "20260225.132150",
+      "publishedAt": "2026-02-25T13:21:50Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260225.132150/combined-data.json",
+      "size": 21127674
+    },
+    {
+      "id": 290481813,
+      "tag": "20260225.173722",
+      "publishedAt": "2026-02-25T17:37:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260225.173722/combined-data.json",
+      "size": 20908455
+    },
+    {
+      "id": 290830642,
+      "tag": "20260226.101850",
+      "publishedAt": "2026-02-26T10:18:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260226.101850/combined-data.json",
+      "size": 20482125
+    },
+    {
+      "id": 291014122,
+      "tag": "20260226.170239",
+      "publishedAt": "2026-02-26T17:02:39Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260226.170239/combined-data.json",
+      "size": 20375699
+    },
+    {
+      "id": 291220527,
+      "tag": "20260227.054704",
+      "publishedAt": "2026-02-27T05:47:05Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260227.054704/combined-data.json",
+      "size": 19559243
+    },
+    {
+      "id": 291590280,
+      "tag": "20260228.052032",
+      "publishedAt": "2026-02-28T05:20:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260228.052032/combined-data.json",
+      "size": 18916366
+    },
+    {
+      "id": 291654424,
+      "tag": "20260228.162342",
+      "publishedAt": "2026-02-28T16:23:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260228.162342/combined-data.json",
+      "size": 18368900
+    },
+    {
+      "id": 291750212,
+      "tag": "20260301.055540",
+      "publishedAt": "2026-03-01T05:55:41Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260301.055540/combined-data.json",
+      "size": 17552150
+    },
+    {
+      "id": 291821751,
+      "tag": "20260301.172017",
+      "publishedAt": "2026-03-01T17:20:18Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260301.172017/combined-data.json",
+      "size": 16810031
+    },
+    {
+      "id": 291914143,
+      "tag": "20260302.054816",
+      "publishedAt": "2026-03-02T05:48:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260302.054816/combined-data.json",
+      "size": 16057671
+    },
+    {
+      "id": 292339384,
+      "tag": "20260303.020804",
+      "publishedAt": "2026-03-03T02:08:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260303.020804/combined-data.json",
+      "size": 16482605
+    },
+    {
+      "id": 292457422,
+      "tag": "20260303.100322",
+      "publishedAt": "2026-03-03T10:03:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260303.100322/combined-data.json",
+      "size": 21858266
+    },
+    {
+      "id": 292496159,
+      "tag": "20260303.112101",
+      "publishedAt": "2026-03-03T11:21:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260303.112101/combined-data.json",
+      "size": 21864993
+    },
+    {
+      "id": 292676675,
+      "tag": "20260303.184133",
+      "publishedAt": "2026-03-03T18:41:34Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260303.184133/combined-data.json",
+      "size": 21804845
+    },
+    {
+      "id": 292828484,
+      "tag": "20260304.053520",
+      "publishedAt": "2026-03-04T05:35:20Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260304.053520/combined-data.json",
+      "size": 21344025
+    },
+    {
+      "id": 293086656,
+      "tag": "20260304.171842",
+      "publishedAt": "2026-03-04T17:18:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260304.171842/combined-data.json",
+      "size": 20963816
+    },
+    {
+      "id": 293429203,
+      "tag": "20260305.103426",
+      "publishedAt": "2026-03-05T10:34:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260305.103426/combined-data.json",
+      "size": 20629163
+    },
+    {
+      "id": 293634226,
+      "tag": "20260305.185801",
+      "publishedAt": "2026-03-05T18:58:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260305.185801/combined-data.json",
+      "size": 20221324
+    },
+    {
+      "id": 293863834,
+      "tag": "20260306.094836",
+      "publishedAt": "2026-03-06T09:48:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260306.094836/combined-data.json",
+      "size": 19448780
+    },
+    {
+      "id": 293880668,
+      "tag": "20260306.103558",
+      "publishedAt": "2026-03-06T10:35:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260306.103558/combined-data.json",
+      "size": 19447699
+    },
+    {
+      "id": 294040701,
+      "tag": "20260306.180014",
+      "publishedAt": "2026-03-06T18:00:15Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260306.180014/combined-data.json",
+      "size": 19431512
+    },
+    {
+      "id": 294192494,
+      "tag": "20260307.051937",
+      "publishedAt": "2026-03-07T05:19:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260307.051937/combined-data.json",
+      "size": 19010160
+    },
+    {
+      "id": 294266540,
+      "tag": "20260307.161822",
+      "publishedAt": "2026-03-07T16:18:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260307.161822/combined-data.json",
+      "size": 18374273
+    },
+    {
+      "id": 294351713,
+      "tag": "20260308.054430",
+      "publishedAt": "2026-03-08T05:44:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260308.054430/combined-data.json",
+      "size": 17446692
+    },
+    {
+      "id": 294424157,
+      "tag": "20260308.162101",
+      "publishedAt": "2026-03-08T16:21:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260308.162101/combined-data.json",
+      "size": 16650606
+    },
+    {
+      "id": 294661722,
+      "tag": "20260309.114609",
+      "publishedAt": "2026-03-09T11:46:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260309.114609/combined-data.json",
+      "size": 15832520
+    },
+    {
+      "id": 294910572,
+      "tag": "20260309.214835",
+      "publishedAt": "2026-03-09T21:48:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260309.214835/combined-data.json",
+      "size": 16710294
+    },
+    {
+      "id": 295009270,
+      "tag": "20260310.060538",
+      "publishedAt": "2026-03-10T06:05:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260310.060538/combined-data.json",
+      "size": 22848375
+    },
+    {
+      "id": 295287232,
+      "tag": "20260310.173009",
+      "publishedAt": "2026-03-10T17:30:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260310.173009/combined-data.json",
+      "size": 23943089
+    },
+    {
+      "id": 295489640,
+      "tag": "20260311.061006",
+      "publishedAt": "2026-03-11T06:10:07Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260311.061006/combined-data.json",
+      "size": 23304493
+    },
+    {
+      "id": 295822697,
+      "tag": "20260311.184633",
+      "publishedAt": "2026-03-11T18:46:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260311.184633/combined-data.json",
+      "size": 23615644
+    },
+    {
+      "id": 295886928,
+      "tag": "20260311.212709",
+      "publishedAt": "2026-03-11T21:27:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260311.212709/combined-data.json",
+      "size": 23605817
+    },
+    {
+      "id": 296082576,
+      "tag": "20260312.094921",
+      "publishedAt": "2026-03-12T09:49:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260312.094921/combined-data.json",
+      "size": 22938240
+    },
+    {
+      "id": 296291881,
+      "tag": "20260312.165902",
+      "publishedAt": "2026-03-12T16:59:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260312.165902/combined-data.json",
+      "size": 22690127
+    },
+    {
+      "id": 296542438,
+      "tag": "20260313.054708",
+      "publishedAt": "2026-03-13T05:47:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260313.054708/combined-data.json",
+      "size": 22397476
+    },
+    {
+      "id": 296809314,
+      "tag": "20260313.174046",
+      "publishedAt": "2026-03-13T17:40:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260313.174046/combined-data.json",
+      "size": 23067899
+    },
+    {
+      "id": 296957918,
+      "tag": "20260314.055042",
+      "publishedAt": "2026-03-14T05:50:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260314.055042/combined-data.json",
+      "size": 22396818
+    },
+    {
+      "id": 297031222,
+      "tag": "20260314.164729",
+      "publishedAt": "2026-03-14T16:47:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260314.164729/combined-data.json",
+      "size": 21757200
+    },
+    {
+      "id": 297128227,
+      "tag": "20260315.062638",
+      "publishedAt": "2026-03-15T06:26:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260315.062638/combined-data.json",
+      "size": 21016421
+    },
+    {
+      "id": 297197376,
+      "tag": "20260315.164549",
+      "publishedAt": "2026-03-15T16:45:50Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260315.164549/combined-data.json",
+      "size": 20275412
+    },
+    {
+      "id": 297477638,
+      "tag": "20260316.133625",
+      "publishedAt": "2026-03-16T13:36:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260316.133625/combined-data.json",
+      "size": 19511538
+    },
+    {
+      "id": 297590212,
+      "tag": "20260316.172312",
+      "publishedAt": "2026-03-16T17:23:13Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260316.172312/combined-data.json",
+      "size": 19501400
+    },
+    {
+      "id": 297789936,
+      "tag": "20260317.061713",
+      "publishedAt": "2026-03-17T06:17:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260317.061713/combined-data.json",
+      "size": 24651655
+    },
+    {
+      "id": 298081225,
+      "tag": "20260317.173850",
+      "publishedAt": "2026-03-17T17:38:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260317.173850/combined-data.json",
+      "size": 25033096
+    },
+    {
+      "id": 298284120,
+      "tag": "20260318.061723",
+      "publishedAt": "2026-03-18T06:17:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260318.061723/combined-data.json",
+      "size": 24522941
+    },
+    {
+      "id": 298605058,
+      "tag": "20260318.175827",
+      "publishedAt": "2026-03-18T17:58:28Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260318.175827/combined-data.json",
+      "size": 24280357
+    },
+    {
+      "id": 298793206,
+      "tag": "20260319.055115",
+      "publishedAt": "2026-03-19T05:51:16Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260319.055115/combined-data.json",
+      "size": 23547482
+    },
+    {
+      "id": 299134107,
+      "tag": "20260319.200516",
+      "publishedAt": "2026-03-19T20:05:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260319.200516/combined-data.json",
+      "size": 23180854
+    },
+    {
+      "id": 299268348,
+      "tag": "20260320.060311",
+      "publishedAt": "2026-03-20T06:03:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260320.060311/combined-data.json",
+      "size": 22419448
+    },
+    {
+      "id": 299502923,
+      "tag": "20260320.163732",
+      "publishedAt": "2026-03-20T16:37:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260320.163732/combined-data.json",
+      "size": 22361220
+    },
+    {
+      "id": 299688237,
+      "tag": "20260321.054320",
+      "publishedAt": "2026-03-21T05:43:20Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260321.054320/combined-data.json",
+      "size": 21674380
+    },
+    {
+      "id": 299762046,
+      "tag": "20260321.161504",
+      "publishedAt": "2026-03-21T16:15:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260321.161504/combined-data.json",
+      "size": 21085000
+    },
+    {
+      "id": 299854800,
+      "tag": "20260322.054526",
+      "publishedAt": "2026-03-22T05:45:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260322.054526/combined-data.json",
+      "size": 20278541
+    },
+    {
+      "id": 299923294,
+      "tag": "20260322.162014",
+      "publishedAt": "2026-03-22T16:20:15Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260322.162014/combined-data.json",
+      "size": 19514462
+    },
+    {
+      "id": 300399012,
+      "tag": "20260323.203731",
+      "publishedAt": "2026-03-23T20:37:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260323.203731/combined-data.json",
+      "size": 18755491
+    },
+    {
+      "id": 300632872,
+      "tag": "20260324.111159",
+      "publishedAt": "2026-03-24T11:12:00Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260324.111159/combined-data.json",
+      "size": 23312626
+    },
+    {
+      "id": 300792933,
+      "tag": "20260324.165949",
+      "publishedAt": "2026-03-24T16:59:50Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260324.165949/combined-data.json",
+      "size": 24373647
+    },
+    {
+      "id": 301022491,
+      "tag": "20260325.062237",
+      "publishedAt": "2026-03-25T06:22:39Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260325.062237/combined-data.json",
+      "size": 23989537
+    },
+    {
+      "id": 301340366,
+      "tag": "20260325.172725",
+      "publishedAt": "2026-03-25T17:27:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260325.172725/combined-data.json",
+      "size": 23685890
+    },
+    {
+      "id": 301688447,
+      "tag": "20260326.072855",
+      "publishedAt": "2026-03-26T07:28:55Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260326.072855/combined-data.json",
+      "size": 23078722
+    },
+    {
+      "id": 301992247,
+      "tag": "20260326.170210",
+      "publishedAt": "2026-03-26T17:02:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260326.170210/combined-data.json",
+      "size": 22669263
+    },
+    {
+      "id": 302215813,
+      "tag": "20260327.061025",
+      "publishedAt": "2026-03-27T06:10:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260327.061025/combined-data.json",
+      "size": 21938940
+    },
+    {
+      "id": 302469467,
+      "tag": "20260327.170658",
+      "publishedAt": "2026-03-27T17:06:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260327.170658/combined-data.json",
+      "size": 21918339
+    },
+    {
+      "id": 302643468,
+      "tag": "20260328.055009",
+      "publishedAt": "2026-03-28T05:50:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260328.055009/combined-data.json",
+      "size": 21330799
+    },
+    {
+      "id": 302714195,
+      "tag": "20260328.165356",
+      "publishedAt": "2026-03-28T16:53:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260328.165356/combined-data.json",
+      "size": 20687316
+    },
+    {
+      "id": 302836512,
+      "tag": "20260329.121347",
+      "publishedAt": "2026-03-29T11:13:47Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260329.121347/combined-data.json",
+      "size": 19789312
+    },
+    {
+      "id": 302875015,
+      "tag": "20260329.172147",
+      "publishedAt": "2026-03-29T16:21:48Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260329.172147/combined-data.json",
+      "size": 19072401
+    },
+    {
+      "id": 303012017,
+      "tag": "20260330.072659",
+      "publishedAt": "2026-03-30T06:26:59Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260330.072659/combined-data.json",
+      "size": 18411990
+    },
+    {
+      "id": 303441277,
+      "tag": "20260330.233601",
+      "publishedAt": "2026-03-30T22:36:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260330.233601/combined-data.json",
+      "size": 20512310
+    },
+    {
+      "id": 303543056,
+      "tag": "20260331.074008",
+      "publishedAt": "2026-03-31T06:40:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260331.074008/combined-data.json",
+      "size": 23706094
+    },
+    {
+      "id": 304042887,
+      "tag": "20260401.081132",
+      "publishedAt": "2026-04-01T07:11:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260401.081132/combined-data.json",
+      "size": 23011889
+    },
+    {
+      "id": 304330470,
+      "tag": "20260401.185743",
+      "publishedAt": "2026-04-01T17:57:44Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260401.185743/combined-data.json",
+      "size": 22402407
+    },
+    {
+      "id": 304534524,
+      "tag": "20260402.074910",
+      "publishedAt": "2026-04-02T06:49:11Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260402.074910/combined-data.json",
+      "size": 21848909
+    },
+    {
+      "id": 304771739,
+      "tag": "20260402.181336",
+      "publishedAt": "2026-04-02T17:13:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260402.181336/combined-data.json",
+      "size": 21463997
+    },
+    {
+      "id": 304963448,
+      "tag": "20260403.075043",
+      "publishedAt": "2026-04-03T06:50:44Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260403.075043/combined-data.json",
+      "size": 20898016
+    },
+    {
+      "id": 305105992,
+      "tag": "20260403.181728",
+      "publishedAt": "2026-04-03T17:17:28Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260403.181728/combined-data.json",
+      "size": 20188240
+    },
+    {
+      "id": 305237923,
+      "tag": "20260404.073238",
+      "publishedAt": "2026-04-04T06:32:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260404.073238/combined-data.json",
+      "size": 19529713
+    },
+    {
+      "id": 305304824,
+      "tag": "20260404.174515",
+      "publishedAt": "2026-04-04T16:45:15Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260404.174515/combined-data.json",
+      "size": 18738575
+    },
+    {
+      "id": 305382830,
+      "tag": "20260405.073209",
+      "publishedAt": "2026-04-05T06:32:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260405.073209/combined-data.json",
+      "size": 18018141
+    },
+    {
+      "id": 305447303,
+      "tag": "20260405.174416",
+      "publishedAt": "2026-04-05T16:44:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260405.174416/combined-data.json",
+      "size": 17258279
+    },
+    {
+      "id": 305555739,
+      "tag": "20260406.081205",
+      "publishedAt": "2026-04-06T07:12:05Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260406.081205/combined-data.json",
+      "size": 18190873
+    },
+    {
+      "id": 305742174,
+      "tag": "20260406.180222",
+      "publishedAt": "2026-04-06T17:02:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260406.180222/combined-data.json",
+      "size": 17511203
+    },
+    {
+      "id": 305941820,
+      "tag": "20260407.071807",
+      "publishedAt": "2026-04-07T06:18:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260407.071807/combined-data.json",
+      "size": 16863567
+    },
+    {
+      "id": 306221999,
+      "tag": "20260407.185358",
+      "publishedAt": "2026-04-07T17:53:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260407.185358/combined-data.json",
+      "size": 17712121
+    },
+    {
+      "id": 306430249,
+      "tag": "20260408.080347",
+      "publishedAt": "2026-04-08T07:03:48Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260408.080347/combined-data.json",
+      "size": 21830498
+    },
+    {
+      "id": 306717272,
+      "tag": "20260408.185613",
+      "publishedAt": "2026-04-08T17:56:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260408.185613/combined-data.json",
+      "size": 22279852
+    },
+    {
+      "id": 306925248,
+      "tag": "20260409.081637",
+      "publishedAt": "2026-04-09T07:16:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260409.081637/combined-data.json",
+      "size": 21834801
+    },
+    {
+      "id": 307214971,
+      "tag": "20260409.193412",
+      "publishedAt": "2026-04-09T18:34:13Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260409.193412/combined-data.json",
+      "size": 21130914
+    },
+    {
+      "id": 307494912,
+      "tag": "20260410.120204",
+      "publishedAt": "2026-04-10T11:02:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260410.120204/combined-data.json",
+      "size": 20636015
+    },
+    {
+      "id": 307706113,
+      "tag": "20260410.204305",
+      "publishedAt": "2026-04-10T19:43:05Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260410.204305/combined-data.json",
+      "size": 20109223
+    },
+    {
+      "id": 307815809,
+      "tag": "20260411.075057",
+      "publishedAt": "2026-04-11T06:50:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260411.075057/combined-data.json",
+      "size": 19534224
+    },
+    {
+      "id": 307882001,
+      "tag": "20260411.173403",
+      "publishedAt": "2026-04-11T16:34:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260411.173403/combined-data.json",
+      "size": 18722165
+    },
+    {
+      "id": 307971260,
+      "tag": "20260412.081542",
+      "publishedAt": "2026-04-12T07:15:42Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260412.081542/combined-data.json",
+      "size": 18025944
+    },
+    {
+      "id": 308049378,
+      "tag": "20260412.181459",
+      "publishedAt": "2026-04-12T17:15:00Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260412.181459/combined-data.json",
+      "size": 17209367
+    },
+    {
+      "id": 308191481,
+      "tag": "20260413.082014",
+      "publishedAt": "2026-04-13T07:20:15Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260413.082014/combined-data.json",
+      "size": 16619817
+    },
+    {
+      "id": 308470118,
+      "tag": "20260413.182521",
+      "publishedAt": "2026-04-13T17:25:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260413.182521/combined-data.json",
+      "size": 16915512
+    },
+    {
+      "id": 308684340,
+      "tag": "20260414.080901",
+      "publishedAt": "2026-04-14T07:09:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260414.080901/combined-data.json",
+      "size": 21727894
+    },
+    {
+      "id": 308970652,
+      "tag": "20260414.185405",
+      "publishedAt": "2026-04-14T17:54:05Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260414.185405/combined-data.json",
+      "size": 22187164
+    },
+    {
+      "id": 309182631,
+      "tag": "20260415.073327",
+      "publishedAt": "2026-04-15T06:33:27Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260415.073327/combined-data.json",
+      "size": 21580354
+    },
+    {
+      "id": 309485975,
+      "tag": "20260415.184423",
+      "publishedAt": "2026-04-15T17:44:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260415.184423/combined-data.json",
+      "size": 21235621
+    },
+    {
+      "id": 309705953,
+      "tag": "20260416.083822",
+      "publishedAt": "2026-04-16T07:38:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260416.083822/combined-data.json",
+      "size": 20806444
+    },
+    {
+      "id": 309983633,
+      "tag": "20260416.190332",
+      "publishedAt": "2026-04-16T18:03:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260416.190332/combined-data.json",
+      "size": 20526688
+    },
+    {
+      "id": 310214656,
+      "tag": "20260417.083456",
+      "publishedAt": "2026-04-17T07:34:57Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260417.083456/combined-data.json",
+      "size": 20758988
+    },
+    {
+      "id": 310279683,
+      "tag": "20260417.112317",
+      "publishedAt": "2026-04-17T10:23:18Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260417.112317/combined-data.json",
+      "size": 20756784
+    },
+    {
+      "id": 310508034,
+      "tag": "20260417.195008",
+      "publishedAt": "2026-04-17T18:50:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260417.195008/combined-data.json",
+      "size": 20997045
+    },
+    {
+      "id": 310745776,
+      "tag": "20260418.193316",
+      "publishedAt": "2026-04-18T18:33:16Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260418.193316/combined-data.json",
+      "size": 19662243
+    },
+    {
+      "id": 310916162,
+      "tag": "20260419.195807",
+      "publishedAt": "2026-04-19T18:58:07Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260419.195807/combined-data.json",
+      "size": 18030772
+    },
+    {
+      "id": 311047344,
+      "tag": "20260420.083323",
+      "publishedAt": "2026-04-20T07:33:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260420.083323/combined-data.json",
+      "size": 17424571
+    },
+    {
+      "id": 311449975,
+      "tag": "20260420.233504",
+      "publishedAt": "2026-04-20T22:35:05Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260420.233504/combined-data.json",
+      "size": 19802044
+    },
+    {
+      "id": 311606870,
+      "tag": "20260421.094022",
+      "publishedAt": "2026-04-21T08:40:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260421.094022/combined-data.json",
+      "size": 22593496
+    },
+    {
+      "id": 311899190,
+      "tag": "20260421.200157",
+      "publishedAt": "2026-04-21T19:01:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260421.200157/combined-data.json",
+      "size": 22984287
+    },
+    {
+      "id": 312069946,
+      "tag": "20260422.075222",
+      "publishedAt": "2026-04-22T06:52:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260422.075222/combined-data.json",
+      "size": 22334175
+    },
+    {
+      "id": 312360672,
+      "tag": "20260422.184029",
+      "publishedAt": "2026-04-22T17:40:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260422.184029/combined-data.json",
+      "size": 21964049
+    },
+    {
+      "id": 312653440,
+      "tag": "20260423.110409",
+      "publishedAt": "2026-04-23T10:04:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260423.110409/combined-data.json",
+      "size": 21572895
+    },
+    {
+      "id": 312930580,
+      "tag": "20260423.213009",
+      "publishedAt": "2026-04-23T20:30:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260423.213009/combined-data.json",
+      "size": 21110776
+    },
+    {
+      "id": 313153113,
+      "tag": "20260424.112317",
+      "publishedAt": "2026-04-24T10:23:18Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260424.112317/combined-data.json",
+      "size": 20609270
+    },
+    {
+      "id": 313554243,
+      "tag": "20260425.104222",
+      "publishedAt": "2026-04-25T09:42:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260425.104222/combined-data.json",
+      "size": 19702812
+    },
+    {
+      "id": 313609436,
+      "tag": "20260425.173755",
+      "publishedAt": "2026-04-25T16:37:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260425.173755/combined-data.json",
+      "size": 18962232
+    },
+    {
+      "id": 313816397,
+      "tag": "20260426.220000",
+      "publishedAt": "2026-04-26T21:00:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260426.220000/combined-data.json",
+      "size": 18160303
+    },
+    {
+      "id": 313908842,
+      "tag": "20260427.075726",
+      "publishedAt": "2026-04-27T06:57:27Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260427.075726/combined-data.json",
+      "size": 16722017
+    },
+    {
+      "id": 314323146,
+      "tag": "20260428.013915",
+      "publishedAt": "2026-04-28T00:39:16Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260428.013915/combined-data.json",
+      "size": 19208896
+    },
+    {
+      "id": 314457750,
+      "tag": "20260428.091235",
+      "publishedAt": "2026-04-28T08:12:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260428.091235/combined-data.json",
+      "size": 21722204
+    },
+    {
+      "id": 314759085,
+      "tag": "20260428.192349",
+      "publishedAt": "2026-04-28T18:23:50Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260428.192349/combined-data.json",
+      "size": 21735812
+    },
+    {
+      "id": 315104990,
+      "tag": "20260429.105830",
+      "publishedAt": "2026-04-29T09:58:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260429.105830/combined-data.json",
+      "size": 21309527
+    },
+    {
+      "id": 315419768,
+      "tag": "20260429.210007",
+      "publishedAt": "2026-04-29T20:00:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260429.210007/combined-data.json",
+      "size": 21226493
+    },
+    {
+      "id": 315689555,
+      "tag": "20260430.101800",
+      "publishedAt": "2026-04-30T09:18:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260430.101800/combined-data.json",
+      "size": 20691875
+    },
+    {
+      "id": 316356912,
+      "tag": "20260501.120013",
+      "publishedAt": "2026-05-01T11:00:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260501.120013/combined-data.json",
+      "size": 19742810
+    },
+    {
+      "id": 316462124,
+      "tag": "20260501.182135",
+      "publishedAt": "2026-05-01T17:21:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260501.182135/combined-data.json",
+      "size": 19687342
+    },
+    {
+      "id": 316660174,
+      "tag": "20260502.083730",
+      "publishedAt": "2026-05-02T07:37:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260502.083730/combined-data.json",
+      "size": 18999639
+    },
+    {
+      "id": 316726536,
+      "tag": "20260502.180802",
+      "publishedAt": "2026-05-02T17:08:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260502.180802/combined-data.json",
+      "size": 18263232
+    },
+    {
+      "id": 316823310,
+      "tag": "20260503.085909",
+      "publishedAt": "2026-05-03T07:59:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260503.085909/combined-data.json",
+      "size": 17524076
+    },
+    {
+      "id": 316907808,
+      "tag": "20260503.200746",
+      "publishedAt": "2026-05-03T19:07:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260503.200746/combined-data.json",
+      "size": 16760159
+    },
+    {
+      "id": 317100444,
+      "tag": "20260504.101750",
+      "publishedAt": "2026-05-04T09:17:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260504.101750/combined-data.json",
+      "size": 16143619
+    },
+    {
+      "id": 317361052,
+      "tag": "20260504.192429",
+      "publishedAt": "2026-05-04T18:24:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260504.192429/combined-data.json",
+      "size": 15269805
+    },
+    {
+      "id": 317740285,
+      "tag": "20260505.115411",
+      "publishedAt": "2026-05-05T10:54:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260505.115411/combined-data.json",
+      "size": 14707308
+    },
+    {
+      "id": 317998951,
+      "tag": "20260505.195637",
+      "publishedAt": "2026-05-05T18:56:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260505.195637/combined-data.json",
+      "size": 15988461
+    },
+    {
+      "id": 318500540,
+      "tag": "20260506.170124",
+      "publishedAt": "2026-05-06T16:01:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260506.170124/combined-data.json",
+      "size": 20001086
+    },
+    {
+      "id": 318560696,
+      "tag": "20260506.192216",
+      "publishedAt": "2026-05-06T18:22:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260506.192216/combined-data.json",
+      "size": 20431074
+    },
+    {
+      "id": 318818051,
+      "tag": "20260507.092449",
+      "publishedAt": "2026-05-07T08:24:50Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260507.092449/combined-data.json",
+      "size": 19949255
+    },
+    {
+      "id": 319116683,
+      "tag": "20260507.195248",
+      "publishedAt": "2026-05-07T18:52:49Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260507.195248/combined-data.json",
+      "size": 19718128
+    },
+    {
+      "id": 319365616,
+      "tag": "20260508.082746",
+      "publishedAt": "2026-05-08T07:27:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260508.082746/combined-data.json",
+      "size": 19209448
+    },
+    {
+      "id": 319665067,
+      "tag": "20260508.190340",
+      "publishedAt": "2026-05-08T18:03:41Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260508.190340/combined-data.json",
+      "size": 18833187
+    },
+    {
+      "id": 319882190,
+      "tag": "20260509.090633",
+      "publishedAt": "2026-05-09T08:06:34Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260509.090633/combined-data.json",
+      "size": 18322995
+    },
+    {
+      "id": 319978172,
+      "tag": "20260509.184003",
+      "publishedAt": "2026-05-09T17:40:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260509.184003/combined-data.json",
+      "size": 17525189
+    },
+    {
+      "id": 320085810,
+      "tag": "20260510.091809",
+      "publishedAt": "2026-05-10T08:18:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260510.091809/combined-data.json",
+      "size": 16817976
+    },
+    {
+      "id": 320163345,
+      "tag": "20260510.184228",
+      "publishedAt": "2026-05-10T17:42:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260510.184228/combined-data.json",
+      "size": 15916839
+    },
+    {
+      "id": 320373646,
+      "tag": "20260511.104929",
+      "publishedAt": "2026-05-11T09:49:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260511.104929/combined-data.json",
+      "size": 15299955
+    },
+    {
+      "id": 321023036,
+      "tag": "20260512.093033",
+      "publishedAt": "2026-05-12T08:30:34Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260512.093033/combined-data.json",
+      "size": 21223518
+    },
+    {
+      "id": 321424133,
+      "tag": "20260512.214700",
+      "publishedAt": "2026-05-12T20:47:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260512.214700/combined-data.json",
+      "size": 21151353
+    },
+    {
+      "id": 321836301,
+      "tag": "20260513.131924",
+      "publishedAt": "2026-05-13T12:19:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260513.131924/combined-data.json",
+      "size": 20669438
+    },
+    {
+      "id": 322739817,
+      "tag": "20260514.195108",
+      "publishedAt": "2026-05-14T18:51:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260514.195108/combined-data.json",
+      "size": 19142387
+    },
+    {
+      "id": 323172444,
+      "tag": "20260515.111627",
+      "publishedAt": "2026-05-15T10:16:28Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260515.111627/combined-data.json",
+      "size": 18644882
+    },
+    {
+      "id": 323418706,
+      "tag": "20260515.193421",
+      "publishedAt": "2026-05-15T18:34:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260515.193421/combined-data.json",
+      "size": 18708070
+    },
+    {
+      "id": 323621196,
+      "tag": "20260516.082218",
+      "publishedAt": "2026-05-16T07:22:18Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260516.082218/combined-data.json",
+      "size": 18132524
+    },
+    {
+      "id": 323846603,
+      "tag": "20260517.091410",
+      "publishedAt": "2026-05-17T08:14:11Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260517.091410/combined-data.json",
+      "size": 16662007
+    },
+    {
+      "id": 324130954,
+      "tag": "20260518.092018",
+      "publishedAt": "2026-05-18T08:20:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260518.092018/combined-data.json",
+      "size": 15158125
+    },
+    {
+      "id": 325256194,
+      "tag": "20260519.194700",
+      "publishedAt": "2026-05-19T18:47:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260519.194700/combined-data.json",
+      "size": 20377118
+    },
+    {
+      "id": 325345937,
+      "tag": "20260519.213737",
+      "publishedAt": "2026-05-19T20:37:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260519.213737/combined-data.json",
+      "size": 20714811
+    },
+    {
+      "id": 326356209,
+      "tag": "20260521.013246",
+      "publishedAt": "2026-05-21T00:32:47Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260521.013246/combined-data.json",
+      "size": 19188931
+    },
+    {
+      "id": 326799354,
+      "tag": "20260521.113820",
+      "publishedAt": "2026-05-21T10:38:21Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260521.113820/combined-data.json",
+      "size": 19224122
+    },
+    {
+      "id": 327239955,
+      "tag": "20260521.204648",
+      "publishedAt": "2026-05-21T19:46:49Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260521.204648/combined-data.json",
+      "size": 18873406
+    },
+    {
+      "id": 327754069,
+      "tag": "20260522.105918",
+      "publishedAt": "2026-05-22T09:59:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260522.105918/combined-data.json",
+      "size": 18554167
+    },
+    {
+      "id": 328103197,
+      "tag": "20260522.200911",
+      "publishedAt": "2026-05-22T19:09:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260522.200911/combined-data.json",
+      "size": 18150489
+    },
+    {
+      "id": 328287247,
+      "tag": "20260523.115934",
+      "publishedAt": "2026-05-23T10:59:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260523.115934/combined-data.json",
+      "size": 17586004
+    },
+    {
+      "id": 328363795,
+      "tag": "20260523.190151",
+      "publishedAt": "2026-05-23T18:01:52Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260523.190151/combined-data.json",
+      "size": 16717194
+    },
+    {
+      "id": 328464437,
+      "tag": "20260524.092427",
+      "publishedAt": "2026-05-24T08:24:28Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260524.092427/combined-data.json",
+      "size": 16032954
+    },
+    {
+      "id": 328550545,
+      "tag": "20260524.185059",
+      "publishedAt": "2026-05-24T17:51:00Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260524.185059/combined-data.json",
+      "size": 15168847
+    },
+    {
+      "id": 328761623,
+      "tag": "20260525.102524",
+      "publishedAt": "2026-05-25T09:25:25Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260525.102524/combined-data.json",
+      "size": 14630937
+    },
+    {
+      "id": 329018271,
+      "tag": "20260525.193734",
+      "publishedAt": "2026-05-25T18:37:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260525.193734/combined-data.json",
+      "size": 13742427
+    },
+    {
+      "id": 329297908,
+      "tag": "20260526.093433",
+      "publishedAt": "2026-05-26T08:34:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260526.093433/combined-data.json",
+      "size": 13451576
+    },
+    {
+      "id": 329691088,
+      "tag": "20260526.214708",
+      "publishedAt": "2026-05-26T20:47:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260526.214708/combined-data.json",
+      "size": 18140497
+    },
+    {
+      "id": 330073665,
+      "tag": "20260527.104121",
+      "publishedAt": "2026-05-27T09:41:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260527.104121/combined-data.json",
+      "size": 19799097
+    },
+    {
+      "id": 330463705,
+      "tag": "20260527.205245",
+      "publishedAt": "2026-05-27T19:52:45Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260527.205245/combined-data.json",
+      "size": 21347022
+    },
+    {
+      "id": 330748962,
+      "tag": "20260528.102438",
+      "publishedAt": "2026-05-28T09:24:39Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260528.102438/combined-data.json",
+      "size": 21012770
+    },
+    {
+      "id": 331137408,
+      "tag": "20260528.215301",
+      "publishedAt": "2026-05-28T20:53:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260528.215301/combined-data.json",
+      "size": 20096699
+    },
+    {
+      "id": 331403859,
+      "tag": "20260529.102326",
+      "publishedAt": "2026-05-29T09:23:27Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260529.102326/combined-data.json",
+      "size": 19695844
+    },
+    {
+      "id": 331744859,
+      "tag": "20260529.210822",
+      "publishedAt": "2026-05-29T20:08:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260529.210822/combined-data.json",
+      "size": 19057903
+    },
+    {
+      "id": 331902327,
+      "tag": "20260530.094536",
+      "publishedAt": "2026-05-30T08:45:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260530.094536/combined-data.json",
+      "size": 18664360
+    },
+    {
+      "id": 332035077,
+      "tag": "20260531.011356",
+      "publishedAt": "2026-05-31T00:13:57Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260531.011356/combined-data.json",
+      "size": 17202808
+    },
+    {
+      "id": 332094675,
+      "tag": "20260531.095847",
+      "publishedAt": "2026-05-31T08:58:48Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260531.095847/combined-data.json",
+      "size": 17198208
+    },
+    {
+      "id": 332217513,
+      "tag": "20260531.224930",
+      "publishedAt": "2026-05-31T21:49:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260531.224930/combined-data.json",
+      "size": 16224814
+    },
+    {
+      "id": 332785151,
+      "tag": "20260601.223536",
+      "publishedAt": "2026-06-01T21:35:37Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260601.223536/combined-data.json",
+      "size": 21434167
+    },
+    {
+      "id": 334064541,
+      "tag": "20260604.012108",
+      "publishedAt": "2026-06-04T00:21:09Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260604.012108/combined-data.json",
+      "size": 20928544
+    },
+    {
+      "id": 334241242,
+      "tag": "20260604.104354",
+      "publishedAt": "2026-06-04T09:43:55Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260604.104354/combined-data.json",
+      "size": 20977985
+    },
+    {
+      "id": 334640141,
+      "tag": "20260604.230743",
+      "publishedAt": "2026-06-04T22:07:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260604.230743/combined-data.json",
+      "size": 20465445
+    },
+    {
+      "id": 334860048,
+      "tag": "20260605.110730",
+      "publishedAt": "2026-06-05T10:07:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260605.110730/combined-data.json",
+      "size": 20014003
+    },
+    {
+      "id": 335112291,
+      "tag": "20260605.195306",
+      "publishedAt": "2026-06-05T18:53:07Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260605.195306/combined-data.json",
+      "size": 19523224
+    },
+    {
+      "id": 335353192,
+      "tag": "20260606.091840",
+      "publishedAt": "2026-06-06T08:18:41Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260606.091840/combined-data.json",
+      "size": 19043549
+    },
+    {
+      "id": 335456519,
+      "tag": "20260606.192339",
+      "publishedAt": "2026-06-06T18:23:40Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260606.192339/combined-data.json",
+      "size": 18209425
+    },
+    {
+      "id": 335562865,
+      "tag": "20260607.095245",
+      "publishedAt": "2026-06-07T08:52:46Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260607.095245/combined-data.json",
+      "size": 17538453
+    },
+    {
+      "id": 335647870,
+      "tag": "20260607.190547",
+      "publishedAt": "2026-06-07T18:05:48Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260607.190547/combined-data.json",
+      "size": 16535947
+    },
+    {
+      "id": 335863758,
+      "tag": "20260608.105130",
+      "publishedAt": "2026-06-08T09:51:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260608.105130/combined-data.json",
+      "size": 15955843
+    },
+    {
+      "id": 336203309,
+      "tag": "20260608.204510",
+      "publishedAt": "2026-06-08T19:45:11Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260608.204510/combined-data.json",
+      "size": 18319349
+    },
+    {
+      "id": 336460225,
+      "tag": "20260609.095030",
+      "publishedAt": "2026-06-09T08:50:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260609.095030/combined-data.json",
+      "size": 21361491
+    },
+    {
+      "id": 336706568,
+      "tag": "20260609.163754",
+      "publishedAt": "2026-06-09T15:37:54Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260609.163754/combined-data.json",
+      "size": 21796874
+    },
+    {
+      "id": 336808714,
+      "tag": "20260609.195620",
+      "publishedAt": "2026-06-09T18:56:21Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260609.195620/combined-data.json",
+      "size": 21704498
+    },
+    {
+      "id": 337095659,
+      "tag": "20260610.093929",
+      "publishedAt": "2026-06-10T08:39:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260610.093929/combined-data.json",
+      "size": 21894138
+    },
+    {
+      "id": 337577500,
+      "tag": "20260611.002021",
+      "publishedAt": "2026-06-10T23:20:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260611.002021/combined-data.json",
+      "size": 21111522
+    },
+    {
+      "id": 337825469,
+      "tag": "20260611.102028",
+      "publishedAt": "2026-06-11T09:20:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260611.102028/combined-data.json",
+      "size": 21098427
+    },
+    {
+      "id": 338194142,
+      "tag": "20260611.203932",
+      "publishedAt": "2026-06-11T19:39:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260611.203932/combined-data.json",
+      "size": 20512346
+    },
+    {
+      "id": 338419805,
+      "tag": "20260612.075630",
+      "publishedAt": "2026-06-12T06:56:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260612.075630/combined-data.json",
+      "size": 20174883
+    },
+    {
+      "id": 338521941,
+      "tag": "20260612.115952",
+      "publishedAt": "2026-06-12T10:59:53Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260612.115952/combined-data.json",
+      "size": 20171495
+    },
+    {
+      "id": 338809702,
+      "tag": "20260612.221029",
+      "publishedAt": "2026-06-12T21:10:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260612.221029/combined-data.json",
+      "size": 19699415
+    },
+    {
+      "id": 338857983,
+      "tag": "20260613.013830",
+      "publishedAt": "2026-06-13T00:38:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260613.013830/combined-data.json",
+      "size": 19253590
+    },
+    {
+      "id": 338954712,
+      "tag": "20260613.121003",
+      "publishedAt": "2026-06-13T11:10:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260613.121003/combined-data.json",
+      "size": 19286303
+    },
+    {
+      "id": 339023627,
+      "tag": "20260613.191425",
+      "publishedAt": "2026-06-13T18:14:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260613.191425/combined-data.json",
+      "size": 18431974
+    },
+    {
+      "id": 339141479,
+      "tag": "20260614.104733",
+      "publishedAt": "2026-06-14T09:47:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260614.104733/combined-data.json",
+      "size": 17883286
+    },
+    {
+      "id": 339218140,
+      "tag": "20260614.184217",
+      "publishedAt": "2026-06-14T17:42:18Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260614.184217/combined-data.json",
+      "size": 16906798
+    },
+    {
+      "id": 339849596,
+      "tag": "20260616.011437",
+      "publishedAt": "2026-06-16T00:14:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260616.011437/combined-data.json",
+      "size": 22971482
+    },
+    {
+      "id": 340144311,
+      "tag": "20260616.134902",
+      "publishedAt": "2026-06-16T12:49:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260616.134902/combined-data.json",
+      "size": 23168847
+    },
+    {
+      "id": 340323699,
+      "tag": "20260616.190217",
+      "publishedAt": "2026-06-16T18:02:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260616.190217/combined-data.json",
+      "size": 23181465
+    },
+    {
+      "id": 340655037,
+      "tag": "20260617.104921",
+      "publishedAt": "2026-06-17T09:49:21Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260617.104921/combined-data.json",
+      "size": 22691862
+    },
+    {
+      "id": 341090297,
+      "tag": "20260618.002435",
+      "publishedAt": "2026-06-17T23:24:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260618.002435/combined-data.json",
+      "size": 24403533
+    },
+    {
+      "id": 341154525,
+      "tag": "20260618.051333",
+      "publishedAt": "2026-06-18T04:13:34Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260618.051333/combined-data.json",
+      "size": 24224499
+    },
+    {
+      "id": 341583897,
+      "tag": "20260618.194447",
+      "publishedAt": "2026-06-18T18:44:47Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260618.194447/combined-data.json",
+      "size": 23741139
+    },
+    {
+      "id": 341746036,
+      "tag": "20260619.050900",
+      "publishedAt": "2026-06-19T04:09:01Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260619.050900/combined-data.json",
+      "size": 23063351
+    },
+    {
+      "id": 342034754,
+      "tag": "20260619.172813",
+      "publishedAt": "2026-06-19T16:28:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260619.172813/combined-data.json",
+      "size": 23155042
+    },
+    {
+      "id": 342280043,
+      "tag": "20260620.100322",
+      "publishedAt": "2026-06-20T09:03:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260620.100322/combined-data.json",
+      "size": 22629255
+    },
+    {
+      "id": 342359558,
+      "tag": "20260620.170453",
+      "publishedAt": "2026-06-20T16:04:54Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260620.170453/combined-data.json",
+      "size": 21949127
+    },
+    {
+      "id": 342453934,
+      "tag": "20260621.052231",
+      "publishedAt": "2026-06-21T04:22:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260621.052231/combined-data.json",
+      "size": 21136509
+    },
+    {
+      "id": 342557631,
+      "tag": "20260621.171523",
+      "publishedAt": "2026-06-21T16:15:24Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260621.171523/combined-data.json",
+      "size": 20390288
+    },
+    {
+      "id": 342665746,
+      "tag": "20260622.045850",
+      "publishedAt": "2026-06-22T03:58:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260622.045850/combined-data.json",
+      "size": 19684402
+    },
+    {
+      "id": 343118636,
+      "tag": "20260622.202541",
+      "publishedAt": "2026-06-22T19:25:42Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260622.202541/combined-data.json",
+      "size": 19774606
+    },
+    {
+      "id": 343924228,
+      "tag": "20260624.075331",
+      "publishedAt": "2026-06-24T06:53:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260624.075331/combined-data.json",
+      "size": 24840900
+    },
+    {
+      "id": 344381515,
+      "tag": "20260624.223942",
+      "publishedAt": "2026-06-24T21:39:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260624.223942/combined-data.json",
+      "size": 24256259
+    },
+    {
+      "id": 345041199,
+      "tag": "20260626.004250",
+      "publishedAt": "2026-06-25T23:42:50Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260626.004250/combined-data.json",
+      "size": 23158300
+    },
+    {
+      "id": 345203359,
+      "tag": "20260626.092504",
+      "publishedAt": "2026-06-26T08:25:05Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260626.092504/combined-data.json",
+      "size": 22460124
+    },
+    {
+      "id": 345485588,
+      "tag": "20260626.200044",
+      "publishedAt": "2026-06-26T19:00:45Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260626.200044/combined-data.json",
+      "size": 22019256
+    },
+    {
+      "id": 345680415,
+      "tag": "20260627.122450",
+      "publishedAt": "2026-06-27T11:24:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260627.122450/combined-data.json",
+      "size": 21246552
+    },
+    {
+      "id": 345736212,
+      "tag": "20260627.173531",
+      "publishedAt": "2026-06-27T16:35:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260627.173531/combined-data.json",
+      "size": 20576542
+    },
+    {
+      "id": 345838711,
+      "tag": "20260628.054250",
+      "publishedAt": "2026-06-28T04:42:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260628.054250/combined-data.json",
+      "size": 19796161
+    },
+    {
+      "id": 345946926,
+      "tag": "20260628.174332",
+      "publishedAt": "2026-06-28T16:43:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260628.174332/combined-data.json",
+      "size": 19058465
+    },
+    {
+      "id": 346066534,
+      "tag": "20260629.053632",
+      "publishedAt": "2026-06-29T04:36:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260629.053632/combined-data.json",
+      "size": 18308611
+    },
+    {
+      "id": 346537430,
+      "tag": "20260629.234442",
+      "publishedAt": "2026-06-29T22:44:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260629.234442/combined-data.json",
+      "size": 18610269
+    },
+    {
+      "id": 346675059,
+      "tag": "20260630.083512",
+      "publishedAt": "2026-06-30T07:35:13Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260630.083512/combined-data.json",
+      "size": 23516783
+    },
+    {
+      "id": 347003792,
+      "tag": "20260630.184901",
+      "publishedAt": "2026-06-30T17:49:02Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260630.184901/combined-data.json",
+      "size": 23968459
+    },
+    {
+      "id": 347117481,
+      "tag": "20260630.224802",
+      "publishedAt": "2026-06-30T21:48:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260630.224802/combined-data.json",
+      "size": 23957226
+    },
+    {
+      "id": 347483547,
+      "tag": "20260701.143816",
+      "publishedAt": "2026-07-01T13:38:17Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260701.143816/combined-data.json",
+      "size": 23418159
+    },
+    {
+      "id": 347616059,
+      "tag": "20260701.181932",
+      "publishedAt": "2026-07-01T17:19:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260701.181932/combined-data.json",
+      "size": 23469124
+    },
+    {
+      "id": 347847974,
+      "tag": "20260702.063918",
+      "publishedAt": "2026-07-02T05:39:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260702.063918/combined-data.json",
+      "size": 22851164
+    },
+    {
+      "id": 348287477,
+      "tag": "20260702.215557",
+      "publishedAt": "2026-07-02T20:55:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260702.215557/combined-data.json",
+      "size": 22728960
+    },
+    {
+      "id": 348424661,
+      "tag": "20260703.061136",
+      "publishedAt": "2026-07-03T05:11:37Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260703.061136/combined-data.json",
+      "size": 21988049
+    },
+    {
+      "id": 348729619,
+      "tag": "20260703.181652",
+      "publishedAt": "2026-07-03T17:16:53Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260703.181652/combined-data.json",
+      "size": 21532397
+    },
+    {
+      "id": 348769829,
+      "tag": "20260703.203329",
+      "publishedAt": "2026-07-03T19:33:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260703.203329/combined-data.json",
+      "size": 21533827
+    },
+    {
+      "id": 348938270,
+      "tag": "20260704.125032",
+      "publishedAt": "2026-07-04T11:50:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260704.125032/combined-data.json",
+      "size": 20955896
+    },
+    {
+      "id": 348997666,
+      "tag": "20260704.181244",
+      "publishedAt": "2026-07-04T17:12:45Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260704.181244/combined-data.json",
+      "size": 20258659
+    },
+    {
+      "id": 349094727,
+      "tag": "20260705.060621",
+      "publishedAt": "2026-07-05T05:06:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260705.060621/combined-data.json",
+      "size": 19495233
+    },
+    {
+      "id": 349210308,
+      "tag": "20260705.181418",
+      "publishedAt": "2026-07-05T17:14:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260705.181418/combined-data.json",
+      "size": 18773057
+    },
+    {
+      "id": 349331058,
+      "tag": "20260706.060433",
+      "publishedAt": "2026-07-06T05:04:33Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260706.060433/combined-data.json",
+      "size": 18031511
+    },
+    {
+      "id": 349707267,
+      "tag": "20260706.182054",
+      "publishedAt": "2026-07-06T17:20:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260706.182054/combined-data.json",
+      "size": 17830644
+    },
+    {
+      "id": 349805791,
+      "tag": "20260706.204630",
+      "publishedAt": "2026-07-06T19:46:30Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260706.204630/combined-data.json",
+      "size": 17814461
+    },
+    {
+      "id": 350117826,
+      "tag": "20260707.094931",
+      "publishedAt": "2026-07-07T08:49:31Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260707.094931/combined-data.json",
+      "size": 23816710
+    },
+    {
+      "id": 350473254,
+      "tag": "20260707.182021",
+      "publishedAt": "2026-07-07T17:20:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260707.182021/combined-data.json",
+      "size": 24204103
+    },
+    {
+      "id": 350702930,
+      "tag": "20260708.061622",
+      "publishedAt": "2026-07-08T05:16:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260708.061622/combined-data.json",
+      "size": 23614368
+    },
+    {
+      "id": 351139419,
+      "tag": "20260708.203107",
+      "publishedAt": "2026-07-08T19:31:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260708.203107/combined-data.json",
+      "size": 23194572
+    },
+    {
+      "id": 351308798,
+      "tag": "20260709.063223",
+      "publishedAt": "2026-07-09T05:32:24Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260709.063223/combined-data.json",
+      "size": 22467892
+    },
+    {
+      "id": 351666565,
+      "tag": "20260709.180256",
+      "publishedAt": "2026-07-09T17:02:57Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260709.180256/combined-data.json",
+      "size": 22275000
+    },
+    {
+      "id": 352004017,
+      "tag": "20260710.103046",
+      "publishedAt": "2026-07-10T09:30:47Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260710.103046/combined-data.json",
+      "size": 21716672
+    },
+    {
+      "id": 352255377,
+      "tag": "20260710.190518",
+      "publishedAt": "2026-07-10T18:05:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260710.190518/combined-data.json",
+      "size": 21579931
+    },
+    {
+      "id": 352430140,
+      "tag": "20260711.060511",
+      "publishedAt": "2026-07-11T05:05:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260711.060511/combined-data.json",
+      "size": 21028100
+    },
+    {
+      "id": 352565664,
+      "tag": "20260711.180407",
+      "publishedAt": "2026-07-11T17:04:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260711.180407/combined-data.json",
+      "size": 20331130
+    },
+    {
+      "id": 352586570,
+      "tag": "20260711.200503",
+      "publishedAt": "2026-07-11T19:05:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260711.200503/combined-data.json",
+      "size": 21097779
+    },
+    {
+      "id": 352726112,
+      "tag": "20260712.113041",
+      "publishedAt": "2026-07-12T10:30:42Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260712.113041/combined-data.json",
+      "size": 20347046
+    },
+    {
+      "id": 352801168,
+      "tag": "20260712.180638",
+      "publishedAt": "2026-07-12T17:06:39Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260712.180638/combined-data.json",
+      "size": 19031613
+    },
+    {
+      "id": 352817599,
+      "tag": "20260712.193856",
+      "publishedAt": "2026-07-12T18:38:57Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260712.193856/combined-data.json",
+      "size": 19044540
+    },
+    {
+      "id": 352936940,
+      "tag": "20260713.060607",
+      "publishedAt": "2026-07-13T05:06:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260713.060607/combined-data.json",
+      "size": 18325056
+    },
+    {
+      "id": 353405536,
+      "tag": "20260713.211135",
+      "publishedAt": "2026-07-13T20:11:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260713.211135/combined-data.json",
+      "size": 18445971
+    },
+    {
+      "id": 353439953,
+      "tag": "20260713.222411",
+      "publishedAt": "2026-07-13T21:24:13Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260713.222411/combined-data.json",
+      "size": 18443304
+    },
+    {
+      "id": 354068722,
+      "tag": "20260714.215155",
+      "publishedAt": "2026-07-14T20:51:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260714.215155/combined-data.json",
+      "size": 23771268
+    },
+    {
+      "id": 354106969,
+      "tag": "20260714.231931",
+      "publishedAt": "2026-07-14T22:19:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260714.231931/combined-data.json",
+      "size": 23770945
+    },
+    {
+      "id": 354215960,
+      "tag": "20260715.061139",
+      "publishedAt": "2026-07-15T05:11:40Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260715.061139/combined-data.json",
+      "size": 23213940
+    },
+    {
+      "id": 354587028,
+      "tag": "20260715.175846",
+      "publishedAt": "2026-07-15T16:58:47Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260715.175846/combined-data.json",
+      "size": 22962989
+    },
+    {
+      "id": 354873321,
+      "tag": "20260716.060509",
+      "publishedAt": "2026-07-16T05:05:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260716.060509/combined-data.json",
+      "size": 22305509
+    },
+    {
+      "id": 355239703,
+      "tag": "20260716.180159",
+      "publishedAt": "2026-07-16T17:02:00Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260716.180159/combined-data.json",
+      "size": 21975198
+    },
+    {
+      "id": 355587627,
+      "tag": "20260717.103757",
+      "publishedAt": "2026-07-17T09:37:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260717.103757/combined-data.json",
+      "size": 21148794
+    },
+    {
+      "id": 355821376,
+      "tag": "20260717.182103",
+      "publishedAt": "2026-07-17T17:21:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260717.182103/combined-data.json",
+      "size": 20572307
+    },
+    {
+      "id": 356023209,
+      "tag": "20260718.060734",
+      "publishedAt": "2026-07-18T05:07:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260718.060734/combined-data.json",
+      "size": 20094202
+    },
+    {
+      "id": 356149757,
+      "tag": "20260718.175834",
+      "publishedAt": "2026-07-18T16:58:35Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260718.175834/combined-data.json",
+      "size": 19372466
+    },
+    {
+      "id": 356307867,
+      "tag": "20260719.105634",
+      "publishedAt": "2026-07-19T09:56:36Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260719.105634/combined-data.json",
+      "size": 18649541
+    },
+    {
+      "id": 356403377,
+      "tag": "20260719.191122",
+      "publishedAt": "2026-07-19T18:11:23Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260719.191122/combined-data.json",
+      "size": 18014496
+    },
+    {
+      "id": 356552817,
+      "tag": "20260720.082121",
+      "publishedAt": "2026-07-20T07:21:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260720.082121/combined-data.json",
+      "size": 17382223
+    },
+    {
+      "id": 357017511,
+      "tag": "20260720.231032",
+      "publishedAt": "2026-07-20T22:10:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260720.231032/combined-data.json",
+      "size": 18015162
+    },
+    {
+      "id": 357202300,
+      "tag": "20260721.092750",
+      "publishedAt": "2026-07-21T08:27:51Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260721.092750/combined-data.json",
+      "size": 22825647
+    },
+    {
+      "id": 357667973,
+      "tag": "20260721.230728",
+      "publishedAt": "2026-07-21T22:07:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260721.230728/combined-data.json",
+      "size": 23050519
+    },
+    {
+      "id": 357685900,
+      "tag": "20260721.235655",
+      "publishedAt": "2026-07-21T22:56:56Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260721.235655/combined-data.json",
+      "size": 23050840
+    },
+    {
+      "id": 357833535,
+      "tag": "20260722.081657",
+      "publishedAt": "2026-07-22T07:16:58Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260722.081657/combined-data.json",
+      "size": 22880744
+    },
+    {
+      "id": 358184221,
+      "tag": "20260722.180517",
+      "publishedAt": "2026-07-22T17:05:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260722.180517/combined-data.json",
+      "size": 22473053
+    },
+    {
+      "id": 358464386,
+      "tag": "20260723.060231",
+      "publishedAt": "2026-07-23T05:02:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260723.060231/combined-data.json",
+      "size": 21935138
+    },
+    {
+      "id": 359002012,
+      "tag": "20260724.001614",
+      "publishedAt": "2026-07-23T23:16:14Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260724.001614/combined-data.json",
+      "size": 21063906
+    },
+    {
+      "id": 359174151,
+      "tag": "20260724.093531",
+      "publishedAt": "2026-07-24T08:35:32Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260724.093531/combined-data.json",
+      "size": 20862022
+    },
+    {
+      "id": 359437808,
+      "tag": "20260724.180902",
+      "publishedAt": "2026-07-24T17:09:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260724.180902/combined-data.json",
+      "size": 20454139
+    },
+    {
+      "id": 359669868,
+      "tag": "20260725.054909",
+      "publishedAt": "2026-07-25T04:49:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260725.054909/combined-data.json",
+      "size": 19918294
+    },
+    {
+      "id": 359805077,
+      "tag": "20260725.174115",
+      "publishedAt": "2026-07-25T16:41:16Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260725.174115/combined-data.json",
+      "size": 19248208
+    },
+    {
+      "id": 359931047,
+      "tag": "20260726.060628",
+      "publishedAt": "2026-07-26T05:06:28Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260726.060628/combined-data.json",
+      "size": 18529072
+    },
+    {
+      "id": 359954805,
+      "tag": "20260726.084436",
+      "publishedAt": "2026-07-26T07:44:37Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260726.084436/combined-data.json",
+      "size": 18531907
+    },
+    {
+      "id": 360087858,
+      "tag": "20260726.192710",
+      "publishedAt": "2026-07-26T18:27:10Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260726.192710/combined-data.json",
+      "size": 17865328
+    },
+    {
+      "id": 360211057,
+      "tag": "20260727.060121",
+      "publishedAt": "2026-07-27T05:01:22Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260727.060121/combined-data.json",
+      "size": 17294042
+    },
+    {
+      "id": 360715608,
+      "tag": "20260727.222625",
+      "publishedAt": "2026-07-27T21:26:26Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260727.222625/combined-data.json",
+      "size": 18067634
+    },
+    {
+      "id": 360860511,
+      "tag": "20260728.064411",
+      "publishedAt": "2026-07-28T05:44:11Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260728.064411/combined-data.json",
+      "size": 22007629
+    },
+    {
+      "id": 361549238,
+      "tag": "20260729.073752",
+      "publishedAt": "2026-07-29T06:37:53Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260729.073752/combined-data.json",
+      "size": 22044521
+    },
+    {
+      "id": 361945180,
+      "tag": "20260729.184703",
+      "publishedAt": "2026-07-29T17:47:04Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260729.184703/combined-data.json",
+      "size": 21436139
+    },
+    {
+      "id": 362206621,
+      "tag": "20260730.062948",
+      "publishedAt": "2026-07-30T05:29:49Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260730.062948/combined-data.json",
+      "size": 20889615
+    },
+    {
+      "id": 362588472,
+      "tag": "20260730.180111",
+      "publishedAt": "2026-07-30T17:01:12Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260730.180111/combined-data.json",
+      "size": 20279184
+    },
+    {
+      "id": 362865170,
+      "tag": "20260731.061845",
+      "publishedAt": "2026-07-31T05:18:45Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260731.061845/combined-data.json",
+      "size": 19628277
+    },
+    {
+      "id": 363223631,
+      "tag": "20260731.181838",
+      "publishedAt": "2026-07-31T17:18:39Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260731.181838/combined-data.json",
+      "size": 19475333
+    },
+    {
+      "id": 363432980,
+      "tag": "20260801.055502",
+      "publishedAt": "2026-08-01T04:55:03Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260801.055502/combined-data.json",
+      "size": 18899127
+    },
+    {
+      "id": 363575932,
+      "tag": "20260801.175428",
+      "publishedAt": "2026-08-01T16:54:29Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260801.175428/combined-data.json",
+      "size": 18220768
+    },
+    {
+      "id": 363704537,
+      "tag": "20260802.061507",
+      "publishedAt": "2026-08-02T05:15:08Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260802.061507/combined-data.json",
+      "size": 17480078
+    },
+    {
+      "id": 363872396,
+      "tag": "20260802.201926",
+      "publishedAt": "2026-08-02T19:19:27Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20260802.201926/combined-data.json",
+      "size": 16773675
+    }
+  ]
+}

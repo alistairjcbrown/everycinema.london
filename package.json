@@ -6,6 +6,11 @@
   "license": "MIT",
   "scripts": {
     "transform": "node transform.mjs",
+    "history:index": "node history.mjs index",
+    "history:fetch": "node history.mjs fetch",
+    "history:windows": "node history.mjs windows",
+    "history:update": "node history.mjs update",
+    "history:build": "node history.mjs build",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

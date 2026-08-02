@@ -10,6 +10,10 @@ dist/
 /data-combined/
 /public/data/
 
+# release assets pulled by history.mjs while building windows.
+# The finalized windows in data-history/ are the durable artefact.
+/data-releases/
+
 # local env
 .env
 .env.*
