@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#18181b" />
+    <title>Screening history — Every Cinema London</title>
+    <meta
+      name="description"
+      content="How many films screened across London's cinemas, hour by hour, since January 2026 — daily totals and per-film runs built from Clusterflick's release history."
+    />
+    <meta property="og:title" content="Screening history — Every Cinema London" />
+    <meta
+      property="og:description"
+      content="Daily screening counts across every London cinema since January 2026, plus per-film runs. Powered by Clusterflick."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Every Cinema London" />
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; font-family: system-ui, sans-serif; }
+      body { display: flex; flex-direction: column; min-height: 100vh;
+        background: #18181b; color: #e4e4e7; }
+
+      /* chrome — matches index.html */
+      header {
+        padding: 10px 16px; border-bottom: 1px solid #2e2e34;
+        display: flex; align-items: center; gap: 8px 40px; flex-wrap: wrap;
+      }
+      .brand { display: flex; flex-direction: column; gap: 2px; }
+      header h1 { font-size: 16px; margin: 0; line-height: 1.1; }
+      .tagline { font-size: 12px; color: #a1a1aa; margin-top: 8px; }
+      .tagline a { color: #93b4f5; text-decoration: none; font-weight: 600; }
+      .tagline a:hover { text-decoration: underline; }
+      header .meta { font-size: 13px; opacity: 0.6; }
+      .views { display: flex; gap: 6px; margin-left: auto; }
+      .views a {
+        font-size: 13px; padding: 4px 12px; border: 1px solid #3f3f46;
+        border-radius: 6px; text-decoration: none; color: inherit;
+      }
+      .views a.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+      footer {
+        padding: 8px 16px; border-top: 1px solid #2e2e34; font-size: 12px;
+        color: #a1a1aa; display: flex; gap: 8px 20px; flex-wrap: wrap; align-items: center;
+      }
+      footer a { color: #93b4f5; text-decoration: none; }
+      footer a:hover { text-decoration: underline; }
+      footer .sep { opacity: 0.35; }
+
+      /* page */
+      main { flex: 1; min-height: 0; padding: 16px; display: flex;
+        flex-direction: column; gap: 16px; }
+      .card {
+        background: #1c1c20; border: 1px solid #2e2e34; border-radius: 10px;
+        padding: 14px 16px; display: flex; flex-direction: column; min-width: 0;
+      }
+      .card h2 { font-size: 14px; margin: 0; font-weight: 600; }
+      .card .sub { font-size: 12px; color: #a1a1aa; margin: 3px 0 10px; }
+      .chart { flex: 1; min-height: 0; }
+      /* flex:none for the same reason as #hoursChart — its height is set in JS to
+         match the heatmap, and .chart's flex:1 would override that */
+      #dailyChart, #shareChart { flex: none; height: 300px; }
+      /* height + max-width are set by fitSquareCells() to keep cells square.
+         flex:none is essential — .chart's flex:1 would let the card's column
+         layout decide the height instead, silently discarding that sizing. */
+      #hoursChart { flex: none; height: 320px; width: 100%; margin-inline: auto; }
+      #runChart { height: 340px; }
+      .empty {
+        height: 340px; display: flex; flex-direction: column; gap: 4px;
+        align-items: center; justify-content: center; text-align: center;
+        border: 1px dashed #2e2e34; border-radius: 8px; color: #71717a;
+      }
+      .empty p { margin: 0; font-size: 13px; }
+      .empty .empty-title { color: #a1a1aa; font-size: 14px; font-weight: 600; }
+      .empty[hidden] { display: none; }
+      .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; }
+      /* heatmap needs the wider half — it has 24 columns to fit */
+      .split.charts { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+      @media (max-width: 900px) {
+        .split, .split.charts { grid-template-columns: minmax(0, 1fr); }
+      }
+      #filmGrid { height: 340px; }
+
+      /* KPI row */
+      .stats { display: flex; gap: 28px; flex-wrap: wrap; margin: 2px 0 4px; }
+      .stat { display: flex; flex-direction: column; gap: 2px; }
+      .stat .v { font-size: 26px; line-height: 1.1; }
+      .stat .k { font-size: 11px; color: #a1a1aa; text-transform: uppercase;
+        letter-spacing: 0.04em; }
+      .note { font-size: 12px; color: #a1a1aa; margin: 10px 0 0; }
+      .card h2 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .toggle {
+        margin-left: auto; font-size: 12px; font-weight: 400; color: #a1a1aa;
+        display: flex; align-items: center; gap: 6px; cursor: pointer;
+        user-select: none; white-space: nowrap;
+      }
+      .toggle input { accent-color: #3b82f6; margin: 0; cursor: pointer; }
+      .toggle:hover { color: #e4e4e7; }
+      .hint { font-size: 12px; color: #71717a; margin: 0 0 8px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <h1>🎬 Every Cinema London</h1>
+        <span class="tagline">
+          London showtimes, all in one place · powered by
+          <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick →</a>
+        </span>
+      </div>
+      <span class="meta" id="meta">loading…</span>
+      <nav class="views">
+        <a href="/">Showtimes grid</a>
+        <a href="/history.html" class="active">Screening history</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Screenings per day across London</h2>
+        <p class="sub" id="dailySub">&nbsp;</p>
+        <div class="stats" id="stats"></div>
+        <div class="chart" id="dailyChart"></div>
+        <p class="note" id="dailyNote"></p>
+      </section>
+
+      <div class="split charts">
+        <section class="card">
+          <h2>When London goes to the cinema</h2>
+          <p class="sub">
+            Every screening since January, by start time and day of the week.
+          </p>
+          <div class="chart" id="hoursChart"></div>
+          <p class="note" id="hoursNote"></p>
+        </section>
+
+        <section class="card">
+          <h2>How concentrated is the programming?</h2>
+          <p class="sub">
+            Share of each day&rsquo;s screenings taken by that day&rsquo;s eight
+            biggest films.
+          </p>
+          <div class="chart" id="shareChart"></div>
+          <p class="note" id="shareNote"></p>
+        </section>
+      </div>
+
+      <div class="split">
+        <section class="card">
+          <h2>Films by total screenings</h2>
+          <p class="sub" id="filmGridSub">Filter in any column, then tick films to compare their runs.</p>
+          <div id="filmGrid"></div>
+        </section>
+        <section class="card">
+          <h2>
+            <span>Screenings per day, by film</span>
+            <label class="toggle">
+              <input type="checkbox" id="runNormalise" />
+              Align to opening
+            </label>
+          </h2>
+          <p class="sub" id="runSub">&nbsp;</p>
+          <div class="chart" id="runChart"></div>
+          <div class="empty" id="runEmpty">
+            <p class="empty-title" id="runEmptyTitle">No films selected</p>
+            <p id="runEmptyBody">Select a film in the list to chart its run.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <span>
+        <a href="/attributions.html#clusterflick">Performance data</a> from
+        <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick</a>
+      </span>
+      <span class="sep">·</span>
+      <span>
+        <a href="/attributions.html#ag-charts">Charts</a> and
+        <a href="/attributions.html#ag-grid">grid</a> by
+        <a href="https://www.ag-grid.com" target="_blank" rel="noopener">AG Grid</a>
+      </span>
+      <span class="sep">·</span>
+      <span>
+        <a href="https://github.com/alistairjcbrown/everycinema.london" target="_blank" rel="noopener">Source on GitHub</a>
+      </span>
+    </footer>
+    <script type="module" src="/src/history.js"></script>
+  </body>
+</html>

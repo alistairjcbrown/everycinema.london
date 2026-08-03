@@ -16,14 +16,16 @@ if [ -n "${GITHUB_TOKEN:-}" ]; then
   AUTH=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
 fi
 
-RESPONSE_LIST=$(curl -sS -L "${AUTH[@]}" \
+# ${AUTH[@]+"${AUTH[@]}"} rather than "${AUTH[@]}": under `set -u`, bash 3.2 (which
+# is what macOS ships) treats expanding an EMPTY array as an unbound variable.
+RESPONSE_LIST=$(curl -sS -L ${AUTH[@]+"${AUTH[@]}"} \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   "$REPO_URL")
 
 for f in $(echo "$RESPONSE_LIST" | grep browser_download | cut -d\" -f4); do
   echo "Getting $f ..."
-  curl -sS -L "${AUTH[@]}" "$f" -o "$OUT_DIR/$(basename "$f")"
+  curl -sS -L ${AUTH[@]+"${AUTH[@]}"} "$f" -o "$OUT_DIR/$(basename "$f")"
 done
 
 echo "Done -> $OUT_DIR"

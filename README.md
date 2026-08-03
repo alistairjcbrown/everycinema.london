@@ -1,53 +1,56 @@
 # Every Cinema London
 
-Every London cinema showtime in one place — browse, group, pivot and filter across
-every venue. A showcase built with [AG Grid](https://www.ag-grid.com) on cinema data
-from [Clusterflick](https://clusterflick.com).
+Every London cinema showtime in one place — browse, group, pivot and filter
+across every venue. A showcase built with [AG Grid](https://www.ag-grid.com) on
+cinema data from [Clusterflick](https://clusterflick.com).
 
-**Live:** [everycinema.london](https://everycinema.london) · **Powered by Clusterflick**
+**Live:** [everycinema.london](https://everycinema.london) · **Powered by
+Clusterflick**
 
 ## What it is
 
-A single-page [AG Grid](https://www.ag-grid.com) Enterprise showcase over ~31k London
-cinema performances, with three views over one dataset:
+A single-page [AG Grid](https://www.ag-grid.com) Enterprise showcase over ~31k
+London cinema performances, with three views over one dataset:
 
 - **Grouped** — movie ▸ venue, with per-movie showing counts
 - **Pivot** — venues × dates, reconfigurable live from the tool panel
 - **Flat** — every performance, filterable by genre, format and accessibility
 
-It's not a replacement for Clusterflick — it's a demonstration of what AG Grid's row
-grouping, pivoting and set-filtering can do with real, messy, real-world data.
+It's not a replacement for Clusterflick — it's a demonstration of what AG Grid's
+row grouping, pivoting and set-filtering can do with real, messy, real-world
+data.
 
 ## Stack
 
 - [Vite](https://vitejs.dev) + vanilla JS (no framework)
-- [AG Grid Enterprise](https://www.ag-grid.com) v36 — only the modules the app uses are
-  registered (see `src/main.js`)
+- [AG Grid Enterprise](https://www.ag-grid.com) v36 — only the modules the app
+  uses are registered (see `src/main.js`)
 - Data from Clusterflick's public
   [data-combined](https://github.com/clusterflick/data-combined) release
 
 ## Data pipeline
 
-The site ships a **compact mapping blob** and denormalizes it in the browser, rather
-than shipping a fat one-row-per-performance table (~4× smaller over the wire):
+The site ships a **compact mapping blob** and denormalizes it in the browser,
+rather than shipping a fat one-row-per-performance table (~4× smaller over the
+wire):
 
-1. **`scripts/get-latest-combined-data.sh`** — downloads Clusterflick's latest combined
-   release into `data-combined/` (~18 MB).
+1. **`scripts/get-latest-combined-data.sh`** — downloads Clusterflick's latest
+   combined release into `data-combined/` (~18 MB).
 2. **`npm run transform`** (`transform.mjs`) — trims and compacts it into
-   `public/data/cinemadata.json` (~6 MB): lookups once, movie fields once per movie,
-   performances as minimal id-referencing records.
-3. **`src/main.js`** — fetches the blob and expands it into flat rows in the browser
-   (~0 ms), resolving ids and computing dates in Europe/London.
+   `public/data/cinemadata.json` (~6 MB): lookups once, movie fields once per
+   movie, performances as minimal id-referencing records.
+3. **`src/main.js`** — fetches the blob and expands it into flat rows in the
+   browser (~0 ms), resolving ids and computing dates in Europe/London.
 
-`data-combined/` and `public/data/` are generated and git-ignored — regenerate them with
-steps 1–2.
+`data-combined/` and `public/data/` are generated and git-ignored — regenerate
+them with steps 1–2.
 
 ## Performance history
 
-`history.mjs` builds per-movie, hour-bucketed counts of what actually screened over time,
-for charting. A Clusterflick release is only a snapshot of *future* performances, so
-history is partitioned into windows bounded by consecutive release publish dates, each
-populated from exactly one release:
+`history.mjs` builds per-movie, hour-bucketed counts of what actually screened
+over time, for charting. A Clusterflick release is only a snapshot of _future_
+performances, so history is partitioned into windows bounded by consecutive
+release publish dates, each populated from exactly one release:
 
 ```
 release A (published A) -> showtimes in [A, B)   finalized, written once
@@ -55,16 +58,18 @@ release B (published B) -> showtimes in [B, C)   finalized, written once
 latest release          -> showtimes >= its date PROVISIONAL, rebuilt every run
 ```
 
-A window is a pure function of one release's data and two publish dates, so there is no
-cross-release identity matching and no deduplication. Cancellations handle themselves: a
-performance dropped before its window's release was cut is simply absent and never
-counted. Buckets are whole **Europe/London** hours; because publish instants are
-arbitrary, a boundary usually falls mid-bucket, so that hour is split between the two
-windows and each side is counted from its own release.
+A window is a pure function of one release's data and two publish dates, so
+there is no cross-release identity matching and no deduplication. Cancellations
+handle themselves: a performance dropped before its window's release was cut is
+simply absent and never counted. Buckets are whole **Europe/London** hours;
+because publish instants are arbitrary, a boundary usually falls mid-bucket, so
+that hour is split between the two windows and each side is counted from its own
+release.
 
-Finalized windows live in `data-history/windows/YYYY-MM/<tag>.json` and **are committed** —
-they cannot be regenerated cheaply. Each is self-contained (it carries its own movie
-titles), so a film dropping out of later releases never invalidates it.
+Finalized windows live in `data-history/windows/YYYY-MM/<tag>.json` and **are
+committed** — they cannot be regenerated cheaply. Each is self-contained (it
+carries its own movie titles), so a film dropping out of later releases never
+invalidates it.
 
 ```bash
 npm run history:index              # refresh data-history/index.json from the GitHub API
@@ -73,17 +78,18 @@ npm run history:windows            # turn those assets into finalized windows
 npm run history:build              # merge windows + provisional -> public/data/history.json
 ```
 
-Backfilling a year pulls **~8.8 GB** of release assets (~454 releases × ~19 MB), so
-`fetch` takes `--since`/`--to` to work through it in chunks, and `windows` deletes each
-asset once its window is written (pass `--keep` to retain them):
+Backfilling a year pulls **~8.8 GB** of release assets (~454 releases × ~19 MB),
+so `fetch` takes `--since`/`--to` to work through it in chunks, and `windows`
+deletes each asset once its window is written (pass `--keep` to retain them):
 
 ```bash
 npm run history:fetch -- --since 2026-01-01 --to 2026-02-01 && npm run history:windows
 ```
 
-Both stages are idempotent and skip any release whose window already exists, so an
-interrupted backfill just resumes. In CI, `npm run history:update` does the incremental
-step — typically two new releases per day — and commits the closed windows.
+Both stages are idempotent and skip any release whose window already exists, so
+an interrupted backfill just resumes. In CI, `npm run history:update` does the
+incremental step — typically two new releases per day — and commits the closed
+windows.
 
 ## Getting started
 
@@ -96,45 +102,49 @@ npm run dev                              # http://localhost:5173
 
 ## Scripts
 
-| Command | Does |
-| --- | --- |
-| `npm run dev` | Start the Vite dev server |
-| `npm run transform` | Rebuild the compact data blob from `data-combined/` |
-| `npm run history:index` | Refresh the cached Clusterflick release index |
-| `npm run history:fetch` | Download release assets that still need a window |
-| `npm run history:windows` | Build finalized history windows from those assets |
-| `npm run history:update` | Incremental history update (fetch + windows for the tail) |
-| `npm run history:build` | Merge history into `public/data/history.json` |
-| `npm run build` | Production build (app + attributions page) |
-| `npm run preview` | Preview the production build |
-| `./scripts/get-latest-combined-data.sh` | Download the latest Clusterflick combined data |
+| Command                                 | Does                                                      |
+| --------------------------------------- | --------------------------------------------------------- |
+| `npm run dev`                           | Start the Vite dev server                                 |
+| `npm run transform`                     | Rebuild the compact data blob from `data-combined/`       |
+| `npm run history:index`                 | Refresh the cached Clusterflick release index             |
+| `npm run history:fetch`                 | Download release assets that still need a window          |
+| `npm run history:windows`               | Build finalized history windows from those assets         |
+| `npm run history:update`                | Incremental history update (fetch + windows for the tail) |
+| `npm run history:build`                 | Merge history into `public/data/history.json`             |
+| `npm run build`                         | Production build (app + attributions page)                |
+| `npm run preview`                       | Preview the production build                              |
+| `./scripts/get-latest-combined-data.sh` | Download the latest Clusterflick combined data            |
 
 ## Deployment
 
 Deployed to [GitHub Pages](https://pages.github.com) via GitHub Actions
-(`.github/workflows/deploy.yml`), modelled on `clusterflick.com`'s pipeline. On every
-push to `main`, daily on a schedule (to pick up fresh data), or on manual dispatch, CI:
+(`.github/workflows/deploy.yml`), modelled on `clusterflick.com`'s pipeline. On
+every push to `main`, daily on a schedule (to pick up fresh data), or on manual
+dispatch, CI:
 
-1. runs `npm run history:update` to close any windows the newest releases superseded, and
-   commits them (the only job with write access; pushes made with `github.token` do not
-   re-trigger the workflow, so it cannot loop)
-2. installs deps, then runs the fetch script + `npm run transform` to produce the data
+1. runs `npm run history:update` to close any windows the newest releases
+   superseded, and commits them (the only job with write access; pushes made
+   with `github.token` do not re-trigger the workflow, so it cannot loop)
+2. installs deps, then runs the fetch script + `npm run transform` to produce
+   the data
 3. runs `npm run history:build`, then `npm run build`
 4. publishes `dist/` to GitHub Pages
 
 ## Attributions
 
 - **Performance data** — [Clusterflick](https://clusterflick.com)
-- **Film metadata** — [TMDB](https://www.themoviedb.org) · *this product uses the TMDB
-  API but is not endorsed or certified by TMDB*
+- **Film metadata** — [TMDB](https://www.themoviedb.org) · _this product uses
+  the TMDB API but is not endorsed or certified by TMDB_
 - **Grid** — [AG Grid](https://www.ag-grid.com)
 
-See the in-app attributions page (`attributions.html`) for full details and logos.
+See the in-app attributions page (`attributions.html`) for full details and
+logos.
 
 ## Notes
 
 - AG Grid Enterprise runs unlicensed here (evaluation watermark). Add a key via
   `LicenseManager.setLicenseKey(...)` in `src/main.js` to remove it.
-- License: [MIT](LICENSE) — covers this project's own code. It does **not** cover
-  third-party data or trademarks: cinema data belongs to Clusterflick, film metadata to
-  TMDB, and the Clusterflick / TMDB / AG Grid names and logos to their respective owners.
+- License: [MIT](LICENSE) — covers this project's own code. It does **not**
+  cover third-party data or trademarks: cinema data belongs to Clusterflick,
+  film metadata to TMDB, and the Clusterflick / TMDB / AG Grid names and logos
+  to their respective owners.

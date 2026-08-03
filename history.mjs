@@ -54,6 +54,7 @@ const WINDOWS_DIR = join(HISTORY_DIR, "windows");
 const RELEASES_DIR = join(__dirname, "data-releases");
 const COMBINED = join(__dirname, "data-combined", "combined-data.json");
 const OUT_FILE = join(__dirname, "public", "data", "history.json");
+const OUT_SUMMARY = join(__dirname, "public", "data", "history-summary.json");
 
 const REPO = "clusterflick/data-combined";
 const ASSET_NAME = "combined-data.json";
@@ -493,6 +494,28 @@ async function update() {
 
 // --- build -----------------------------------------------------------------
 
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+// Roll per-movie hour buckets up to the two shapes the headline charts need:
+// a daily total series, and an hour-of-day × weekday matrix. Both are tiny, so
+// the history page can render them before the full per-movie blob arrives.
+function summarize(counts) {
+  const days = {};
+  const matrix = Object.fromEntries(WEEKDAYS.map((d) => [d, new Array(24).fill(0)]));
+  for (const hours of Object.values(counts)) {
+    for (const [bucket, n] of Object.entries(hours)) {
+      const date = bucket.slice(0, 10);
+      days[date] = (days[date] || 0) + n;
+      // bucket keys are already London-local, so the weekday of the bare date
+      // is what we want — read it in UTC to avoid a second timezone shift
+      matrix[WEEKDAYS[new Date(`${date}T00:00:00Z`).getUTCDay()]][
+        Number(bucket.slice(11, 13))
+      ] += n;
+    }
+  }
+  return { days: sortKeys(days), matrix };
+}
+
 // Merge every finalized window plus a provisional window derived from the latest
 // release, which the site build has already downloaded to data-combined/.
 function build() {
@@ -572,12 +595,43 @@ function build() {
   mkdirSync(dirname(OUT_FILE), { recursive: true });
   writeFileSync(OUT_FILE, JSON.stringify(blob));
 
+  // The finalized/provisional boundary falls mid-day, so the last finalized day
+  // is always cut short and would read as a collapse on a daily chart. Name it
+  // rather than trim it, and let the chart decide.
+  const finalizedDaily = summarize(counts);
+  const summary = {
+    generatedAt: blob.generatedAt,
+    timezone: "Europe/London",
+    finalized: {
+      start,
+      end,
+      windows,
+      partialDay: end === null ? null : hourBucket(Date.parse(end)).slice(0, 10),
+      performances: Object.values(finalizedDaily.days).reduce((a, b) => a + b, 0),
+      movies: Object.keys(counts).length,
+      days: finalizedDaily.days,
+    },
+    hourWeekday: finalizedDaily.matrix,
+    provisional: provisional && {
+      start: provisional.start,
+      generatedAt: provisional.generatedAt,
+      releaseTag: provisional.releaseTag,
+      performances: provisional.performances,
+      days: summarize(provisional.counts).days,
+    },
+  };
+  writeFileSync(OUT_SUMMARY, JSON.stringify(summary));
+
   const rows = Object.values(counts).reduce((n, h) => n + Object.keys(h).length, 0);
   const bytes = readFileSync(OUT_FILE).length;
   console.log(
     `Wrote ${windows} finalized windows (${rows.toLocaleString()} movie-hour rows, ` +
       `${Object.keys(titles).length.toLocaleString()} movies) -> ${OUT_FILE} ` +
       `(${(bytes / 1e6).toFixed(1)} MB)`
+  );
+  console.log(
+    `Wrote summary (${Object.keys(summary.finalized.days).length} days) -> ${OUT_SUMMARY} ` +
+      `(${(readFileSync(OUT_SUMMARY).length / 1000).toFixed(1)} KB)`
   );
   if (provisional)
     console.log(

@@ -69,14 +69,26 @@ const theme = themeQuartz
 // ---------------------------------------------------------------------------
 const fmtDate = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Europe/London",
-  weekday: "short", year: "numeric", month: "2-digit", day: "2-digit",
+  weekday: "short",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
 });
 const fmtTime = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hour12: false,
+  timeZone: "Europe/London",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
 });
 function dateParts(ms) {
-  const p = Object.fromEntries(fmtDate.formatToParts(ms).map((x) => [x.type, x.value]));
-  return { date: `${p.year}-${p.month}-${p.day}`, weekday: p.weekday, time: fmtTime.format(ms) };
+  const p = Object.fromEntries(
+    fmtDate.formatToParts(ms).map((x) => [x.type, x.value]),
+  );
+  return {
+    date: `${p.year}-${p.month}-${p.day}`,
+    weekday: p.weekday,
+    time: fmtTime.format(ms),
+  };
 }
 
 function expand(blob) {
@@ -91,15 +103,30 @@ function expand(blob) {
       const { date, weekday, time } = dateParts(p.t);
       rows.push({
         performanceId: `${p.v}@${p.t}`,
-        movieId: m.id, title: m.title, year: m.year, classification: m.cert,
-        durationMins: m.dur, poster: m.poster, director: m.dir,
-        genre: primaryGenre, genres: genreNames,
+        movieId: m.id,
+        title: m.title,
+        year: m.year,
+        classification: m.cert,
+        durationMins: m.dur,
+        poster: m.poster,
+        director: m.dir,
+        genre: primaryGenre,
+        genres: genreNames,
         category: p.cat || "movie",
-        venueId: p.v, venue: v.n, venueType: v.t,
-        date, weekday, time, timestamp: p.t,
-        screen: p.sc || null, notes: p.no || null, bookingUrl: p.b || null,
+        venueId: p.v,
+        venue: v.n,
+        venueType: v.t,
+        date,
+        weekday,
+        time,
+        timestamp: p.t,
+        screen: p.sc || null,
+        notes: p.no || null,
+        bookingUrl: p.b || null,
         soldOut: !!p.so,
-        dimension: p.dim || null, presentation: p.pr || null, source: p.src || null,
+        dimension: p.dim || null,
+        presentation: p.pr || null,
+        source: p.src || null,
         audioDescription: has(p.a, "audioDescription"),
         subtitled: has(p.a, "subtitled"),
         hardOfHearing: has(p.a, "hardOfHearing"),
@@ -112,13 +139,20 @@ function expand(blob) {
 }
 
 const posterRenderer = (p) =>
-  p.value ? `<img class="poster" src="https://image.tmdb.org/t/p/w92${p.value}" alt="" loading="lazy">` : "";
+  p.value
+    ? `<img class="poster" src="https://image.tmdb.org/t/p/w92${p.value}" alt="" loading="lazy">`
+    : "";
 const bookRenderer = (p) =>
-  p.value ? `<a class="book" href="${p.value}" target="_blank" rel="noopener">Book ↗</a>` : "";
+  p.value
+    ? `<a class="book" href="${p.value}" target="_blank" rel="noopener">Book ↗</a>`
+    : "";
 const yesNo = (p) => (p.value ? "✓" : "");
 
 const esc = (s) =>
-  String(s ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;");
 
 // Custom pivot aggregation: instead of counting the performances in a
 // venue × date cell, collect them into one time-sorted list. `params.values`
@@ -152,62 +186,205 @@ function columnDefs(view) {
   const grouped = view === "grouped";
   const pivot = view === "pivot";
   return [
-    { field: "poster", headerName: "", width: 60, cellRenderer: posterRenderer,
-      sortable: false, filter: false, hide: pivot, enableRowGroup: false, enablePivot: false },
-    { field: "title", headerName: "Movie", minWidth: 240,
-      rowGroup: grouped, hide: grouped || pivot, filter: "agTextColumnFilter" },
-    { field: "venue", minWidth: 200, rowGroup: grouped || pivot,
-      hide: grouped || pivot, filter: "agSetColumnFilter" },
-    { field: "date", headerName: "Date", width: 130, pivot: pivot, hide: pivot,
-      filter: "agSetColumnFilter", sort: grouped ? null : "asc" },
-    { field: "weekday", headerName: "Day", width: 90, filter: "agSetColumnFilter", hide: pivot },
+    {
+      field: "poster",
+      headerName: "",
+      width: 60,
+      cellRenderer: posterRenderer,
+      sortable: false,
+      filter: false,
+      hide: pivot,
+      enableRowGroup: false,
+      enablePivot: false,
+    },
+    {
+      field: "title",
+      headerName: "Movie",
+      minWidth: 240,
+      rowGroup: grouped,
+      hide: grouped || pivot,
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "venue",
+      minWidth: 200,
+      rowGroup: grouped || pivot,
+      hide: grouped || pivot,
+      filter: "agSetColumnFilter",
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      width: 130,
+      pivot: pivot,
+      hide: pivot,
+      filter: "agSetColumnFilter",
+      sort: grouped ? null : "asc",
+    },
+    {
+      field: "weekday",
+      headerName: "Day",
+      width: 90,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
     { field: "time", width: 90, filter: "agSetColumnFilter", hide: pivot },
     // grouped view: count of showings per movie ▸ venue
-    { colId: "showings", field: "performanceId", headerName: "Showings",
-      aggFunc: grouped ? "count" : null, hide: !grouped, filter: false,
-      enableRowGroup: false, enablePivot: false,
-      cellClass: "ag-right-aligned-cell", width: 110 },
+    {
+      colId: "showings",
+      field: "performanceId",
+      headerName: "Showings",
+      aggFunc: grouped ? "count" : null,
+      hide: !grouped,
+      filter: false,
+      enableRowGroup: false,
+      enablePivot: false,
+      cellClass: "ag-right-aligned-cell",
+      width: 110,
+    },
     // pivot view: the actual showtimes, aggregated into each venue × date cell
-    { colId: "showtimes", headerName: "Showtimes", hide: !pivot,
+    {
+      colId: "showtimes",
+      headerName: "Showtimes",
+      hide: !pivot,
       aggFunc: pivot ? collectShowings : null,
       valueGetter: (p) =>
         p.data
-          ? { t: p.data.timestamp, label: p.data.time, title: p.data.title, soldOut: p.data.soldOut }
+          ? {
+              t: p.data.timestamp,
+              label: p.data.time,
+              title: p.data.title,
+              soldOut: p.data.soldOut,
+            }
           : null,
-      cellRenderer: showtimesRenderer, sortable: false, filter: false, minWidth: 150,
-      enableRowGroup: false, enablePivot: false },
-    { field: "genre", headerName: "Genre", filter: "agSetColumnFilter", hide: pivot,
-      enableRowGroup: true, enablePivot: true },
-    { field: "genres", headerName: "All genres", hide: true,
-      enableRowGroup: false, enablePivot: false,
-      valueFormatter: (p) => (p.value || []).join(", ") },
-    { field: "category", filter: "agSetColumnFilter", width: 110, hide: pivot,
-      enableRowGroup: true, enablePivot: true },
-    { field: "classification", headerName: "Cert", width: 90, filter: "agSetColumnFilter", hide: pivot },
-    { field: "venueType", headerName: "Venue type", filter: "agSetColumnFilter",
-      hide: true, enableRowGroup: true, enablePivot: true },
-    { field: "dimension", headerName: "2D/3D", width: 90, filter: "agSetColumnFilter",
-      hide: pivot, enablePivot: true },
-    { field: "presentation", headerName: "Presentation", filter: "agSetColumnFilter",
-      hide: pivot, enablePivot: true },
-    { field: "source", headerName: "Film source", filter: "agSetColumnFilter", hide: pivot },
-    { field: "audioDescription", headerName: "Audio desc.", width: 110,
-      cellRenderer: yesNo, filter: "agSetColumnFilter", hide: pivot },
-    { field: "subtitled", width: 100, cellRenderer: yesNo, filter: "agSetColumnFilter", hide: pivot },
-    { field: "hardOfHearing", headerName: "HoH", width: 90, cellRenderer: yesNo,
-      filter: "agSetColumnFilter", hide: pivot },
-    { field: "babyFriendly", headerName: "Baby-friendly", width: 120, cellRenderer: yesNo,
-      filter: "agSetColumnFilter", hide: pivot },
-    { field: "relaxed", width: 100, cellRenderer: yesNo, filter: "agSetColumnFilter", hide: pivot },
-    { field: "durationMins", headerName: "Runtime", width: 110, filter: "agNumberColumnFilter",
-      hide: pivot, valueFormatter: (p) => (p.value ? `${p.value} min` : "") },
+      cellRenderer: showtimesRenderer,
+      sortable: false,
+      filter: false,
+      minWidth: 150,
+      enableRowGroup: false,
+      enablePivot: false,
+    },
+    {
+      field: "genre",
+      headerName: "Genre",
+      filter: "agSetColumnFilter",
+      hide: pivot,
+      enableRowGroup: true,
+      enablePivot: true,
+    },
+    {
+      field: "genres",
+      headerName: "All genres",
+      hide: true,
+      enableRowGroup: false,
+      enablePivot: false,
+      valueFormatter: (p) => (p.value || []).join(", "),
+    },
+    {
+      field: "category",
+      filter: "agSetColumnFilter",
+      width: 110,
+      hide: pivot,
+      enableRowGroup: true,
+      enablePivot: true,
+    },
+    {
+      field: "classification",
+      headerName: "Cert",
+      width: 90,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
+    {
+      field: "venueType",
+      headerName: "Venue type",
+      filter: "agSetColumnFilter",
+      hide: true,
+      enableRowGroup: true,
+      enablePivot: true,
+    },
+    {
+      field: "dimension",
+      headerName: "2D/3D",
+      width: 90,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+      enablePivot: true,
+    },
+    {
+      field: "presentation",
+      headerName: "Presentation",
+      filter: "agSetColumnFilter",
+      hide: pivot,
+      enablePivot: true,
+    },
+    {
+      field: "source",
+      headerName: "Film source",
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
+    {
+      field: "audioDescription",
+      headerName: "Audio desc.",
+      width: 110,
+      cellRenderer: yesNo,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
+    {
+      field: "subtitled",
+      width: 100,
+      cellRenderer: yesNo,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
+    {
+      field: "hardOfHearing",
+      headerName: "HoH",
+      width: 90,
+      cellRenderer: yesNo,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
+    {
+      field: "babyFriendly",
+      headerName: "Baby-friendly",
+      width: 120,
+      cellRenderer: yesNo,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
+    {
+      field: "relaxed",
+      width: 100,
+      cellRenderer: yesNo,
+      filter: "agSetColumnFilter",
+      hide: pivot,
+    },
+    {
+      field: "durationMins",
+      headerName: "Runtime",
+      width: 110,
+      filter: "agNumberColumnFilter",
+      hide: pivot,
+      valueFormatter: (p) => (p.value ? `${p.value} min` : ""),
+    },
     { field: "year", width: 90, filter: "agNumberColumnFilter", hide: pivot },
     { field: "director", filter: "agSetColumnFilter", hide: true },
     { field: "screen", hide: true },
     { field: "notes", minWidth: 220, hide: true },
-    { field: "bookingUrl", headerName: "Book", cellRenderer: bookRenderer,
-      sortable: false, filter: false, width: 90, hide: pivot,
-      enableRowGroup: false, enablePivot: false },
+    {
+      field: "bookingUrl",
+      headerName: "Book",
+      cellRenderer: bookRenderer,
+      sortable: false,
+      filter: false,
+      width: 90,
+      hide: pivot,
+      enableRowGroup: false,
+      enablePivot: false,
+    },
   ];
 }
 
@@ -218,10 +395,18 @@ const gridOptions = {
   // group/pivot enabled everywhere by default; opted out per-column below where
   // it's meaningless (images, links, the aggregated value columns)
   defaultColDef: {
-    sortable: true, resizable: true, filter: true, floatingFilter: true,
-    enableRowGroup: true, enablePivot: true,
+    sortable: true,
+    resizable: true,
+    filter: true,
+    floatingFilter: true,
+    enableRowGroup: true,
+    enablePivot: true,
   },
-  autoGroupColumnDef: { headerName: "Movie ▸ Venue", minWidth: 320, pinned: "left" },
+  autoGroupColumnDef: {
+    headerName: "Movie ▸ Venue",
+    minWidth: 320,
+    pinned: "left",
+  },
   groupDefaultExpanded: 0,
   rowGroupPanelShow: "always",
   pivotPanelShow: "always",
@@ -245,15 +430,18 @@ function applyView(view) {
   // pivot groups by venue only; grouped view groups by movie ▸ venue
   api.setGridOption("autoGroupColumnDef", {
     headerName: pivot ? "Venue" : "Movie ▸ Venue",
-    minWidth: 320, pinned: "left",
+    minWidth: 320,
+    pinned: "left",
   });
-  document.querySelectorAll(".views button").forEach((b) =>
-    b.classList.toggle("active", b.dataset.view === view)
-  );
+  document
+    .querySelectorAll(".views button")
+    .forEach((b) => b.classList.toggle("active", b.dataset.view === view));
 }
-document.querySelectorAll(".views button").forEach((btn) =>
-  btn.addEventListener("click", () => applyView(btn.dataset.view))
-);
+document
+  .querySelectorAll(".views button")
+  .forEach((btn) =>
+    btn.addEventListener("click", () => applyView(btn.dataset.view)),
+  );
 
 const initialView = new URLSearchParams(location.search).get("view");
 if (initialView) applyView(initialView);

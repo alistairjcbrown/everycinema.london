@@ -19,6 +19,8 @@
     "vite": "6.4.3"
   },
   "dependencies": {
+    "ag-charts-community": "^14.0.2",
+    "ag-charts-enterprise": "^14.0.2",
     "ag-grid-community": "36.0.1",
     "ag-grid-enterprise": "36.0.1"
   }
