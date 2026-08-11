@@ -20,11 +20,12 @@
 // The stages are kept separate so each is independently resumable, and so that
 // window building is pure local computation with no network involved:
 //
-//   node history.mjs index      refresh the cached release index
-//   node history.mjs fetch      download release assets that still need a window
-//   node history.mjs windows    turn cached assets into finalized window files
-//   node history.mjs update     fetch + windows for the tail (runs in CI)
-//   node history.mjs build      emit public/data/history.json for the site
+//   node history.mjs index       refresh the cached release index
+//   node history.mjs fetch       download release assets that still need a window
+//   node history.mjs windows     turn cached assets into finalized window files
+//   node history.mjs update      fetch + windows for the tail (runs in CI)
+//   node history.mjs build       emit public/data/history.json for the site
+//   node history.mjs latest-tag  print the release the site build should pin to
 //
 // Backfilling this year pulls ~8.8GB of assets, so `fetch` takes --since/--to to
 // work through it in chunks and `windows` prunes each asset once its window is
@@ -83,6 +84,15 @@ const ghHeaders = () => {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   return headers;
 };
+
+// Warnings that a human needs to act on. In Actions, the `::warning::` form is
+// surfaced on the run summary page instead of being buried thousands of lines deep
+// in a log nobody opens — these conditions are all "the data is quietly wrong
+// until someone runs something", which is exactly what deserves that.
+function warn(message) {
+  if (process.env.GITHUB_ACTIONS) console.log(`::warning::${message}`);
+  else console.warn(`Warning: ${message}`);
+}
 
 async function withRetry(label, work, attempts = 5) {
   for (let attempt = 1; ; attempt++) {
@@ -484,7 +494,7 @@ async function update() {
   const limit = Number(flag("limit", 10));
   const take = pending.slice(-limit);
   if (pending.length > take.length)
-    console.warn(
+    warn(
       `${pending.length} windows are unwritten; updating the most recent ${take.length}. ` +
         `Backfill the rest with "npm run history:fetch" + "npm run history:windows".`
     );
@@ -552,13 +562,13 @@ function build() {
     const owner = index.releases.find((r) => r.publishedAt >= data.generatedAt);
     const latest = index.releases.at(-1);
     if (!owner)
-      console.warn(
-        `Warning: ${COMBINED} is newer than every indexed release; ` +
+      warn(
+        `${COMBINED} is newer than every indexed release; ` +
           `re-run "node history.mjs index".`
       );
     else if (owner !== latest)
-      console.warn(
-        `Warning: ${COMBINED} is release ${owner.tag}, not the latest (${latest.tag}); ` +
+      warn(
+        `${COMBINED} is release ${owner.tag}, not the latest (${latest.tag}); ` +
           `re-run scripts/get-latest-combined-data.sh for an up-to-date provisional window.`
       );
     // The provisional window opens at that release's publish date and is
@@ -566,6 +576,31 @@ function build() {
     // the last finalized end makes overlap impossible — a no-op in steady state,
     // where the latest release is precisely the one with no window yet.
     const from = maxDate(owner?.publishedAt ?? data.generatedAt, end);
+
+    // A GAP, which is the one failure mode this pipeline cannot self-correct at
+    // build time. If the blob's own release was published after the last window
+    // closes, the hours in between belong to a window that has not been written,
+    // and they are not in this blob either: a release only carries FUTURE
+    // performances, so screenings that already ran are absent from it. The only
+    // copy is the earlier release's asset. The day therefore under-counts —
+    // silently, and by up to a full day of daytime screenings — until that window
+    // is written, at which point it corrects itself for good.
+    //
+    // Happens when a new release lands between the history job closing windows and
+    // the build job downloading data. Warn rather than fail: the finalized history
+    // is still correct, and a deploy should not be blocked by a transient condition
+    // that the next run repairs.
+    if (end !== null && from > end) {
+      const missing = index.releases.find((r) => r.publishedAt === end);
+      const hours = ((Date.parse(from) - Date.parse(end)) / 3600000).toFixed(1);
+      warn(
+        `${hours}h of screenings (${end} to ${from}) are in no window and not in ` +
+          `${COMBINED}, so the last day will under-count. ` +
+          (missing
+            ? `Write the missing window with "npm run history:update" (release ${missing.tag}).`
+            : `No indexed release closes at ${end}; re-run "node history.mjs index".`)
+      );
+    }
     const { movies, performances } = aggregate(data, from, null);
     for (const [id, movie] of Object.entries(movies))
       titles[id] ||= { t: movie.t, y: movie.y };
@@ -579,7 +614,7 @@ function build() {
       ),
     };
   } else {
-    console.warn(
+    warn(
       `No ${COMBINED}; emitting finalized history only (run scripts/get-latest-combined-data.sh).`
     );
   }
@@ -639,6 +674,22 @@ function build() {
     );
 }
 
+// --- pinning ---------------------------------------------------------------
+
+// The release the site build must download, so its data and the history windows
+// are the same snapshot. It has to come from the committed index rather than from
+// a fresh "give me the latest" call: the index is what the windows were built
+// against, and any newer release is precisely the drift we are avoiding. Note the
+// newest indexed release is also the one with no window yet, which is why the
+// provisional window meets the finalized history exactly.
+function latestTag() {
+  const latest = readIndex().releases.at(-1);
+  if (!latest)
+    throw new Error(`${INDEX_FILE} has no releases; run "node history.mjs index".`);
+  // consumed by a shell command substitution, so stdout carries the tag ALONE
+  process.stdout.write(`${latest.tag}\n`);
+}
+
 // --- cli -------------------------------------------------------------------
 
 const commands = {
@@ -647,10 +698,11 @@ const commands = {
   windows: buildWindows,
   update,
   build,
+  "latest-tag": latestTag,
 };
 if (!commands[command]) {
   console.error(
-    "Usage: node history.mjs <index|fetch|windows|update|build>\n" +
+    "Usage: node history.mjs <index|fetch|windows|update|build|latest-tag>\n" +
       "  --from ISO        history start date (default: 1 Jan this year)\n" +
       "  --since/--to ISO  limit which windows this run covers\n" +
       "  --concurrency N   parallel downloads (default 4)\n" +

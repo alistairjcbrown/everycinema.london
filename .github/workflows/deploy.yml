@@ -74,8 +74,14 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
+      # Pinned to the release the history job indexed, NOT to whatever is newest
+      # now. Releases land a few times a day; one arriving between that job and
+      # this step would leave the hours between the last closed window and the new
+      # release in no window and absent from the new release too (releases carry
+      # only FUTURE performances), so they would vanish from the daily totals.
+      # Pinning makes the two agree by construction rather than by timing.
       - name: Download Clusterflick combined data
-        run: ./scripts/get-latest-combined-data.sh
+        run: ./scripts/get-latest-combined-data.sh "$(node history.mjs latest-tag)"
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Build compact data blob

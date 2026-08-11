@@ -113,7 +113,8 @@ npm run dev                              # http://localhost:5173
 | `npm run history:build`                 | Merge history into `public/data/history.json`             |
 | `npm run build`                         | Production build (app + attributions page)                |
 | `npm run preview`                       | Preview the production build                              |
-| `./scripts/get-latest-combined-data.sh` | Download the latest Clusterflick combined data            |
+| `npm run history:latest-tag`             | Print the release the site build pins its data to         |
+| `./scripts/get-latest-combined-data.sh` | Download the latest Clusterflick combined data (or `<tag>`) |
 
 ## Deployment
 
@@ -129,6 +130,16 @@ dispatch, CI:
    the data
 3. runs `npm run history:build`, then `npm run build`
 4. publishes `dist/` to GitHub Pages
+
+Step 2 pins its download to the release step 1 indexed
+(`get-latest-combined-data.sh "$(node history.mjs latest-tag)"`) rather than
+asking for whatever is newest. Releases land a few times a day, and one arriving
+between the two steps would leave the hours between the last closed window and
+the newer release covered by no window — and missing from the newer release too,
+since a release lists only *future* performances — so those screenings would drop
+out of the daily totals until the window was written. Pinning makes the site data
+and the history windows the same snapshot by construction. `history.mjs build`
+warns if they ever diverge anyway.
 
 ## Attributions
 
