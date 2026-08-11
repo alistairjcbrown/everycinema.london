@@ -59,6 +59,17 @@ const SERIES = [
   "#e66767", // red
 ];
 const SURFACE = "#1c1c20"; // the .card background these charts sit on
+// Annotation, not data: school-holiday bands on the daily chart. Warm, so it
+// reads as a different KIND of thing from the blue series, and only ever used at
+// low opacity across a wide area. Fill and edge share one opacity so the band
+// cannot grow a visible outline — see holidayCrossLines.
+const HOLIDAY_WASH = "#c98500";
+const HOLIDAY_WASH_OPACITY = 0.08;
+// Release markers on the concentration chart. Deliberately NOT the holiday warm:
+// these mark a different kind of event, and a shared colour would imply otherwise.
+// A neutral hairline, a couple of shades up from the gridlines so it reads as
+// deliberate without competing with the series.
+const OPENING_INK = "#52525b";
 
 // Sequential ramp for magnitude — one hue, from the same blue family as slot 1,
 // running from the card surface up to the lightest blue so an hour with nothing
@@ -138,6 +149,85 @@ const dayGap = (a, b) =>
     (Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / DAY_MS,
   );
 const el = (id) => document.getElementById(id);
+
+// ---------------------------------------------------------------------------
+// School holidays
+// ---------------------------------------------------------------------------
+
+// Term dates are what the daily series is mostly made of. Measured against the
+// term-time weekdays within a fortnight either side, holiday weekdays run 13-23%
+// busier (Feb half term +20%, Easter +23%, May half term +14%), and essentially
+// the whole lift is in the morning: 09:00-13:00 roughly doubles (+63% to +98%)
+// while evenings do not move at all. That is the signature of a school holiday
+// rather than of a big release, which would lift evenings too. Without the bands
+// the spikes look like unexplained noise.
+//
+// London state-school dates, taken from the Royal Borough of Greenwich, which
+// follows the standard London pattern — academies and voluntary-aided schools set
+// their own, so these are representative rather than universal. Spans are the
+// published holiday dates, end-INCLUSIVE.
+//
+// EXTEND THIS when the data rolls past the last entry: the calendar starts on
+// 1 January of the current year, so a new academic year needs its dates adding
+// from royalgreenwich.gov.uk/schools-and-education/school-term-dates
+const SCHOOL_HOLIDAYS = [
+  ["Christmas", "2026-01-01", "2026-01-04"],
+  ["Feb half term", "2026-02-16", "2026-02-20"],
+  ["Easter", "2026-03-30", "2026-04-10"],
+  ["May half term", "2026-05-25", "2026-05-29"],
+  ["Summer", "2026-07-21", "2026-09-01"],
+  ["Oct half term", "2026-10-26", "2026-10-30"],
+  ["Christmas", "2026-12-21", "2027-01-01"],
+];
+
+const holidayOn = (iso) =>
+  SCHOOL_HOLIDAYS.find(([, start, end]) => iso >= start && iso <= end)?.[0] ??
+  null;
+
+// Bands span whole days: the series plots each day at midday, so a band running
+// midday-to-midday would visibly cut its own first and last day in half. Ranges
+// therefore run from 00:00 on the first day to 00:00 on the day AFTER the last.
+const startOfDay = (iso) => new Date(`${iso}T00:00:00Z`);
+const startOfNextDay = (iso) =>
+  new Date(Date.parse(`${iso}T00:00:00Z`) + DAY_MS);
+
+// Clamped to the plotted range, and dropped entirely when they fall outside it:
+// an unclamped band would stretch the axis domain into empty space (the summer
+// holiday runs weeks past the last day there is data for) and leave the series
+// squashed into part of the plot.
+function holidayCrossLines(from, to) {
+  return SCHOOL_HOLIDAYS.filter(
+    ([, start, end]) => end >= from && start <= to,
+  ).map(([name, start, end]) => ({
+    type: "range",
+    range: [
+      startOfDay(start < from ? from : start),
+      startOfNextDay(end > to ? to : end),
+    ],
+    // A wide wash rather than a saturated block, and a warm hue so it cannot be
+    // mistaken for the blue the data is drawn in. The label wears axis ink, not
+    // the band colour — it is chrome, not a series.
+    fill: HOLIDAY_WASH,
+    fillOpacity: HOLIDAY_WASH_OPACITY,
+    // A range cross line strokes its own two edges in a bright contrasting
+    // colour by default, which puts a pair of vertical rules on the plot per
+    // holiday — louder than the data itself. Matching the edges to the fill, at
+    // the same opacity, makes the boundary read as where the wash stops rather
+    // than as a rule drawn over the chart.
+    stroke: HOLIDAY_WASH,
+    strokeOpacity: HOLIDAY_WASH_OPACITY,
+    strokeWidth: 1,
+    label: {
+      text: name,
+      // Above the plot, not inside: the half-term bands are only ~1% of a
+      // seven-month axis, far too narrow to hold their own text, and the nearest
+      // neighbouring band is six weeks away so centred labels do not collide.
+      position: "top",
+      color: AXIS_INK,
+      fontSize: 11,
+    },
+  }));
+}
 
 // ---------------------------------------------------------------------------
 // Daily totals
@@ -250,19 +340,37 @@ function renderDaily(summary) {
     tooltip: {
       // renderer params carry `title`/`datum` but not the series key, so read the
       // value from the closure rather than a yKey that isn't there
-      renderer: ({ datum }) => ({
-        title: fmtDay.format(datum.date),
-        data: datum.rows ?? [
+      renderer: ({ datum }) => {
+        const rows = datum.rows ?? [
           { label: unit, value: fmtInt.format(datum.value) },
-        ],
-      }),
+        ];
+        // Naming the holiday per day is what the bands cannot do: they are only
+        // wide enough to carry one label each, and on the narrow ones that label
+        // sits over the band rather than in it.
+        const holiday = holidayOn(datum.date.toISOString().slice(0, 10));
+        return {
+          title: fmtDay.format(datum.date),
+          data: holiday
+            ? [...rows, { label: "School holiday", value: holiday }]
+            : rows,
+        };
+      },
     },
     ...extra,
   });
 
+  // the plotted span: the finalized days plus however many listed days survived
+  // clipping, which is what the holiday bands are clamped to
+  const plottedTo = (listedData.at(-1)?.date ?? asDate(dates.at(-1)))
+    .toISOString()
+    .slice(0, 10);
+
   dailyChart?.destroy();
   dailyChart = AgCharts.create({
     ...chartBase,
+    // more top room than the other charts: the holiday band labels sit above the
+    // plot, and the default 16px is only enough for the y-axis tick label
+    padding: { ...chartBase.padding, top: 30 },
     container: el("dailyChart"),
     series: [
       line(ranData, "Screenings that ran", "Screenings"),
@@ -270,16 +378,20 @@ function renderDaily(summary) {
         lineDash: [5, 4],
       }),
     ],
-    axes: [
-      { type: "time", position: "bottom" },
-      {
+    axes: {
+      x: {
+        type: "time",
+        position: "bottom",
+        crossLines: holidayCrossLines(dates[0], plottedTo),
+      },
+      y: {
         type: "number",
         position: "left",
         min: 0,
         title: { enabled: false },
         label: { formatter: ({ value }) => fmtInt.format(value) },
       },
-    ],
+    },
     legend: legendBase,
   });
 
@@ -311,7 +423,10 @@ function renderDaily(summary) {
     "Solid line: screenings that actually ran, taken from the release that was " +
     "current at the time. Dashed: what is currently listed for the days ahead — " +
     "cinemas publish schedules only a few days out, so it is shown only while it " +
-    "stays comparable, and is not a forecast.";
+    "stays comparable, and is not a forecast. Shaded: London school holidays, " +
+    "which account for every spike in the series — half-term and Easter weekdays " +
+    "run 14-23% busier than the term weeks either side, and almost all of the " +
+    "extra screenings are morning ones.";
   el("meta").textContent =
     `${fmtInt.format(finalized.performances)} screenings · ${
       finalized.windows
@@ -333,6 +448,8 @@ const WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const HOURS_CHROME_X = 56;
 const HOURS_CHROME_Y = 88;
 const HOURS_MAX_CELL = 64; // past this the grid just becomes a wall of colour
+// how much taller the daily chart sits than the heatmap it is sized against
+const DAILY_EXTRA_HEIGHT = 90;
 
 function fitSquareCells(container, cols, rows, matchHeight = []) {
   // Measure the PARENT, not the container. Setting max-width on the container
@@ -356,10 +473,14 @@ function fitSquareCells(container, cols, rows, matchHeight = []) {
     if (container.style.height !== height) container.style.height = height;
     if (container.style.maxWidth !== maxWidth)
       container.style.maxWidth = maxWidth;
-    // charts that only need to match the height, not the aspect ratio — they get
-    // no max-width, so they still span the full card
-    for (const other of matchHeight)
-      if (other.style.height !== height) other.style.height = height;
+    // Charts that only need to match the height, not the aspect ratio — they get
+    // no max-width, so they still span the full card. Each entry may carry extra
+    // pixels on top, for a chart that should track the grid as the window resizes
+    // while sitting taller than it.
+    for (const [other, extra = 0] of matchHeight) {
+      const own = `${Math.round(cell * rows + HOURS_CHROME_Y + extra)}px`;
+      if (other.style.height !== own) other.style.height = own;
+    }
   };
   apply();
   new ResizeObserver(apply).observe(host);
@@ -381,12 +502,13 @@ function renderHours(summary) {
   // colour stops instead — which are deliberately uneven, so they bunch up.
   const step = 2000;
   const ceiling = Math.ceil(busiest / step) * step;
-  // Size before creating the chart so the first paint is square too. The daily
-  // chart is matched to the same height so the two full-width cards read as a
-  // pair and scale together.
+  // Size before creating the chart so the first paint is square too. The other two
+  // charts are matched to this height so the cards scale together, but the daily
+  // chart gets extra: it is the headline series and the one carrying the most in a
+  // single plot — 223 days, two series and the holiday bands — so it earns the room.
   fitSquareCells(el("hoursChart"), 24, WEEK.length, [
-    el("dailyChart"),
-    el("shareChart"),
+    [el("dailyChart"), DAILY_EXTRA_HEIGHT],
+    [el("shareChart")],
   ]);
 
   AgCharts.create({
@@ -417,21 +539,26 @@ function renderHours(summary) {
         },
       },
     ],
-    axes: [
-      { type: "category", position: "bottom", label: { color: AXIS_INK } },
-      { type: "category", position: "left", label: { color: AXIS_INK } },
-    ],
+    axes: {
+      x: { type: "category", position: "bottom", label: { color: AXIS_INK } },
+      y: { type: "category", position: "left", label: { color: AXIS_INK } },
+    },
     gradientLegend: {
       enabled: true,
       position: "bottom",
+      // The bar defaults to a length that six ticks do not fit along: the top two
+      // labels collided ("8k10k"). The card is ~1,100px wide, so there is room to
+      // lengthen it rather than thin the ticks out — a longer ramp also reads more
+      // like a scale, which is the job it is doing.
+      gradient: { preferredLength: 260 },
       scale: {
         interval: { step },
         label: {
           color: AXIS_INK,
           fontSize: 12,
           minSpacing: 12,
-          // "2k" rather than "2,000" — the gradient bar is short and the full
-          // numbers run into each other
+          // "2k" rather than "2,000" — abbreviated so the ticks stay clear of each
+          // other even on a narrow card, where the bar shrinks to fit
           formatter: ({ value }) =>
             value >= 1000
               ? `${+(value / 1000).toFixed(1)}k`
@@ -462,6 +589,49 @@ function renderHours(summary) {
 // ---------------------------------------------------------------------------
 
 const TOP_N = 8;
+
+// What counts as going wide: the share of one day's screenings a film has to take
+// for that day to be its opening. This threshold is the only thing selecting which
+// films get marked — every film that clears it is drawn (13 of them so far this
+// year), so it is also the dial for how busy the chart gets.
+const OPENING_SHARE = 20;
+
+// A wide release re-cuts the whole city's schedule overnight — on its first day a
+// tentpole can take a third of every screening in London — and that is exactly
+// what the steps in this series are. Marking them turns unexplained jumps into the
+// story of the year's releases.
+//
+// Derived from the data rather than a hardcoded list of titles, so it stays true as
+// the year goes on. A film's own opening is the first day it clears the threshold,
+// which is NOT the same as the day it peaks: Spider-Man: Brand New Day opened at
+// 24% and only reached 43% a day later. Results come back ordered by that peak, so
+// the caller can name the year's most dominant film without re-deriving it.
+function wideOpenings(byDay, movies) {
+  const dates = Object.keys(byDay).sort();
+  const films = new Map();
+
+  for (const date of dates) {
+    const counts = Object.values(byDay[date]);
+    const total = counts.reduce((a, b) => a + b, 0);
+    for (const [id, n] of Object.entries(byDay[date])) {
+      const share = (100 * n) / total;
+      const film = films.get(id) ?? { peak: 0, opened: null };
+      if (share > film.peak) film.peak = share;
+      // dates are walked in order, so the first one to clear the bar is the open
+      if (film.opened === null && share >= OPENING_SHARE) film.opened = date;
+      films.set(id, film);
+    }
+  }
+
+  return [...films]
+    .filter(([, film]) => film.opened !== null)
+    .sort((a, b) => b[1].peak - a[1].peak)
+    .map(([id, film]) => ({
+      title: movies[id]?.t ?? id,
+      date: film.opened,
+      peak: film.peak,
+    }));
+}
 
 // A stacked area of the top films' market share does not work on this data: the
 // eight biggest films of the whole period account for only 26% of screenings, so
@@ -508,6 +678,12 @@ function renderShare(blob, boundary) {
       };
     });
 
+  const openings = wideOpenings(byDay, blob.movies);
+  // more than one film can go wide on the same day, so a date maps to a list
+  const openedOn = new Map();
+  for (const { date, title } of openings)
+    openedOn.set(date, [...(openedOn.get(date) ?? []), title]);
+
   shareChart?.destroy();
   shareChart = AgCharts.create({
     ...chartBase,
@@ -523,23 +699,51 @@ function renderShare(blob, boundary) {
         strokeWidth: 2,
         marker: { enabled: false, size: 8 },
         tooltip: {
-          renderer: ({ datum }) => ({
-            title: fmtDay.format(datum.date),
-            data: [
-              {
-                label: `Top ${TOP_N} films`,
-                value: `${datum.share.toFixed(0)}%`,
-              },
-              { label: "Films screening", value: fmtInt.format(datum.films) },
-              { label: "Screenings", value: fmtInt.format(datum.total) },
-            ],
-          }),
+          renderer: ({ datum }) => {
+            const opened = openedOn.get(
+              datum.date.toISOString().slice(0, 10),
+            );
+            return {
+              title: fmtDay.format(datum.date),
+              data: [
+                {
+                  label: `Top ${TOP_N} films`,
+                  value: `${datum.share.toFixed(0)}%`,
+                },
+                { label: "Films screening", value: fmtInt.format(datum.films) },
+                { label: "Screenings", value: fmtInt.format(datum.total) },
+                ...(opened
+                  ? [{ label: "Opened wide", value: opened.join(", ") }]
+                  : []),
+              ],
+            };
+          },
         },
       },
     ],
-    axes: [
-      { type: "time", position: "bottom" },
-      {
+    axes: {
+      x: {
+        type: "time",
+        position: "bottom",
+        crossLines: openings.map(({ title, date }) => ({
+          type: "line",
+          value: asDate(date), // midday, where the day's own point sits
+          stroke: OPENING_INK,
+          strokeWidth: 1,
+          label: {
+            text: title,
+            // Rotated and anchored to the bottom of the plot: the series never
+            // goes below 49%, so the lower half is empty and a vertical label has
+            // room to run its full title there without being truncated or
+            // crossing the line it belongs to.
+            position: "inside-bottom",
+            rotation: -90,
+            color: AXIS_INK,
+            fontSize: 11,
+          },
+        })),
+      },
+      y: {
         type: "number",
         position: "left",
         min: 0,
@@ -547,12 +751,14 @@ function renderShare(blob, boundary) {
         title: { enabled: false },
         label: { formatter: ({ value }) => `${value}%` },
       },
-    ],
+    },
     legend: { enabled: false },
   });
 
   const shares = data.map((d) => d.share).sort((a, b) => a - b);
   const films = data.map((d) => d.films).sort((a, b) => a - b);
+  // named from the data, not written in, so the example cannot go stale
+  const biggest = openings[0];
   el("shareNote").textContent =
     `On a typical day the eight biggest films take ${shares[
       Math.floor(shares.length / 2)
@@ -561,7 +767,12 @@ function renderShare(blob, boundary) {
     )}% of all screenings, ranging from ${shares[0].toFixed(0)}% to ` +
     `${shares.at(-1).toFixed(0)}%. A median of ${films[Math.floor(films.length / 2)]} ` +
     `films screen somewhere in London on any given day, so the long tail is wide ` +
-    `but thin.`;
+    `but thin. Vertical lines mark the year's widest openings, and each one steps ` +
+    `the whole city up overnight` +
+    (biggest
+      ? `: ${biggest.title} reached ${biggest.peak.toFixed(0)}% of every ` +
+        `screening in London.`
+      : `.`);
 }
 
 // ---------------------------------------------------------------------------
@@ -739,8 +950,11 @@ function renderRun(selected) {
       : names.join(" · ");
 }
 
-const runAxes = (aligned = false) => [
-  aligned
+// Axes are a dictionary keyed by axis name, NOT an array — an array is rejected
+// wholesale ("expecting an object, ignoring") and every option in it silently
+// lost, leaving the chart on inferred default axes.
+const runAxes = (aligned = false) => ({
+  x: aligned
     ? {
         type: "number",
         position: "bottom",
@@ -753,14 +967,14 @@ const runAxes = (aligned = false) => [
         label: { formatter: ({ value }) => fmtInt.format(value) },
       }
     : { type: "time", position: "bottom" },
-  {
+  y: {
     type: "number",
     position: "left",
     min: 0,
     title: { enabled: false },
     label: { formatter: ({ value }) => fmtInt.format(value) },
   },
-];
+});
 
 function renderFilms(blob) {
   let films = Object.entries(blob.finalized.counts).map(([id, hours]) => {
