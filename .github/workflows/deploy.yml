@@ -3,11 +3,16 @@ name: Build and deploy
 on:
   push:
     branches: [main]
-  # Rebuild daily around midday to pick up fresh Clusterflick data.
-  # GitHub cron is UTC (no DST): 12:00 UTC = 12:00 London in winter (GMT),
-  # ~13:00 in summer (BST).
+  # Rebuild daily in the evening to pick up fresh Clusterflick data. Late rather
+  # than midday because cinema chains publish the coming week's schedule in bulk
+  # during the day: a midday build caught the "before" state and listings for
+  # days 3+ out came in ~30% short (see clipProvisional in src/history.js). A
+  # late build also puts the finalized/provisional boundary after the 20:00 peak
+  # rather than in the small hours.
+  # GitHub cron is UTC (no DST): 21:00 UTC = 21:00 London in winter (GMT),
+  # ~22:00 in summer (BST).
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "0 21 * * *"
   workflow_dispatch:
 
 # GitHub Pages: queue deploys rather than cancel an in-progress one.

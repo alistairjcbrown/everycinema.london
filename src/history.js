@@ -148,12 +148,21 @@ const el = (id) => document.getElementById(id);
 // cliff (2,800 -> 700 overnight in the data as of writing). Drawing the full
 // tail would render that listing horizon as a collapse in cinema-going, so the
 // series is clipped where it stops being comparable to recent finalized days.
+//
+// The floor has to sit just under a normal day, NOT halfway down. The fall-off is
+// not only a cliff: a chain publishing next week's schedule in bulk leaves a
+// multi-day shelf at ~70% of normal until it lands (observed 11 Aug 2026: the
+// 14th-20th listed ~1,980-2,170 in the morning and ~2,820-2,970 by that evening).
+// A 50% floor drew that shelf, and ~850 screenings a day missing across a week
+// reads as a collapse rather than as listings not being out yet.
+const LISTED_FLOOR = 0.9;
+
 function clipProvisional(days, finalizedDays, boundary) {
   const recent = Object.values(finalizedDays)
     .slice(-28)
     .sort((a, b) => a - b);
   if (!recent.length) return [];
-  const floor = recent[Math.floor(recent.length / 2)] * 0.5;
+  const floor = recent[Math.floor(recent.length / 2)] * LISTED_FLOOR;
   const out = [];
   for (const date of Object.keys(days).sort()) {
     // the boundary day is only a part-day of listings and is charted separately;
@@ -460,14 +469,30 @@ const TOP_N = 8;
 // actually concentrated is any single DAY — its own top eight take a median 73% —
 // so the honest measure is that share plotted over time: one series, no
 // categorical palette, and it answers the same question.
-function renderShare(blob) {
+function renderShare(blob, boundary) {
   // per day, per film: how many screenings
   const byDay = {};
-  for (const [id, hours] of Object.entries(blob.finalized.counts))
-    for (const [bucket, n] of Object.entries(hours)) {
-      const day = (byDay[bucket.slice(0, 10)] ||= {});
-      day[id] = (day[id] || 0) + n;
-    }
+  const add = (counts, onlyDay = null) => {
+    for (const [id, hours] of Object.entries(counts))
+      for (const [bucket, n] of Object.entries(hours)) {
+        const day = bucket.slice(0, 10);
+        if (onlyDay !== null && day !== onlyDay) continue;
+        const into = (byDay[day] ||= {});
+        into[id] = (into[id] || 0) + n;
+      }
+  };
+  add(blob.finalized.counts);
+
+  // The finalized/provisional boundary falls mid-day, so the last finalized day
+  // holds only the hours before it — a handful of late-night screenings when the
+  // boundary lands in the early morning, and eight films out of five is trivially
+  // 100%. A share over a part-day is not a measure of concentration, so complete
+  // the day from the provisional window (the same split renderDaily makes, and
+  // safe from double counting because the provisional window opens exactly where
+  // the finalized one closes), or drop the day when there is nothing to complete
+  // it with.
+  if (blob.provisional) add(blob.provisional.counts, boundary);
+  else delete byDay[boundary];
 
   const data = Object.keys(byDay)
     .sort()
@@ -857,14 +882,15 @@ const load = (path) =>
     return r.json();
   });
 
+// The per-movie blob does not name the part-measured last day (only the summary
+// does, and it is the summary's own boundary), so it is threaded through rather
+// than re-derived — a second derivation is a second thing to keep in step.
 load("/data/history-summary.json")
-  .then((summary) => {
+  .then(async (summary) => {
     renderDaily(summary);
     renderHours(summary);
-  })
-  .then(() => load("/data/history.json"))
-  .then((blob) => {
-    renderShare(blob);
+    const blob = await load("/data/history.json");
+    renderShare(blob, summary.finalized.partialDay);
     renderFilms(blob);
   })
   .catch((err) => {
