@@ -976,9 +976,29 @@ const runAxes = (aligned = false) => ({
   },
 });
 
-function renderFilms(blob) {
-  let films = Object.entries(blob.finalized.counts).map(([id, hours]) => {
-    const days = dailyForFilm(hours);
+function renderFilms(blob, boundary) {
+  const byFilm = {};
+  for (const [id, hours] of Object.entries(blob.finalized.counts))
+    byFilm[id] = dailyForFilm(hours);
+
+  // The finalized/provisional boundary falls mid-day, so a film's last finalized
+  // day holds only the hours before it — a run then ends on a cliff that records
+  // when the build ran rather than anything the film did. Complete that day from
+  // the provisional window (the same split renderDaily makes, and safe from
+  // double counting because the provisional window opens exactly where the
+  // finalized one closes), or drop it when there is nothing to complete it with.
+  if (blob.provisional) {
+    for (const [id, hours] of Object.entries(blob.provisional.counts)) {
+      const listed = dailyForFilm(hours)[boundary];
+      if (!listed) continue;
+      const days = (byFilm[id] ||= {});
+      days[boundary] = (days[boundary] || 0) + listed;
+    }
+  } else if (boundary) {
+    for (const days of Object.values(byFilm)) delete days[boundary];
+  }
+
+  let films = Object.entries(byFilm).map(([id, days]) => {
     const dates = Object.keys(days).sort();
     const meta = blob.movies[id] || {};
     return {
@@ -1105,7 +1125,7 @@ load("/data/history-summary.json")
     renderHours(summary);
     const blob = await load("/data/history.json");
     renderShare(blob, summary.finalized.partialDay);
-    renderFilms(blob);
+    renderFilms(blob, summary.finalized.partialDay);
   })
   .catch((err) => {
     console.error(err);
