@@ -56,9 +56,24 @@
         background: #1c1c20; border: 1px solid #2e2e34; border-radius: 10px;
         padding: 14px 16px; display: flex; flex-direction: column; min-width: 0;
       }
-      .card h2 { font-size: 14px; margin: 0; font-weight: 600; }
+      .card h2 {
+        font-size: 14px; margin: 0; font-weight: 600;
+        display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap;
+      }
       .card .sub { font-size: 12px; color: #a1a1aa; margin: 3px 0 10px; }
-      .chart { flex: 1; min-height: 0; }
+      /* stack held to the top right of the card, but the toggles inside it stay
+         left-aligned so the two checkboxes line up under each other */
+      .toggle-controls {
+        margin-left: auto;
+        display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+      }
+      .toggle {
+        font-size: 12px; font-weight: 400; color: #a1a1aa;
+        display: flex; align-items: center; gap: 6px; cursor: pointer;
+        user-select: none; white-space: nowrap;
+      }
+      .toggle input { accent-color: #3b82f6; margin: 0; cursor: pointer; }
+      .toggle:hover { color: #e4e4e7; }
       /* flex:none for the same reason as #hoursChart — its height is set in JS to
          match the heatmap, and .chart's flex:1 would override that */
       #dailyChart, #shareChart { flex: none; height: 300px; }
@@ -66,9 +81,9 @@
          flex:none is essential — .chart's flex:1 would let the card's column
          layout decide the height instead, silently discarding that sizing. */
       #hoursChart { flex: none; height: 320px; width: 100%; margin-inline: auto; }
-      #runChart { height: 340px; }
+      #runChart { height: 460px; }
       .empty {
-        height: 340px; display: flex; flex-direction: column; gap: 4px;
+        height: 460px; display: flex; flex-direction: column; gap: 4px;
         align-items: center; justify-content: center; text-align: center;
         border: 1px dashed #2e2e34; border-radius: 8px; color: #71717a;
       }
@@ -78,10 +93,10 @@
       .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; }
       /* heatmap needs the wider half — it has 24 columns to fit */
       .split.charts { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
-      @media (max-width: 900px) {
+      @media (max-width: 1200px) {
         .split, .split.charts { grid-template-columns: minmax(0, 1fr); }
       }
-      #filmGrid { height: 340px; }
+      #filmGrid { height: 460px; }
 
       /* KPI row */
       .stats { display: flex; gap: 28px; flex-wrap: wrap; margin: 2px 0 4px; }
@@ -89,15 +104,7 @@
       .stat .v { font-size: 26px; line-height: 1.1; }
       .stat .k { font-size: 11px; color: #a1a1aa; text-transform: uppercase;
         letter-spacing: 0.04em; }
-      .note { font-size: 12px; color: #a1a1aa; margin: 10px 0 0; }
-      .card h2 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-      .toggle {
-        margin-left: auto; font-size: 12px; font-weight: 400; color: #a1a1aa;
-        display: flex; align-items: center; gap: 6px; cursor: pointer;
-        user-select: none; white-space: nowrap;
-      }
-      .toggle input { accent-color: #3b82f6; margin: 0; cursor: pointer; }
-      .toggle:hover { color: #e4e4e7; }
+      .note { font-size: 12px; color: #a1a1aa; margin: 22px 0 0; }
       .hint { font-size: 12px; color: #71717a; margin: 0 0 8px; }
     </style>
   </head>
@@ -156,14 +163,16 @@
         <section class="card">
           <h2>
             <span>Screenings per day, by film</span>
-            <label class="toggle">
-              <input type="checkbox" id="runNormalise" />
-              Align to opening
-            </label>
-            <label class="toggle">
-              <input type="checkbox" id="runProject" />
-              Project decline
-            </label>
+            <div class="toggle-controls">
+              <label class="toggle">
+                <input type="checkbox" id="runNormalise" />
+                Align to opening
+              </label>
+              <label class="toggle">
+                <input type="checkbox" id="runProject" />
+                Project decline
+              </label>
+            </div>
           </h2>
           <p class="sub" id="runSub">&nbsp;</p>
           <div class="chart" id="runChart"></div>

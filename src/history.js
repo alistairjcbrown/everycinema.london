@@ -983,11 +983,11 @@ function projectRun(days, dataEnd) {
   // back for repertory dates, and using the latter would stretch the drawn line
   // flat along the axis for half a year after the run it describes had ended.
   const lastWeek = xs.at(-1);
-  // Reachable only on fits too short for the retention ceiling to have excluded
-  // them: The Housemaid on three weeks fits 95% retention and puts the end of
-  // its run in February 2027. The line stops here rather than having the chart
-  // build a row per day for a year and a half, and the note says so rather than
-  // naming a date the drawn line does not reach.
+  // A pure safety rail. Every route to drawTo is bounded already — a fit under
+  // the ceiling reaches the threshold within log(0.05)/log(0.85) = 18.4 weeks,
+  // and one above it draws only to the ceiling's own crossing — so this should
+  // never bind. It stays because if that ever stopped holding, the cost is the
+  // chart building a row per day for years and locking the page up drawing them.
   const cap = lastWeek + PROJECTION_MAX_WEEKS;
   const onWeek = (w) => addDays(first, Math.round(w * 7));
 
@@ -995,19 +995,21 @@ function projectRun(days, dataEnd) {
   // decline the data has ever shown, which is what stops a merely uncertain
   // slope putting the late edge a year and a half out.
   //
-  // The outer Math.max is what keeps the two ends in order. A fit shorter than
-  // PROJECTION_FLAT_WEEKS is allowed to sit above the ceiling, and clamping such
-  // a slope would hand the late end something STEEPER than the fit itself — the
-  // late edge would land before the early one and the range would read
-  // backwards. Never clamp past the fitted slope; both ends stay negative, so
-  // there is always a late edge to give.
+  // A fit shorter than PROJECTION_FLAT_WEEKS is allowed to sit above that
+  // ceiling, and then the clamp has nothing to say: it would hand the late end a
+  // slope STEEPER than the fit itself, and the only way to keep the two ends in
+  // order would be to pin the late end onto the point estimate — an interval
+  // that looks two-sided and is not. Spider-Man: Brand New Day fits 87.6% on
+  // three weeks and did exactly that, reporting "between 4 Sept and 5 Jan" where
+  // 5 Jan was just the estimate wearing an upper bound's label. A film declining
+  // more slowly than anything that has finished is a film whose far end this
+  // cannot bound, and saying so is the only honest answer.
+  const ceilingSlope = Math.log(PROJECTION_MAX_RETENTION);
+  const unbounded = slope > ceilingSlope;
   const earliestWeek = crossing(slope - slopeErr);
-  const latestWeek = crossing(
-    Math.max(
-      slope,
-      Math.min(slope + slopeErr, Math.log(PROJECTION_MAX_RETENTION)),
-    ),
-  );
+  const latestWeek = unbounded
+    ? null
+    : crossing(Math.min(slope + slopeErr, ceilingSlope));
 
   return {
     first,
@@ -1018,20 +1020,25 @@ function projectRun(days, dataEnd) {
     retention: Math.exp(slope),
     observedTo: addDays(first, lastWeek * 7 + 6),
     endDate: onWeek(endWeek),
-    // the fit runs past what is drawn — too shallow to put a date on at all
-    capped: endWeek > cap,
+    // declining more slowly than any finished run here: no end date to give
+    unbounded,
     earliest: onWeek(earliestWeek),
-    latest: onWeek(latestWeek),
+    latest: unbounded ? null : onWeek(latestWeek),
     // how many weeks wide the interval is, so a fit too vague to name a date can
     // say so instead of naming one anyway
-    spread: latestWeek - earliestWeek,
+    spread: unbounded ? Infinity : latestWeek - earliestWeek,
     // The fit loop above stops at the first week under the threshold, so if it
     // stopped before running out of weeks then the run has already got there and
     // the date is known rather than projected. Reported as the week it began:
     // the threshold is a weekly total, so no single day inside it is the crossing.
     crossedOn: lastWeek + 1 < weeks.length ? onWeek(lastWeek + 1) : null,
     drawFrom: addDays(first, peakWeek * 7),
-    drawTo: onWeek(Math.min(Math.max(endWeek, lastWeek + 1), cap)),
+    drawTo: onWeek(
+      Math.min(
+        Math.max(unbounded ? crossing(ceilingSlope) : endWeek, lastWeek + 1),
+        cap,
+      ),
+    ),
     // what the fit puts on a day, as a daily rate so it can be drawn against the
     // daily series the chart already plots
     rateOn: (date) =>
@@ -1071,12 +1078,13 @@ function projectionNote(selected, projections) {
       `(actually the week of ${on(only.crossedOn)}).`
     );
 
-  // So shallow the fit does not reach an end inside the drawn range. Naming the
-  // date it does reach would put it months past where the dashed line stops.
-  if (only.capped)
+  // Holding on better than anything that has finished. There is a floor but no
+  // ceiling on when this ends, so give the floor and say the rest is open.
+  if (only.unbounded)
     return (
-      `${holding}, which on ${only.fitWeeks} weeks is too slow to call an end ` +
-      `to: the run is still going past ${on(only.drawTo)}.`
+      `${holding} — slower than any run in this data that has finished. On ` +
+      `${only.fitWeeks} weeks that is not enough to call an end: no earlier ` +
+      `than ${on(only.earliest)}, with no far end the fit can put a date on.`
     );
 
   // Too vague to name a date. Saying "23 October" and then "between September
@@ -1265,15 +1273,17 @@ function renderRun(selected) {
             },
             {
               label: "Run over by",
-              value: p.capped
-                ? `beyond ${fmtDay.format(asDate(p.drawTo))}`
+              value: p.unbounded
+                ? "too slow to call"
                 : fmtDay.format(asDate(p.endDate)),
             },
             {
               // ~73% of the time in backtest, not the nominal 95% — the gap is
               // films losing screens, which the fit cannot see coming
               label: "Range (holds ~3 in 4)",
-              value: `${fmtDay.format(asDate(p.earliest))} – ${fmtDay.format(asDate(p.latest))}`,
+              value: p.latest
+                ? `${fmtDay.format(asDate(p.earliest))} – ${fmtDay.format(asDate(p.latest))}`
+                : `${fmtDay.format(asDate(p.earliest))} at the earliest`,
             },
             // only once it has actually happened; measured, so it goes last as
             // the thing the rows above were estimating
