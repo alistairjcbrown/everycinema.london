@@ -790,6 +790,10 @@ function dailyForFilm(hours) {
 
 let runChart = null;
 let runAligned = null;
+let runProjected = null;
+// Last day the history covers, so a week cut short by the boundary can be told
+// apart from a week a film genuinely gave up on. Set once the films are built.
+let dataEnd = null;
 let dailyChart = null;
 let shareChart = null;
 
@@ -802,8 +806,291 @@ function showRunPanel(title, body) {
   el("runEmptyTitle").textContent = title;
   el("runEmptyBody").textContent = body;
   el("runSub").innerHTML = "&nbsp;";
+  el("runNote").textContent = "";
   runChart?.destroy();
   runChart = null;
+}
+
+// ---------------------------------------------------------------------------
+// Decline projection
+// ---------------------------------------------------------------------------
+//
+// Films leave cinemas by exponential decay. Across the completed wide releases
+// in this data the median week-on-week retention is 0.55 — a film roughly halves
+// every week — so fitting log(weekly screenings) against week number from the
+// peak, then reading off where that line crosses a "run over" threshold, dates
+// the end of a run.
+//
+// Backtested by refitting each finished film on only its first four, five and
+// six weeks and comparing against where its run actually ended: median error
+// 1.1, 0.9 and 0.7 weeks respectively; within one week for 46%, 58% and 64% of
+// films, and within two for 67%, 74% and 78%.
+//
+// The fit is per-film and deliberately unshrunk toward that population median.
+// Films do not only fade, they get evicted: on Friday 13 February 2026 Wuthering
+// Heights opened into Valentine's weekend alongside two expansions, some 9,200
+// screenings of new demand into a market that grew by 2,600, and every incumbent
+// lost screens at once — Hamnet down 921 in a week, Send Help 841, Marty Supreme
+// 720. Nothing in a film's own curve anticipates that. Pulling each slope toward
+// the median would hide the honest reading — that this projects a decline and
+// nothing else — behind a number biased to be right on average. The band, taken
+// from the film's own residuals, is where that uncertainty belongs — and where
+// it shows up: the band is a 95% interval on the fitted slope, but on the same
+// backtest it contains the real end date only about three times in four. That
+// shortfall is not sampling noise the interval got wrong, it is films losing
+// screens rather than fading, and no interval drawn from a film's own curve can
+// account for it. Said plainly on the chart rather than papered over.
+
+const PROJECTION_END_SHARE = 0.05; // "run over" = a week below 5% of the peak week
+const PROJECTION_MIN_PEAK = 50; // below this a weekly total is noise, not a curve
+const PROJECTION_MIN_WEEKS = 3; // fewer points than this fits nothing worth drawing
+const PROJECTION_MAX_WEEKS = 26; // draw at most six months on; slow fades run away
+// Past this much spread between the early and late end of the fit, a single
+// projected date is not worth stating — leading with a midpoint would claim a
+// precision the range beside it takes straight back. With the retention ceiling
+// below holding the late edge in, spread runs from about 4 to 15 weeks, and
+// everything above 13 is a fit on the bare minimum three weeks. So this is the
+// line between "we have a date" and "we have a quarter".
+const PROJECTION_VAGUE_WEEKS = 13;
+// The shallowest weekly decline a theatrical run actually shows. Two jobs, both
+// resting on the same fact — that no real release in this data holds more than
+// about 85% of its screenings week to week.
+//
+// It excludes what is not a declining run at all. Zog and the Flying Doctors
+// goes 145, 129, 88, 83, 97, 83, 85, 79: a kids title on a standing weekend
+// matinee, flat rather than falling, and a line through it fits 93% retention
+// and projects into 2028. That is not a slow decline, it is a different thing
+// being measured, and the honest answer is to say nothing about it.
+//
+// And it bounds the slow end of the interval. The crossing point goes to
+// infinity as the slope goes to zero, so a fit on four weeks puts a late edge
+// months out on the strength of a slope that is merely uncertain — The Odyssey
+// reached June 2027. Only the slow side is clamped: the fast side is where
+// eviction risk lives, and that tail is real. Backtested, the clamp cuts the
+// median interval from 11.0 to 7.6 weeks at four weeks of data while coverage
+// goes UP, 72% to 74% — the width it removes is width that was never right.
+const PROJECTION_MAX_RETENTION = 0.85;
+// ...but only as grounds for exclusion once the fit has this many weeks behind
+// it. The ceiling was calibrated on completed runs, and a film part-way through
+// one has not shown its hand yet: The Housemaid looked like a 95% holder at
+// three weeks and finished at 73%, and 28 of 57 confirmed runs decline faster
+// than their first four weeks suggested. Applied ungated it rejects a real
+// release about one time in fifteen at three weeks — including Spider-Man:
+// Brand New Day, holding 88% in week three of a perfectly ordinary blockbuster
+// run. Flatness only tells you anything once there has been time for a decline
+// to show up, and by six weeks that misfire is down to 1 in 57.
+//
+// Size is not a substitute here: excluding these titles by peak week instead
+// would need a floor of 200, which drops 105 of 243 films, among them plainly
+// real declines like Five Nights at Freddy's 2. What sets Zog apart is that it
+// is flat, not that it is small.
+const PROJECTION_FLAT_WEEKS = 6;
+// A film's first recorded screening is very often a preview: Wuthering Heights
+// has one show on 13 June and then nothing for the eight weeks to the end of the
+// data. Anchoring week 0 there would slide every weekly bucket off the Friday
+// the film actually opened on, mixing an opening Friday into the tail of a dying
+// week. Anchor on the first day that reaches a fifth of the film's best day
+// instead, which is the opening in every ordinary case.
+const PROJECTION_OPENING_SHARE = 0.2;
+// Two-sided 95% t quantiles by degrees of freedom, for the slope interval. A fit
+// on four weekly points has 2 degrees of freedom, where t is 4.30 against the
+// normal's 1.96 — using the normal here would draw a band less than half the
+// width it should be, on exactly the films with the least data behind them.
+const T95 = [
+  12.71, 4.30, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.20, 2.18,
+  2.16, 2.14, 2.13,
+];
+const t95 = (df) => (df < 1 ? T95[0] : (T95[df - 1] ?? 1.96));
+
+// Weekly totals from the film's opening. A trailing week the data boundary cuts
+// short is dropped rather than plotted: a four-day week reads as a collapse, and
+// for a film still showing that is always the most recent week — exactly the one
+// the fit would lean on hardest.
+function weeklyTotals(days, opening, dataEnd) {
+  const weeks = [];
+  for (let w = 0; addDays(opening, w * 7 + 6) <= dataEnd; w++) {
+    let total = 0;
+    for (let d = 0; d < 7; d++) total += days[addDays(opening, w * 7 + d)] || 0;
+    weeks.push(total);
+  }
+  while (weeks.length && weeks.at(-1) === 0) weeks.pop(); // after the run, not in it
+  return weeks;
+}
+
+// The day the film opened, as against the day it was first shown anywhere.
+function openingDay(days) {
+  const best = Math.max(...Object.values(days));
+  return Object.keys(days)
+    .sort()
+    .find((date) => days[date] >= best * PROJECTION_OPENING_SHARE);
+}
+
+// Fit a film's decline and say where it runs out. Returns null when the film has
+// not given the fit enough to work with, which is a normal answer, not a failure.
+function projectRun(days, dataEnd) {
+  const first = openingDay(days); // the opening, not the first preview
+  const weeks = weeklyTotals(days, first, dataEnd);
+  if (!weeks.length) return null;
+
+  const peak = Math.max(...weeks);
+  if (peak < PROJECTION_MIN_PEAK) return null;
+  const peakWeek = weeks.indexOf(peak);
+  const threshold = peak * PROJECTION_END_SHARE;
+
+  // Fit from the peak to the first week already under the threshold. Past that
+  // point a film is on one-off and repertory bookings — Super Mario Galaxy fell
+  // to 8 screenings a week and then came back to 183 — and that is a different
+  // process from the theatrical decline being modelled here.
+  const xs = [];
+  const ys = [];
+  for (let w = peakWeek; w < weeks.length && weeks[w] >= threshold; w++) {
+    xs.push(w);
+    ys.push(Math.log(weeks[w]));
+  }
+  if (xs.length < PROJECTION_MIN_WEEKS) return null;
+
+  // Least squares anchored at the centroid, so slope and intercept are
+  // uncorrelated and the band below can be drawn by varying the slope alone.
+  const n = xs.length;
+  const meanX = xs.reduce((a, b) => a + b, 0) / n;
+  const meanY = ys.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0;
+  let sxx = 0;
+  for (let i = 0; i < n; i++) {
+    sxy += (xs[i] - meanX) * (ys[i] - meanY);
+    sxx += (xs[i] - meanX) ** 2;
+  }
+  const slope = sxy / sxx;
+  if (!(slope < 0)) return null; // still climbing, or flat — nothing to project
+  // not a run in decline — but only once there is enough of it to tell
+  if (n >= PROJECTION_FLAT_WEEKS && Math.exp(slope) > PROJECTION_MAX_RETENTION)
+    return null;
+
+  // Residual spread gives the standard error of the slope, and with it a band
+  // that is narrow for a film declining smoothly and wide for one that is not.
+  let ss = 0;
+  for (let i = 0; i < n; i++)
+    ss += (ys[i] - (meanY + slope * (xs[i] - meanX))) ** 2;
+  // n is at least PROJECTION_MIN_WEEKS, so there is always at least 1 degree of
+  // freedom here and no need to guard the division.
+  const slopeErr = t95(n - 2) * Math.sqrt(ss / (n - 2) / sxx);
+
+  // Week, possibly fractional, where a line of the given slope hits the threshold
+  const crossing = (s) => meanX + (Math.log(threshold) - meanY) / s;
+  const endWeek = crossing(slope);
+  // The last week the fit is built on, NOT the last week the film screened at
+  // all. Those diverge by months for a film that finished its run and then came
+  // back for repertory dates, and using the latter would stretch the drawn line
+  // flat along the axis for half a year after the run it describes had ended.
+  const lastWeek = xs.at(-1);
+  // Reachable only on fits too short for the retention ceiling to have excluded
+  // them: The Housemaid on three weeks fits 95% retention and puts the end of
+  // its run in February 2027. The line stops here rather than having the chart
+  // build a row per day for a year and a half, and the note says so rather than
+  // naming a date the drawn line does not reach.
+  const cap = lastWeek + PROJECTION_MAX_WEEKS;
+  const onWeek = (w) => addDays(first, Math.round(w * 7));
+
+  // A steeper slope ends the run sooner. The shallow end is held to the slowest
+  // decline the data has ever shown, which is what stops a merely uncertain
+  // slope putting the late edge a year and a half out.
+  //
+  // The outer Math.max is what keeps the two ends in order. A fit shorter than
+  // PROJECTION_FLAT_WEEKS is allowed to sit above the ceiling, and clamping such
+  // a slope would hand the late end something STEEPER than the fit itself — the
+  // late edge would land before the early one and the range would read
+  // backwards. Never clamp past the fitted slope; both ends stay negative, so
+  // there is always a late edge to give.
+  const earliestWeek = crossing(slope - slopeErr);
+  const latestWeek = crossing(
+    Math.max(
+      slope,
+      Math.min(slope + slopeErr, Math.log(PROJECTION_MAX_RETENTION)),
+    ),
+  );
+
+  return {
+    first,
+    peakWeek,
+    fitWeeks: n,
+    // the readable form of the slope: the share of a week's screenings that the
+    // next week keeps
+    retention: Math.exp(slope),
+    observedTo: addDays(first, lastWeek * 7 + 6),
+    endDate: onWeek(endWeek),
+    // the fit runs past what is drawn — too shallow to put a date on at all
+    capped: endWeek > cap,
+    earliest: onWeek(earliestWeek),
+    latest: onWeek(latestWeek),
+    // how many weeks wide the interval is, so a fit too vague to name a date can
+    // say so instead of naming one anyway
+    spread: latestWeek - earliestWeek,
+    // The fit loop above stops at the first week under the threshold, so if it
+    // stopped before running out of weeks then the run has already got there and
+    // the date is known rather than projected. Reported as the week it began:
+    // the threshold is a weekly total, so no single day inside it is the crossing.
+    crossedOn: lastWeek + 1 < weeks.length ? onWeek(lastWeek + 1) : null,
+    drawFrom: addDays(first, peakWeek * 7),
+    drawTo: onWeek(Math.min(Math.max(endWeek, lastWeek + 1), cap)),
+    // what the fit puts on a day, as a daily rate so it can be drawn against the
+    // daily series the chart already plots
+    rateOn: (date) =>
+      Math.exp(meanY + slope * (dayGap(first, date) / 7 - meanX)) / 7,
+  };
+}
+
+// The note carries the method; per-film numbers live in the dashed line's own
+// tooltip, which has room for them however many films are selected.
+function projectionNote(selected, projections) {
+  const found = projections.filter(Boolean);
+  if (!found.length)
+    return (
+      `No trend to project here. A film needs a peak week of at least ` +
+      `${PROJECTION_MIN_PEAK} screenings and ${PROJECTION_MIN_WEEKS} complete ` +
+      `weeks after it — and once ${PROJECTION_FLAT_WEEKS} weeks are in, it has ` +
+      `to still be losing more than ` +
+      `${(100 - PROJECTION_MAX_RETENTION * 100).toFixed(0)}% a week: a title on ` +
+      `a standing weekend matinee is holding steady, not winding down.`
+    );
+
+  const only = found.length === 1 && selected.length === 1 ? found[0] : null;
+  if (!only)
+    return (
+      `Dashed lines fit each film's own weekly decline and continue it to 5% of ` +
+      `its peak week. Hover one for its projected end date.`
+    );
+
+  const on = (date) => fmtDay.format(asDate(date));
+  const holding = `Holding ${(only.retention * 100).toFixed(0)}% of its screenings week to week`;
+
+  // Already there. The date is measured, not projected, so it leads — and the
+  // estimate stays alongside it as a read on how well the fit did.
+  if (only.crossedOn)
+    return (
+      `${holding}, estimated to reach 5% of its peak around ${on(only.endDate)} ` +
+      `(actually the week of ${on(only.crossedOn)}).`
+    );
+
+  // So shallow the fit does not reach an end inside the drawn range. Naming the
+  // date it does reach would put it months past where the dashed line stops.
+  if (only.capped)
+    return (
+      `${holding}, which on ${only.fitWeeks} weeks is too slow to call an end ` +
+      `to: the run is still going past ${on(only.drawTo)}.`
+    );
+
+  // Too vague to name a date. Saying "23 October" and then "between September
+  // and next June" in the same breath just makes the first half noise.
+  if (only.spread > PROJECTION_VAGUE_WEEKS)
+    return (
+      `${holding}, but the fit is still too loose to call: it puts the end of ` +
+      `the run anywhere between ${on(only.earliest)} and ${on(only.latest)}.`
+    );
+
+  return (
+    `${holding}, the run reaches 5% of its peak around ${on(only.endDate)} — ` +
+    `between ${on(only.earliest)} and ${on(only.latest)} on the spread of the fit.`
+  );
 }
 
 function renderRun(selected) {
@@ -837,6 +1124,16 @@ function renderRun(selected) {
   // Each film is still plotted only between its own first and last screening: a
   // gap inside a run really is a zero-screening day, but outside the run the film
   // was not in cinemas at all, and filling those with zero invents data.
+  // Opt-in, and off by default: the dashed lines are a model, not measurement,
+  // and they should not be the first thing the chart says about a film.
+  const projected = el("runProject").checked;
+  const projections = selected.map((film) =>
+    projected ? projectRun(film.days, dataEnd) : null,
+  );
+  el("runNote").textContent = projected
+    ? projectionNote(selected, projections)
+    : "";
+
   const runs = selected.map((film) => {
     const own = Object.keys(film.days).sort();
     return { first: own[0], last: own.at(-1) };
@@ -845,20 +1142,33 @@ function renderRun(selected) {
     (a, r) => (r.first < a ? r.first : a),
     runs[0].first,
   );
-  const to = runs.reduce((a, r) => (r.last > a ? r.last : a), runs[0].last);
+  // A projection runs past the last day anything was actually screened, so the
+  // axis has to reach it — otherwise the line is drawn only as far as the
+  // measured data and stops short of the date it exists to give.
+  const to = projections.reduce(
+    (a, p) => (p && p.drawTo > a ? p.drawTo : a),
+    runs.reduce((a, r) => (r.last > a ? r.last : a), runs[0].last),
+  );
 
   // Aligned mode slides every film to a shared day 0 = its own first screening,
   // so runs that never overlapped in the calendar can be compared shape to shape.
   // The x-axis stops being a date and becomes a count of days into the run.
   const aligned = el("runNormalise").checked;
+
   const data = [];
   if (aligned) {
-    const longest = Math.max(...runs.map((r) => dayGap(r.first, r.last)));
+    const longest = Math.max(
+      ...runs.map((r) => dayGap(r.first, r.last)),
+      ...projections.map((p) => (p ? dayGap(p.first, p.drawTo) : 0)),
+    );
     for (let offset = 0; offset <= longest; offset++) {
       const row = { offset };
       selected.forEach((film, i) => {
         const date = addDays(runs[i].first, offset);
         if (date <= runs[i].last) row[`f${i}`] = film.days[date] || 0;
+        const p = projections[i];
+        if (p && date >= p.drawFrom && date <= p.drawTo)
+          row[`p${i}`] = p.rateOn(date);
       });
       data.push(row);
     }
@@ -871,6 +1181,9 @@ function renderRun(selected) {
       selected.forEach((film, i) => {
         const { first, last } = runs[i];
         if (date >= first && date <= last) row[`f${i}`] = film.days[date] || 0;
+        const p = projections[i];
+        if (p && date >= p.drawFrom && date <= p.drawTo)
+          row[`p${i}`] = p.rateOn(date);
       });
       data.push(row);
       cursor.setUTCDate(cursor.getUTCDate() + 1);
@@ -912,11 +1225,77 @@ function renderRun(selected) {
     },
   }));
 
+  // Listed before the measured series so they draw underneath: the model should
+  // never be the line sitting on top of the thing it is modelling.
+  const projectionSeries = [];
+  projections.forEach((p, i) => {
+    if (!p) return;
+    projectionSeries.push({
+      type: "line",
+      xKey: aligned ? "offset" : "date",
+      yKey: `p${i}`,
+      yName: `${selected[i].title} (projected)`,
+      // the film's own colour, dashed and dimmed — same subject, weaker claim
+      stroke: SERIES[i % SERIES.length],
+      strokeWidth: 2,
+      strokeOpacity: 0.5,
+      lineDash: [6, 5],
+      marker: { enabled: false },
+      connectMissingData: false,
+      // the legend already names the film; a second entry per film would double
+      // its length to say nothing the dashing does not
+      showInLegend: false,
+      tooltip: {
+        renderer: ({ datum }) => ({
+          title: `${selected[i].title} · projected`,
+          data: [
+            {
+              label: aligned
+                ? `Day ${datum.offset}`
+                : fmtDay.format(datum.date),
+              value: `${datum[`p${i}`].toFixed(1)} screenings/day`,
+            },
+            {
+              label: "Holding week to week",
+              value: `${(p.retention * 100).toFixed(0)}%`,
+            },
+            {
+              label: "Fitted on",
+              value: `${p.fitWeeks} weeks to ${fmtDay.format(asDate(p.observedTo))}`,
+            },
+            {
+              label: "Run over by",
+              value: p.capped
+                ? `beyond ${fmtDay.format(asDate(p.drawTo))}`
+                : fmtDay.format(asDate(p.endDate)),
+            },
+            {
+              // ~73% of the time in backtest, not the nominal 95% — the gap is
+              // films losing screens, which the fit cannot see coming
+              label: "Range (holds ~3 in 4)",
+              value: `${fmtDay.format(asDate(p.earliest))} – ${fmtDay.format(asDate(p.latest))}`,
+            },
+            // only once it has actually happened; measured, so it goes last as
+            // the thing the rows above were estimating
+            ...(p.crossedOn
+              ? [
+                  {
+                    label: "Actually reached it",
+                    value: `week of ${fmtDay.format(asDate(p.crossedOn))}`,
+                  },
+                ]
+              : []),
+          ],
+        }),
+      },
+    });
+  });
+
   const options = {
     ...chartBase,
     container: el("runChart"),
     data,
-    series,
+    series: [...projectionSeries, ...series],
     axes: runAxes(aligned),
     // one series is self-evident from the heading; two or more need a legend
     legend: {
@@ -934,12 +1313,15 @@ function renderRun(selected) {
     },
   };
   // switching alignment swaps the x-axis between time and number — rebuild rather
-  // than update, since that is a change of axis type, not just of data
-  if (runChart && runAligned !== aligned) {
+  // than update, since that is a change of axis type, not just of data. The
+  // projection toggle adds and removes whole series, so it gets the same
+  // treatment rather than trusting update() to reconcile the difference.
+  if (runChart && (runAligned !== aligned || runProjected !== projected)) {
     runChart.destroy();
     runChart = null;
   }
   runAligned = aligned;
+  runProjected = projected;
   runChart = runChart
     ? (runChart.update(options), runChart)
     : AgCharts.create(options);
@@ -997,6 +1379,10 @@ function renderFilms(blob, boundary) {
   } else if (boundary) {
     for (const days of Object.values(byFilm)) delete days[boundary];
   }
+  // Whichever branch ran above decides where the measured data stops, and the
+  // projection needs that to know whether a film's last week is a real week or
+  // just the part of one the build happened to catch.
+  dataEnd = blob.provisional ? boundary : addDays(boundary, -1);
 
   let films = Object.entries(byFilm).map(([id, days]) => {
     const dates = Object.keys(days).sort();
@@ -1027,6 +1413,13 @@ function renderFilms(blob, boundary) {
       accentColor: SERIES[0],
       backgroundColor: SURFACE,
     });
+
+  // Declared before the grid so the selection handler cannot reach it in its
+  // temporal dead zone; `grid` inside is only read once something is selected.
+  const rechart = () =>
+    renderRun(
+      grid.getSelectedRows().map((r) => ({ title: r.title, days: r.series })),
+    );
 
   const grid = createGrid(el("filmGrid"), {
     theme,
@@ -1082,10 +1475,7 @@ function renderFilms(blob, boundary) {
         filterParams: { defaultOption: "greaterThanOrEqual" },
       },
     ],
-    onSelectionChanged: () =>
-      renderRun(
-        grid.getSelectedRows().map((r) => ({ title: r.title, days: r.series })),
-      ),
+    onSelectionChanged: () => rechart(),
   });
 
   el("filmGridSub").innerHTML =
@@ -1093,12 +1483,9 @@ function renderFilms(blob, boundary) {
     `(${fmtInt.format(oneOff)} one-off screenings excluded).<br>` +
     `Filter in any column, then tick films to compare their runs.`;
 
-  // Re-chart the current selection when the alignment toggle flips
-  el("runNormalise").addEventListener("change", () =>
-    renderRun(
-      grid.getSelectedRows().map((r) => ({ title: r.title, days: r.series })),
-    ),
-  );
+  // Re-chart the current selection when either toggle flips
+  el("runNormalise").addEventListener("change", rechart);
+  el("runProject").addEventListener("change", rechart);
 
   // Nothing is selected on arrival, so put the run chart into its empty state
   // explicitly rather than relying on the markup's initial attribute — this is
