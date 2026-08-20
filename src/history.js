@@ -935,14 +935,26 @@ function openingDay(days) {
 
 // The day the film's wide release effectively ended, as against the day it was
 // last shown anywhere — long-tail one-off and repertory bookings can trail a
-// film for years after it has otherwise left cinemas. Mirrors openingDay: the
-// last day it still reaches a fifth of its own best day.
+// film for years after it has otherwise left cinemas. Unlike openingDay, a
+// single day's count is the wrong yardstick here: a hit's peak day can run to
+// several hundred screenings, and 20% of that is still deep in the decline,
+// not the flatline the trim is meant to remove — chomping the chart off while
+// it is still clearly headed down. Mirrors the "run over" point projectRun
+// uses instead: the last week that still reaches a twentieth of the film's
+// peak WEEK, past which it is one-off bookings, not the run.
 function closingDay(days) {
-  const best = Math.max(...Object.values(days));
-  return Object.keys(days)
-    .sort()
-    .reverse()
-    .find((date) => days[date] >= best * PROJECTION_OPENING_SHARE);
+  const dates = Object.keys(days).sort();
+  const first = dates[0];
+  const last = dates.at(-1);
+  const weeks = weeklyTotals(days, first, last);
+  if (!weeks.length) return last;
+  const peak = Math.max(...weeks);
+  const threshold = peak * PROJECTION_END_SHARE;
+  let endWeek = weeks.indexOf(peak);
+  for (let w = endWeek; w < weeks.length && weeks[w] >= threshold; w++)
+    endWeek = w;
+  const weekEnd = addDays(first, endWeek * 7 + 6);
+  return weekEnd < last ? weekEnd : last;
 }
 
 // Fit a film's decline and say where it runs out. Returns null when the film has
