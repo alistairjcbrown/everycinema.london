@@ -25,6 +25,7 @@ import {
   ClientSideRowModelModule,
   TextFilterModule,
   NumberFilterModule,
+  DateFilterModule, // agDateColumnFilter, for the Opening column
   RowSelectionModule, // select films to compare their runs
   enableDevValidations,
 } from "ag-grid-community";
@@ -35,6 +36,7 @@ ModuleRegistry.registerModules([
   ClientSideRowModelModule,
   TextFilterModule, // agTextColumnFilter + its floating filter
   NumberFilterModule, // agNumberColumnFilter + its floating filter
+  DateFilterModule, // agDateColumnFilter + its floating filter
   RowSelectionModule,
 ]);
 ChartModuleRegistry.registerModules([
@@ -134,6 +136,12 @@ const legendBase = {
 const fmtInt = new Intl.NumberFormat("en-GB");
 const fmtDay = new Intl.DateTimeFormat("en-GB", {
   weekday: "short",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+// No weekday: a grid column, not a chart tooltip, so it stays narrow.
+const fmtDate = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
   year: "numeric",
@@ -925,6 +933,18 @@ function openingDay(days) {
     .find((date) => days[date] >= best * PROJECTION_OPENING_SHARE);
 }
 
+// The day the film's wide release effectively ended, as against the day it was
+// last shown anywhere — long-tail one-off and repertory bookings can trail a
+// film for years after it has otherwise left cinemas. Mirrors openingDay: the
+// last day it still reaches a fifth of its own best day.
+function closingDay(days) {
+  const best = Math.max(...Object.values(days));
+  return Object.keys(days)
+    .sort()
+    .reverse()
+    .find((date) => days[date] >= best * PROJECTION_OPENING_SHARE);
+}
+
 // Fit a film's decline and say where it runs out. Returns null when the film has
 // not given the fit enough to work with, which is a normal answer, not a failure.
 function projectRun(days, dataEnd) {
@@ -1149,12 +1169,19 @@ function renderRun(selected) {
   // the chart and throws off both the aligned day-0 and any calendar overlap
   // with other films. Trimming to the same "opening" the decline fit anchors
   // on — the first day a film reaches a fifth of its own best day — drops it.
+  // The same trailing tail Super Mario Galaxy showed in the projection comment
+  // above — falling to a handful of screenings a week, then still turning up
+  // occasionally for years on repertory and one-off bookings — stretches a run
+  // on the chart long after the wide release that makes it comparable to
+  // others has finished. Trimming to the last day a film reaches a fifth of
+  // its own best day drops that tail, symmetric with trimming the lead-in.
   const trimLeadIn = el("runTrimLeadIn").checked;
+  const trimTail = el("runTrimTail").checked;
   const runs = selected.map((film) => {
     const own = Object.keys(film.days).sort();
     return {
       first: trimLeadIn ? openingDay(film.days) : own[0],
-      last: own.at(-1),
+      last: trimTail ? closingDay(film.days) : own.at(-1),
     };
   });
   const from = runs.reduce(
@@ -1416,6 +1443,7 @@ function renderFilms(blob, boundary) {
       days: dates.length,
       first: dates[0],
       last: dates.at(-1),
+      opening: asDate(openingDay(days)),
       series: days,
     };
   });
@@ -1495,6 +1523,17 @@ function renderFilms(blob, boundary) {
         filter: "agNumberColumnFilter",
         filterParams: { defaultOption: "greaterThanOrEqual" },
       },
+      {
+        field: "opening",
+        headerName: "Opening",
+        width: 130,
+        // the first day a film reaches a fifth of its own best day — the same
+        // "opening" the run chart's lead-in trim and decline projection anchor
+        // on, not the day it was first (often sparsely) shown anywhere
+        filter: "agDateColumnFilter",
+        filterParams: { defaultOption: "greaterThanOrEqual" },
+        valueFormatter: ({ value }) => fmtDate.format(value),
+      },
     ],
     onSelectionChanged: () => rechart(),
   });
@@ -1508,6 +1547,7 @@ function renderFilms(blob, boundary) {
   el("runNormalise").addEventListener("change", rechart);
   el("runProject").addEventListener("change", rechart);
   el("runTrimLeadIn").addEventListener("change", rechart);
+  el("runTrimTail").addEventListener("change", rechart);
 
   // Nothing is selected on arrival, so put the run chart into its empty state
   // explicitly rather than relying on the markup's initial attribute — this is
