@@ -1142,9 +1142,20 @@ function renderRun(selected) {
     ? projectionNote(selected, projections)
     : "";
 
+  // A film's first recorded screening is very often a preview, or a handful of
+  // sparse lead-in dates well ahead of general release — The Invite ran 1
+  // screening on 3 June, 12 on the 23rd and 16 on the 30th before opening wide
+  // at 301 on 3 July. Left in, that lead-in is most of a run's early length on
+  // the chart and throws off both the aligned day-0 and any calendar overlap
+  // with other films. Trimming to the same "opening" the decline fit anchors
+  // on — the first day a film reaches a fifth of its own best day — drops it.
+  const trimLeadIn = el("runTrimLeadIn").checked;
   const runs = selected.map((film) => {
     const own = Object.keys(film.days).sort();
-    return { first: own[0], last: own.at(-1) };
+    return {
+      first: trimLeadIn ? openingDay(film.days) : own[0],
+      last: own.at(-1),
+    };
   });
   const from = runs.reduce(
     (a, r) => (r.first < a ? r.first : a),
@@ -1493,9 +1504,10 @@ function renderFilms(blob, boundary) {
     `(${fmtInt.format(oneOff)} one-off screenings excluded).<br>` +
     `Filter in any column, then tick films to compare their runs.`;
 
-  // Re-chart the current selection when either toggle flips
+  // Re-chart the current selection when any toggle flips
   el("runNormalise").addEventListener("change", rechart);
   el("runProject").addEventListener("change", rechart);
+  el("runTrimLeadIn").addEventListener("change", rechart);
 
   // Nothing is selected on arrival, so put the run chart into its empty state
   // explicitly rather than relying on the markup's initial attribute — this is
