@@ -898,8 +898,31 @@ const PROJECTION_FLAT_WEEKS = 6;
 // data. Anchoring week 0 there would slide every weekly bucket off the Friday
 // the film actually opened on, mixing an opening Friday into the tail of a dying
 // week. Anchor on the first day that reaches a fifth of the film's best day
-// instead, which is the opening in every ordinary case.
+// instead, which is the opening in every ordinary case — and in the two cases
+// where it is not, on the previews the two constants below pick out.
 const PROJECTION_OPENING_SHARE = 0.2;
+// A part-day preview clears a fifth of the peak on its own. Toy Story 5 ran 394
+// screenings on 18 June — evening previews only — then 1,102, 1,290 and 1,238
+// once it opened on the 19th. Anchored on the 18th, the run opens on a day that
+// reads as a collapse the film immediately recovered from, and the trim the
+// anchor exists to drive leaves the previews on the chart. What separates a
+// preview from an opening is not its size against the peak but its size against
+// the days either side of it: a preview evening is a fraction of the level the
+// release settles at within a day, where an opening day is already at that
+// level — even an opening Friday is rarely half again smaller than its own
+// Saturday. Across films with more than 500 screenings, day-on-day growth
+// inside an established run passes 1.57x once in a hundred days.
+const PREVIEW_DAY_SHARE = 0.6;
+// ...measured against the busiest of the next few days rather than tomorrow
+// alone, so one quiet day cannot end the walk early.
+const PREVIEW_LOOKAHEAD = 3;
+// The other shape is a preview weekend, and nothing about its level gives it
+// away: Hoppers ran 455 and 425 on 28 February and 1 March, went dark for four
+// days, and opened on the 6th at 416 before peaking at 610 the next day. The
+// previews are the same size as the run. The dark days are the tell — cinemas
+// do not drop a film for half a week in the middle of a release — so a gap this
+// long before the peak marks previews off from the run that follows.
+const PREVIEW_GAP_DAYS = 3;
 // Two-sided 95% t quantiles by degrees of freedom, for the slope interval. A fit
 // on four weekly points has 2 degrees of freedom, where t is 4.30 against the
 // normal's 1.96 — using the normal here would draw a band less than half the
@@ -927,10 +950,32 @@ function weeklyTotals(days, opening, dataEnd) {
 
 // The day the film opened, as against the day it was first shown anywhere.
 function openingDay(days) {
+  const dates = Object.keys(days).sort();
   const best = Math.max(...Object.values(days));
-  return Object.keys(days)
-    .sort()
-    .find((date) => days[date] >= best * PROJECTION_OPENING_SHARE);
+  const peak = dates.find((date) => days[date] === best);
+  let opening = dates.find(
+    (date) => days[date] >= best * PROJECTION_OPENING_SHARE,
+  );
+
+  // A preview weekend cut off from the run by dark days. Only gaps before the
+  // peak count, and only when what follows the gap is itself run-sized, so a
+  // sparse lead-in cannot drag the opening past the release it leads in to.
+  for (let i = 1; i < dates.length && dates[i] <= peak; i++) {
+    if (dayGap(dates[i - 1], dates[i]) - 1 < PREVIEW_GAP_DAYS) continue;
+    if (days[dates[i]] < best * PROJECTION_OPENING_SHARE) continue;
+    if (dates[i] > opening) opening = dates[i];
+  }
+
+  // Then walk off part-day previews a day at a time, bounded by the peak day,
+  // which is by definition not one.
+  while (opening < peak) {
+    let after = 0;
+    for (let d = 1; d <= PREVIEW_LOOKAHEAD; d++)
+      after = Math.max(after, days[addDays(opening, d)] || 0);
+    if (days[opening] >= after * PREVIEW_DAY_SHARE) break;
+    opening = addDays(opening, 1);
+  }
+  return opening;
 }
 
 // The day the film's wide release effectively ended, as against the day it was
@@ -1180,7 +1225,8 @@ function renderRun(selected) {
   // at 301 on 3 July. Left in, that lead-in is most of a run's early length on
   // the chart and throws off both the aligned day-0 and any calendar overlap
   // with other films. Trimming to the same "opening" the decline fit anchors
-  // on — the first day a film reaches a fifth of its own best day — drops it.
+  // on — openingDay, which reads past a sparse lead-in, a preview evening and a
+  // preview weekend alike — drops it.
   // The same trailing tail Super Mario Galaxy showed in the projection comment
   // above — falling to a handful of screenings a week, then still turning up
   // occasionally for years on repertory and one-off bookings — stretches a run
@@ -1191,10 +1237,21 @@ function renderRun(selected) {
   const trimTail = el("runTrimTail").checked;
   const runs = selected.map((film) => {
     const own = Object.keys(film.days).sort();
-    return {
-      first: trimLeadIn ? openingDay(film.days) : own[0],
-      last: trimTail ? closingDay(film.days) : own.at(-1),
-    };
+    const first = trimLeadIn ? openingDay(film.days) : own[0];
+    const last = trimTail ? closingDay(film.days) : own.at(-1);
+    // Neither trim can find a release in a film that never had one. A repertory
+    // title playing one-off bookings across the year has no opening and no
+    // closing, only its own busiest day, and the two ends can cross: Eternity's
+    // opening falls 83 days after its closing, 300's 107 days after. Crossed,
+    // the film silently leaves the chart — every row below is gated on
+    // `date >= first && date <= last` — while keeping its legend entry and its
+    // colour, and a film ticked on its own takes the whole chart blank with it.
+    // Where the trims leave a single day or less of a run that plainly lasted
+    // longer, they have nothing to say about that film, so let them say nothing
+    // and plot it whole. 83 films, none of them above 200 screenings.
+    return dayGap(first, last) < 1 && dayGap(own[0], own.at(-1)) > 1
+      ? { first: own[0], last: own.at(-1) }
+      : { first, last };
   });
   const from = runs.reduce(
     (a, r) => (r.first < a ? r.first : a),
@@ -1539,9 +1596,9 @@ function renderFilms(blob, boundary) {
         field: "opening",
         headerName: "Opening",
         width: 130,
-        // the first day a film reaches a fifth of its own best day — the same
-        // "opening" the run chart's lead-in trim and decline projection anchor
-        // on, not the day it was first (often sparsely) shown anywhere
+        // the day the wide release started — the same "opening" the run
+        // chart's lead-in trim and decline projection anchor on, not the day
+        // it was first (often sparsely, or in previews) shown anywhere
         filter: "agDateColumnFilter",
         filterParams: { defaultOption: "greaterThanOrEqual" },
         valueFormatter: ({ value }) => fmtDate.format(value),
