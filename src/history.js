@@ -923,6 +923,15 @@ const PREVIEW_LOOKAHEAD = 3;
 // do not drop a film for half a week in the middle of a release — so a gap this
 // long before the peak marks previews off from the run that follows.
 const PREVIEW_GAP_DAYS = 3;
+// The gap is counted in quiet days rather than empty ones, because a single
+// booking is enough to bridge it otherwise: Project Hail Mary previewed on 14
+// and 15 March, was dark on the 16th, ran ONE screening on the 17th, was dark
+// again on the 18th and opened on the 19th at 466 on its way to 675. Three days
+// of nothing, with one show in the middle of them, and that one show is enough
+// to leave the previews looking continuous with the release. A day at a
+// twentieth of the film's best is a one-off booking, not a film in release —
+// the same yardstick closingDay and projectRun use at the other end of a run.
+const PREVIEW_QUIET_SHARE = 0.05;
 // Two-sided 95% t quantiles by degrees of freedom, for the slope interval. A fit
 // on four weekly points has 2 degrees of freedom, where t is 4.30 against the
 // normal's 1.96 — using the normal here would draw a band less than half the
@@ -948,6 +957,17 @@ function weeklyTotals(days, opening, dataEnd) {
   return weeks;
 }
 
+// The level a film is playing at once a given day is behind it: the busiest of
+// the few days that follow. Both preview tests below are really the same
+// question asked twice — is this day part of the run, or in front of it — and
+// the run is what comes next, not what this one day happens to hold.
+function levelAfter(days, date) {
+  let level = 0;
+  for (let d = 1; d <= PREVIEW_LOOKAHEAD; d++)
+    level = Math.max(level, days[addDays(date, d)] || 0);
+  return level;
+}
+
 // The day the film opened, as against the day it was first shown anywhere.
 function openingDay(days) {
   const dates = Object.keys(days).sort();
@@ -957,24 +977,41 @@ function openingDay(days) {
     (date) => days[date] >= best * PROJECTION_OPENING_SHARE,
   );
 
-  // A preview weekend cut off from the run by dark days. Only gaps before the
-  // peak count, and only when what follows the gap is itself run-sized, so a
-  // sparse lead-in cannot drag the opening past the release it leads in to.
-  for (let i = 1; i < dates.length && dates[i] <= peak; i++) {
-    if (dayGap(dates[i - 1], dates[i]) - 1 < PREVIEW_GAP_DAYS) continue;
-    if (days[dates[i]] < best * PROJECTION_OPENING_SHARE) continue;
-    if (dates[i] > opening) opening = dates[i];
+  // A preview weekend cut off from the run by quiet days. The peak day is in
+  // scope: for a film that platforms, the opening IS the peak — The Stranger
+  // trickled 1 to 11 screenings a day from 16 March, then went quiet for a week
+  // and opened on 10 April at 45, holding 45, 45, 43, 42 from there. What keeps
+  // that from dragging every sparse title forward to its busiest afternoon is
+  // the second half of the test: a gap only marks an opening when a run
+  // follows it, not a single booking. Eternity's busiest day is an isolated
+  // spike in April with nothing either side, so its opening stays in January.
+  let quiet = 0;
+  for (let date = dates[0]; date <= peak; date = addDays(date, 1)) {
+    const screenings = days[date] || 0;
+    if (screenings < best * PREVIEW_QUIET_SHARE) {
+      quiet++;
+      continue;
+    }
+    if (
+      quiet >= PREVIEW_GAP_DAYS &&
+      screenings >= best * PROJECTION_OPENING_SHARE &&
+      levelAfter(days, date) >= best * PROJECTION_OPENING_SHARE &&
+      date > opening
+    )
+      opening = date;
+    quiet = 0;
   }
 
   // Then walk off part-day previews a day at a time, bounded by the peak day,
   // which is by definition not one.
-  while (opening < peak) {
-    let after = 0;
-    for (let d = 1; d <= PREVIEW_LOOKAHEAD; d++)
-      after = Math.max(after, days[addDays(opening, d)] || 0);
-    if (days[opening] >= after * PREVIEW_DAY_SHARE) break;
+  // `|| 0` is load-bearing: the walk steps over dark days, and `undefined < x`
+  // is false, which would stop it on one and open the run on a day the film
+  // did not screen.
+  while (
+    opening < peak &&
+    (days[opening] || 0) < levelAfter(days, opening) * PREVIEW_DAY_SHARE
+  )
     opening = addDays(opening, 1);
-  }
   return opening;
 }
 
@@ -1248,7 +1285,7 @@ function renderRun(selected) {
     // colour, and a film ticked on its own takes the whole chart blank with it.
     // Where the trims leave a single day or less of a run that plainly lasted
     // longer, they have nothing to say about that film, so let them say nothing
-    // and plot it whole. 83 films, none of them above 200 screenings.
+    // and plot it whole. 42 films, one of which anyone would notice.
     return dayGap(first, last) < 1 && dayGap(own[0], own.at(-1)) > 1
       ? { first: own[0], last: own.at(-1) }
       : { first, last };
