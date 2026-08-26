@@ -16,6 +16,10 @@ London cinema performances, with three views over one dataset:
 - **Pivot** — venues × dates, reconfigurable live from the tool panel
 - **Flat** — every performance, filterable by genre, format and accessibility
 
+Plus two charting pages over the same data's history: **Screening history**
+(what actually screened, day by day and film by film) and **Venue health** (which
+venues answer when we ask, and when they publish new showtimes).
+
 It's not a replacement for Clusterflick — it's a demonstration of what AG Grid's
 row grouping, pivoting and set-filtering can do with real, messy, real-world
 data.
@@ -91,12 +95,65 @@ an interrupted backfill just resumes. In CI, `npm run history:update` does the
 incremental step — typically two new releases per day — and commits the closed
 windows.
 
+## Venue health
+
+`health.mjs` builds the data behind the venue-health page: how often each cinema
+answers when we ask it for its listings, and what time of day new showtimes
+actually appear.
+
+[clusterflick/data-analysed](https://github.com/clusterflick/data-analysed)
+probes every tracked venue once an hour and publishes the rows as **one release
+per London day**, tagged `YYYYMMDD` with a `health-log.jsonl` asset — one JSON
+row per venue per cycle, carrying what the venue was listing and, when it did not
+answer, why not. No GitHub API is involved anywhere here: a release's tag is the
+London date and the asset name is fixed, so a day's download URL is a pure
+function of the day, which means no token and no rate limit.
+
+A day's log is immutable once the day is over, so it is aggregated once and the
+aggregate committed — the same reasoning as the history windows above, and for
+the same reason: a raw day is ~1.8 MB, the aggregate ~25 KB.
+
+```bash
+npm run health:days     # aggregate finished days -> data-health/days/YYYYMM/
+npm run health:build    # merge those + today     -> public/data/health.json
+```
+
+`days` is both the backfill and the incremental step: it takes every day between
+the earliest one already held and yesterday that has no file yet, so a failed run
+— or a day the upstream workflow never published — is picked up next time rather
+than being lost. Today's log is still being appended to, so it is never
+committed; `build` fetches it itself and folds it in as a provisional day.
+
+Two things the aggregation is careful about:
+
+- **The day boundary.** Whether a venue published is a comparison against the
+  previous hourly check, and for the first check of a day that lives in the
+  previous day's file. Each day therefore carries a `tail` — what every venue was
+  listing at its last check — so the next day can open against something. Without
+  it, midnight would be a permanent hole in exactly the chart this page exists
+  for.
+- **What counts as publishing.** The headline metric is checks where a venue's
+  own listing count went *up*, not checks where anything changed. At 00:00 the
+  day that just ended drops out of every venue's listings at once, so a third of
+  the estate reads as "changed" with nobody having published anything; an
+  increase can only be new listings. It is also unit-free, which matters because
+  five chains report individual performances and three report a film × date
+  matrix — a total over both would mean nothing, so the raw "listings added"
+  figure is only offered where the selection speaks one unit.
+
+Venue and chain display names come from the Clusterflick combined data the site
+build already downloads, keyed by the same cinema id the health log uses. Nothing
+about the venue list is written down in this repo: whatever the log carries is
+what the page offers, so a venue added upstream appears on its own.
+
 ## Getting started
 
 ```bash
 npm install
 ./scripts/get-latest-combined-data.sh   # fetch Clusterflick data  -> data-combined/
 npm run transform                        # build the compact blob   -> public/data/
+npm run history:build                    # merge history           -> public/data/
+npm run health:days && npm run health:build   # venue health       -> public/data/
 npm run dev                              # http://localhost:5173
 ```
 
@@ -111,6 +168,8 @@ npm run dev                              # http://localhost:5173
 | `npm run history:windows`               | Build finalized history windows from those assets         |
 | `npm run history:update`                | Incremental history update (fetch + windows for the tail) |
 | `npm run history:build`                 | Merge history into `public/data/history.json`             |
+| `npm run health:days`                   | Aggregate finished venue-health days into `data-health/`  |
+| `npm run health:build`                  | Merge venue health into `public/data/health.json`         |
 | `npm run build`                         | Production build (app + attributions page)                |
 | `npm run preview`                       | Preview the production build                              |
 | `npm run history:latest-tag`             | Print the release the site build pins its data to         |
@@ -123,12 +182,13 @@ Deployed to [GitHub Pages](https://pages.github.com) via GitHub Actions
 every push to `main`, daily on a schedule (to pick up fresh data), or on manual
 dispatch, CI:
 
-1. runs `npm run history:update` to close any windows the newest releases
-   superseded, and commits them (the only job with write access; pushes made
-   with `github.token` do not re-trigger the workflow, so it cannot loop)
+1. runs `npm run history:update` and `npm run health:days` to close any history
+   windows the newest releases superseded and aggregate any venue-health day
+   that has finished, and commits both (the only job with write access; pushes
+   made with `github.token` do not re-trigger the workflow, so it cannot loop)
 2. installs deps, then runs the fetch script + `npm run transform` to produce
    the data
-3. runs `npm run history:build`, then `npm run build`
+3. runs `npm run history:build` and `npm run health:build`, then `npm run build`
 4. publishes `dist/` to GitHub Pages
 
 Step 2 pins its download to the release step 1 indexed

@@ -24,13 +24,18 @@ concurrency:
 permissions: {}
 
 jobs:
-  # Close any performance-history windows that the newest releases have now
-  # superseded, and commit them. Windows are write-once, so this only ever adds
-  # files. Unlike every other job here this one needs write access and therefore
-  # keeps its checkout credentials — pushes made with github.token deliberately
-  # do NOT trigger another workflow run, so this cannot loop.
-  history:
-    name: Update performance history
+  # Close whatever the newest upstream releases have now superseded, and commit
+  # it: performance-history windows, and venue-health day aggregates. Both are
+  # write-once — a window is a pure function of one release, a day aggregate of
+  # one finished London day — so this only ever adds files.
+  #
+  # Both live in one job because both push to the same branch, and two jobs
+  # racing to do that would just conflict. Unlike every other job here it needs
+  # write access and therefore keeps its checkout credentials; pushes made with
+  # github.token deliberately do NOT trigger another workflow run, so this
+  # cannot loop.
+  data:
+    name: Update committed data
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -39,26 +44,32 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
-      # history.mjs has no dependencies, so no npm ci needed here
-      - name: Finalize newly-closed windows
+      # neither history.mjs nor health.mjs has dependencies, so no npm ci here
+      - name: Finalize newly-closed history windows
         run: npm run history:update
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: Commit new windows
+      # Aggregates every day up to yesterday that has no file yet, so a run that
+      # failed — or a day clusterflick/data-analysed never published — is picked
+      # up by the next run rather than being lost. No token: a health release's
+      # asset URL is derived from its date, so nothing here touches the API.
+      - name: Aggregate finished venue-health days
+        run: npm run health:days
+      - name: Commit new data
         run: |
-          if [ -z "$(git status --porcelain data-history)" ]; then
-            echo "No history changes to commit."
+          if [ -z "$(git status --porcelain data-history data-health)" ]; then
+            echo "No data changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data-history
-          git commit -m "Update performance history windows"
+          git add data-history data-health
+          git commit -m "Update performance history and venue health data"
           git push
 
   build:
     name: Build site
-    needs: history
+    needs: data
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -67,7 +78,7 @@ jobs:
         with:
           persist-credentials: false
           # take the branch tip rather than the triggering SHA, so this picks up
-          # the windows the history job just committed
+          # the windows and day aggregates the data job just committed
           ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v6
         with:
@@ -88,6 +99,11 @@ jobs:
         run: npm run transform
       - name: Build performance history blob
         run: npm run history:build
+      # Merges the committed day aggregates with today's still-open health log,
+      # which it fetches itself — the job that writes day files is a different
+      # checkout, so today's cannot be handed over from there.
+      - name: Build venue health blob
+        run: npm run health:build
       - name: Build site
         run: npm run build
       - uses: actions/upload-pages-artifact@v5
