@@ -12,6 +12,8 @@
     "history:update": "node history.mjs update",
     "history:build": "node history.mjs build",
     "history:latest-tag": "node history.mjs latest-tag",
+    "health:days": "node health.mjs days",
+    "health:build": "node health.mjs build",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
