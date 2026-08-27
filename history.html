@@ -127,7 +127,19 @@
 
     <main>
       <section class="card">
-        <h2>Screenings per day across London</h2>
+        <h2>
+          <span>Screenings per day across London</span>
+          <div class="toggle-controls">
+            <label class="toggle">
+              <input type="checkbox" id="dailyHolidays" checked />
+              School holidays
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="dailyWeekends" />
+              Weekends
+            </label>
+          </div>
+        </h2>
         <p class="sub" id="dailySub">&nbsp;</p>
         <div class="stats" id="stats"></div>
         <div class="chart" id="dailyChart"></div>
