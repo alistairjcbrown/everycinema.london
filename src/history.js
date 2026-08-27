@@ -67,6 +67,14 @@ const SURFACE = "#1c1c20"; // the .card background these charts sit on
 // cannot grow a visible outline — see holidayCrossLines.
 const HOLIDAY_WASH = "#c98500";
 const HOLIDAY_WASH_OPACITY = 0.08;
+// Weekend bands on the same chart. Neutral rather than warm — a second hue would
+// read as a second KIND of event competing with the holidays, and these are only
+// ever a backdrop. Fainter than the holiday wash too: there are ~30 of them
+// across the axis where there are five holidays, so at equal weight the chart
+// becomes a stripe pattern with a series somewhere behind it. Where a weekend
+// falls inside a holiday the two washes stack, which is correct — it is both.
+const WEEKEND_WASH = "#9aa4b2";
+const WEEKEND_WASH_OPACITY = 0.06;
 // Release markers on the concentration chart. Deliberately NOT the holiday warm:
 // these mark a different kind of event, and a shared colour would imply otherwise.
 // A neutral hairline, a couple of shades up from the gridlines so it reads as
@@ -238,6 +246,51 @@ function holidayCrossLines(from, to) {
 }
 
 // ---------------------------------------------------------------------------
+// Weekends
+// ---------------------------------------------------------------------------
+
+// Saturday-and-Sunday as one band rather than two, so the pair reads as a single
+// weekend and no hairline appears down the middle of it where two adjacent
+// ranges meet. Same whole-day convention as the holiday bands: 00:00 on the
+// Saturday to 00:00 on the Monday.
+//
+// A Sunday only opens a band of its own when it is the first day plotted — every
+// other Sunday is already covered by the Saturday before it. Both ends are
+// clamped to the plotted range for the same reason the holidays are: an
+// overhanging band would stretch the axis into empty space.
+function weekendCrossLines(from, to) {
+  const first = Date.parse(`${from}T00:00:00Z`);
+  const last = Date.parse(`${to}T00:00:00Z`);
+  const bands = [];
+  for (let t = first; t <= last; t += DAY_MS) {
+    const weekday = new Date(t).getUTCDay(); // 0 Sun, 6 Sat
+    if (weekday !== 6 && (weekday !== 0 || t !== first)) continue;
+    const end = Math.min(t + (weekday === 6 ? 2 : 1) * DAY_MS, last + DAY_MS);
+    bands.push({
+      type: "range",
+      range: [new Date(t), new Date(end)],
+      fill: WEEKEND_WASH,
+      fillOpacity: WEEKEND_WASH_OPACITY,
+      // edges matched to the fill for the same reason as the holiday bands, and
+      // more so here: 30-odd default-stroked ranges would be 60 vertical rules
+      stroke: WEEKEND_WASH,
+      strokeOpacity: WEEKEND_WASH_OPACITY,
+      strokeWidth: 1,
+    });
+  }
+  return bands;
+}
+
+// Weekends first so the holiday bands and their labels draw over the top, and so
+// a holiday reads as the louder of the two where they overlap.
+function dailyCrossLines(from, to) {
+  return [
+    ...(el("dailyWeekends").checked ? weekendCrossLines(from, to) : []),
+    ...(el("dailyHolidays").checked ? holidayCrossLines(from, to) : []),
+  ];
+}
+
+// ---------------------------------------------------------------------------
 // Daily totals
 // ---------------------------------------------------------------------------
 
@@ -368,13 +421,15 @@ function renderDaily(summary) {
   });
 
   // the plotted span: the finalized days plus however many listed days survived
-  // clipping, which is what the holiday bands are clamped to
+  // clipping, which is what the holiday and weekend bands are clamped to
   const plottedTo = (listedData.at(-1)?.date ?? asDate(dates.at(-1)))
     .toISOString()
     .slice(0, 10);
 
-  dailyChart?.destroy();
-  dailyChart = AgCharts.create({
+  // Kept on the module so the band toggles can swap the cross lines and hand the
+  // same options back to update(), rather than re-running this whole render
+  dailySpan = [dates[0], plottedTo];
+  dailyOptions = {
     ...chartBase,
     // more top room than the other charts: the holiday band labels sit above the
     // plot, and the default 16px is only enough for the y-axis tick label
@@ -390,7 +445,7 @@ function renderDaily(summary) {
       x: {
         type: "time",
         position: "bottom",
-        crossLines: holidayCrossLines(dates[0], plottedTo),
+        crossLines: dailyCrossLines(...dailySpan),
       },
       y: {
         type: "number",
@@ -401,7 +456,9 @@ function renderDaily(summary) {
       },
     },
     legend: legendBase,
-  });
+  };
+  dailyChart?.destroy();
+  dailyChart = AgCharts.create(dailyOptions);
 
   const totals = Object.values(finalized.days);
   const busiest = Object.entries(finalized.days).sort((a, b) => b[1] - a[1])[0];
@@ -427,18 +484,43 @@ function renderDaily(summary) {
     `Every recorded screening across London's cinemas, ${fmtDay.format(
       asDate(Object.keys(finalized.days)[0]),
     )} to ${fmtDay.format(asDate(boundary))}.`;
-  el("dailyNote").textContent =
-    "Solid line: screenings that actually ran, taken from the release that was " +
-    "current at the time. Dashed: what is currently listed for the days ahead — " +
-    "cinemas publish schedules only a few days out, so it is shown only while it " +
-    "stays comparable, and is not a forecast. Shaded: London school holidays, " +
-    "which account for every spike in the series — half-term and Easter weekdays " +
-    "run 14-23% busier than the term weeks either side, and almost all of the " +
-    "extra screenings are morning ones.";
+  el("dailyNote").textContent = dailyNote();
   el("meta").textContent =
     `${fmtInt.format(finalized.performances)} screenings · ${
       finalized.windows
     } windows`;
+}
+
+// Only describe the bands that are actually drawn, and name them by colour once
+// both can be on at the same time — "shaded" stops being enough to tell the
+// reader which sentence is about which band.
+function dailyNote() {
+  const both = el("dailyHolidays").checked && el("dailyWeekends").checked;
+  return [
+    "Solid line: screenings that actually ran, taken from the release that was " +
+      "current at the time. Dashed: what is currently listed for the days ahead — " +
+      "cinemas publish schedules only a few days out, so it is shown only while it " +
+      "stays comparable, and is not a forecast.",
+    el("dailyHolidays").checked &&
+      `${both ? "Amber bands" : "Shaded"}: London school holidays, which ` +
+        "account for every spike in the series — half-term and Easter weekdays " +
+        "run 14-23% busier than the term weeks either side, and almost all of " +
+        "the extra screenings are morning ones.",
+    el("dailyWeekends").checked &&
+      `${both ? "Grey bands" : "Shaded"}: weekends, Saturday and Sunday.`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+// Only the bands change, so the chart is updated rather than rebuilt. update()
+// replaces the chart's options wholesale, so it is handed the stored options with
+// the cross lines swapped — a partial object would drop the series with them.
+function redrawDailyBands() {
+  if (!dailyChart) return;
+  dailyOptions.axes.x.crossLines = dailyCrossLines(...dailySpan);
+  dailyChart.update(dailyOptions);
+  el("dailyNote").textContent = dailyNote();
 }
 
 // ---------------------------------------------------------------------------
@@ -803,6 +885,10 @@ let runProjected = null;
 // apart from a week a film genuinely gave up on. Set once the films are built.
 let dataEnd = null;
 let dailyChart = null;
+// The daily chart's own options and the range they were built for, kept so the
+// band toggles can swap the cross lines without re-deriving the series.
+let dailyOptions = null;
+let dailySpan = null;
 let shareChart = null;
 
 // Show the panel instead of the plot. The chart is destroyed rather than hidden:
@@ -1677,6 +1763,10 @@ const load = (path) =>
 load("/data/history-summary.json")
   .then(async (summary) => {
     renderDaily(summary);
+    // Wired here rather than at module scope so they cannot fire before there is
+    // a chart to redraw
+    el("dailyHolidays").addEventListener("change", redrawDailyBands);
+    el("dailyWeekends").addEventListener("change", redrawDailyBands);
     renderHours(summary);
     const blob = await load("/data/history.json");
     renderShare(blob, summary.finalized.partialDay);
