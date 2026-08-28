@@ -9,9 +9,11 @@
 //     reason? }
 //
 // `reason.kind` is absent when the venue answered; otherwise it says what was
-// seen instead — `bot-challenge`, `source-maintenance`, `no-listings-found` are
-// observations about the source, `unknown-venue-id` and `probe-error` mean
-// something is wrong on our side.
+// seen instead, and it falls into three groups. `bot-challenge`,
+// `source-maintenance`, `source-queue` and `no-listings-found` are observations
+// about the source; `unknown-venue-id` and `probe-error` mean something is wrong
+// on our side; and `expected-closure` is a closure declared upstream, which is
+// neither — see FAILURE_KINDS and EXPECTED_KINDS below.
 //
 // Two questions come out of that log, and this builds the data for both:
 //
@@ -68,6 +70,15 @@ const DISCOVER_MISS_RUN = 7;
 // the upstream log uses to decide its own exit code — kept here so the site can
 // say "we could not see this venue" separately from "the venue said no".
 const FAILURE_KINDS = new Set(["unknown-venue-id", "probe-error"]);
+
+// Which kinds mean the venue was never in a position to answer. Upstream
+// re-labels a venue that has gone from its chain's own site list, or that lists
+// nothing, as `expected-closure` when a declared closure covers the date — a
+// refurbishment it has cited and windowed in `common/expected-closures.js`. The
+// check did not fail and the source did not push back; the doors were shut, so
+// there was no listing to answer with. The site scores these as neither uptime
+// nor downtime — see `renderUptime` in src/health.js.
+const EXPECTED_KINDS = new Set(["expected-closure"]);
 
 // The one number per venue that says how much is listed. Chains answer at
 // different granularities — five report individual performances, three a film ×
@@ -522,6 +533,7 @@ async function build() {
     timezone: "Europe/London",
     source: `https://github.com/${REPO}/releases`,
     failureKinds: [...FAILURE_KINDS],
+    expectedKinds: [...EXPECTED_KINDS],
     from: dayList[0].day,
     to: dayList.at(-1).day,
     days: dayList,

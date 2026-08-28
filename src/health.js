@@ -55,6 +55,10 @@ const ACCENT = "#3b82f6";
 const OK_INK = "#199e70"; // aqua — the venue answered
 const SOURCE_INK = "#c98500"; // yellow — the source pushed back
 const FAIL_INK = "#e66767"; // red — we could not see the venue at all
+// Grey rather than a palette slot, and deliberately so: a declared closure is
+// the one outcome that is not a result. It should read as stood down next to
+// the three inks above, not as a fourth kind of problem competing with them.
+const EXPECTED_INK = "#71717a";
 const SURFACE = "#1c1c20"; // the .card background these charts sit on
 const AXIS_INK = "#a1a1aa";
 const GRID_INK = "#2e2e34";
@@ -323,16 +327,34 @@ function kindTotals(venues) {
 }
 
 const isFailure = (kind) => blob.failureKinds.includes(kind);
+// A closure we declared upstream, and therefore neither an answer nor a fault.
+// Defaulted rather than read straight off the blob so a checkout holding a
+// health.json built before this existed still renders, one kind short.
+const isExpected = (kind) => (blob.expectedKinds ?? []).includes(kind);
+const expectedTotal = (kinds) =>
+  Object.entries(kinds).reduce(
+    (sum, [kind, n]) => (isExpected(kind) ? sum + n : sum),
+    0,
+  );
 const outcomeInk = (kind) =>
-  kind === "ok" ? OK_INK : isFailure(kind) ? FAIL_INK : SOURCE_INK;
+  kind === "ok"
+    ? OK_INK
+    : isExpected(kind)
+      ? EXPECTED_INK
+      : isFailure(kind)
+        ? FAIL_INK
+        : SOURCE_INK;
 // `no-listings-found` is a source saying there is nothing on; `probe-error` is
-// us failing to look. Neither reads well as a raw slug in a legend.
+// us failing to look; `source-queue` is a virtual waiting room in front of an
+// on-sale. None of them reads well as a raw slug in a legend.
 const outcomeLabel = (kind) =>
   ({
     ok: "Answered",
     "bot-challenge": "Bot challenge",
     "source-maintenance": "Source in maintenance",
+    "source-queue": "Held in a queue",
     "no-listings-found": "Nothing listed",
+    "expected-closure": "Closed (expected)",
     "unknown-venue-id": "Venue id not found",
     "probe-error": "Check failed",
   })[kind] ?? kind;
@@ -355,6 +377,15 @@ function cellValue(totals, day, hour) {
 function renderUptime(totals) {
   const kinds = kindTotals(scope.venues);
   const checks = Object.values(kinds).reduce((a, b) => a + b, 0);
+  // Checks a declared closure accounts for are not downtime — and not uptime
+  // either. Scoring them would put a venue at 0% for a refurbishment we knew
+  // about, cited and wrote a window for, which is the one outcome on this page
+  // meaning nothing is wrong at all. So they leave the denominator rather than
+  // the numerator: the same rule the publish comparison already applies to a
+  // pair it cannot compare — say nothing rather than something wrong. They stay
+  // fully visible in the daily chart below, in their own ink.
+  const closed = expectedTotal(kinds);
+  const open = checks - closed;
   const answered = kinds.ok ?? 0;
 
   // The hour that most often had something new in it, across the whole window.
@@ -375,7 +406,7 @@ function renderUptime(totals) {
   const stats = [
     ["Venues", fmtInt.format(scope.venues.length)],
     ["Hourly checks", fmtInt.format(checks)],
-    ["Answered", pct(answered, checks, 1)],
+    ["Answered", pct(answered, open, 1)],
     ["Days observed", fmtInt.format(blob.days.length)],
     ["Peak publish hour", best.hour === null ? "—" : hh(best.hour)],
   ];
@@ -474,16 +505,30 @@ function renderUptime(totals) {
   });
 
   const issues = Object.entries(kinds)
-    .filter(([kind]) => kind !== "ok")
+    .filter(([kind]) => kind !== "ok" && !isExpected(kind))
     .sort(([, a], [, b]) => b - a);
-  el("uptimeNote").innerHTML =
-    (issues.length
-      ? `<strong>${pct(answered, checks, 1)}</strong> of checks got an answer. ` +
+  // Said rather than silently dropped: closures are why this percentage is over
+  // fewer checks than the tile above it counts, and a reader who cannot see
+  // that has been handed a number they cannot reconcile.
+  const closedNote = closed
+    ? ` A further ${fmtInt.format(closed)} ${closed === 1 ? "check fell" : "checks fell"} ` +
+      `inside a declared closure and ${closed === 1 ? "is" : "are"} left out.`
+    : "";
+  // The all-clear no longer names the things that did not happen. That list was
+  // a copy of the kind vocabulary, and it went stale the moment upstream added
+  // one; there is nothing to keep in step with here.
+  const headline = !open
+    ? `<strong>Nothing to score</strong> — every venue in scope was closed for the whole window.`
+    : issues.length
+      ? `<strong>${pct(answered, open, 1)}</strong> of checks got an answer. ` +
         `The rest: ${issues
           .map(([kind, n]) => `${fmtInt.format(n)} ${outcomeLabel(kind).toLowerCase()}`)
           .join(", ")}.`
-      : `<strong>Every one of the ${fmtInt.format(checks)} checks got an answer</strong> — ` +
-        `no bot challenges, no maintenance pages, nothing missing.`) +
+      : `<strong>Every one of the ${fmtInt.format(open)} checks got an answer</strong> — ` +
+        `nothing pushed back and nothing went missing.`;
+  el("uptimeNote").innerHTML =
+    headline +
+    closedNote +
     ` Sampling: ${gaps.length ? `cycles missing at ${gaps.join("; ")}` : "no missing cycles on a completed day"}.`;
 }
 
@@ -789,18 +834,26 @@ function venueRows() {
       }
     }
     const checks = Object.values(venue.kinds).reduce((a, b) => a + b, 0);
+    // Closures come out of the rate but stay in the cell beside it. A row that
+    // dropped them entirely would show a venue with a full count of checks, a
+    // clean answered figure and nothing accounting for the gap between them.
+    const closed = expectedTotal(venue.kinds);
+    const open = checks - closed;
     const issues = Object.entries(venue.kinds)
-      .filter(([kind]) => kind !== "ok")
-      .sort(([, a], [, b]) => b - a);
+      .filter(([kind]) => kind !== "ok" && !isExpected(kind))
+      .sort(([, a], [, b]) => b - a)
+      .map(([kind, n]) => `${n} ${outcomeLabel(kind).toLowerCase()}`);
+    if (closed) issues.push(`${closed} closed (not counted)`);
     return {
       id,
       name: venue.name,
       chain: blob.chains[venue.chain] ?? venue.chain,
       checks,
-      answered: checks ? (100 * (venue.kinds.ok ?? 0)) / checks : 0,
-      issues: issues.length
-        ? issues.map(([kind, n]) => `${n} ${outcomeLabel(kind).toLowerCase()}`).join(", ")
-        : "—",
+      // null, not 0: a venue shut for the whole window was never asked a
+      // question it could answer, and 0% would sort it to the top of this
+      // column as the worst venue on the estate rather than a closed one.
+      answered: open ? (100 * (venue.kinds.ok ?? 0)) / open : null,
+      issues: issues.length ? issues.join(", ") : "—",
       publishRate: compared ? (100 * up) / compared : 0,
       added,
       // Named so the column header can say what "added" is counting, since a
@@ -863,12 +916,26 @@ function renderGrid() {
       {
         field: "answered",
         headerName: "Answered",
+        headerTooltip:
+          "Share of checks that got an answer, over the hours the venue was open — checks inside a declared closure are excluded",
         width: 130,
         sort: "asc", // anything that is not 100% is what this column is for
         filter: "agNumberColumnFilter",
         filterParams: { defaultOption: "lessThanOrEqual" },
-        valueFormatter: ({ value }) => `${value.toFixed(1)}%`,
-        cellStyle: ({ value }) => (value < 100 ? { color: SOURCE_INK } : null),
+        // A venue with no open checks has no rate to sort on. The default
+        // comparator puts null first, which in a column sorted worst-first is
+        // exactly where a closed venue should not be, so it is pinned to the
+        // bottom in both directions using the direction AG Grid passes in.
+        comparator: (a, b, _nodeA, _nodeB, isDescending) => {
+          if (a === null && b === null) return 0;
+          if (a === null) return isDescending ? -1 : 1;
+          if (b === null) return isDescending ? 1 : -1;
+          return a - b;
+        },
+        valueFormatter: ({ value }) =>
+          value === null ? "—" : `${value.toFixed(1)}%`,
+        cellStyle: ({ value }) =>
+          value !== null && value < 100 ? { color: SOURCE_INK } : null,
       },
       { field: "issues", headerName: "Not answered", flex: 1, minWidth: 150 },
       {

@@ -124,7 +124,7 @@ the earliest one already held and yesterday that has no file yet, so a failed ru
 than being lost. Today's log is still being appended to, so it is never
 committed; `build` fetches it itself and folds it in as a provisional day.
 
-Two things the aggregation is careful about:
+Three things the page is careful about:
 
 - **The day boundary.** Whether a venue published is a comparison against the
   previous hourly check, and for the first check of a day that lives in the
@@ -140,6 +140,13 @@ Two things the aggregation is careful about:
   five chains report individual performances and three report a film × date
   matrix — a total over both would mean nothing, so the raw "listings added"
   figure is only offered where the selection speaks one unit.
+- **What counts as downtime.** Upstream declares venues it knows are shut — a
+  cited, windowed refurbishment — and labels their checks `expected-closure`
+  rather than treating a delisted venue or an empty listing as a breakage. Those
+  checks leave the uptime denominator rather than scoring against it: a venue
+  closed for a week we wrote down ourselves is not a venue that failed to answer.
+  They stay visible everywhere else, in their own ink on the daily chart and
+  counted in the venue table beside the rate they are excluded from.
 
 Venue and chain display names come from the Clusterflick combined data the site
 build already downloads, keyed by the same cinema id the health log uses. Nothing
