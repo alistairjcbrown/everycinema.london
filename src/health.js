@@ -140,13 +140,31 @@ const WEEK = [
 ];
 const WORKING_HOURS = [9, 18]; // [from, until) — "office hours", London
 
-// What each metric means, and how a cell's value is derived from the three
-// counters. `share` metrics are a percentage of the checks that could be
-// compared; `mean` is a magnitude per check, and is the only one whose units
-// depend on which venues are selected.
+// What a chain's counts are counting. `unit` is the noun for a total ("212
+// film × date"); `listings` names the same thing in a sentence that already says
+// "listings". A granularity missing here reports no volume at all — see
+// `hasVolume` — and has no unit to name.
+const UNITS = {
+  performance: { unit: "performances", listings: "per-performance listings" },
+  "film-date": { unit: "film × date", listings: "film × date listings" },
+};
+
+// What each metric means, and how a cell's value is derived from the counters.
+// `share` metrics are a percentage of the checks that could be compared; `mean`
+// is a magnitude per check, and is the only one whose units depend on which
+// venues are selected.
+//
+// `den` is which pool of comparisons the metric divides by, and the two are not
+// the same pool. "Anything moved" can be answered for every venue that answered
+// twice running; "new listings" can only be answered where the venue reports a
+// listing volume to compare, so it divides by the comparisons made at those
+// venues alone. Sharing one denominator would put a venue that cannot report a
+// volume into a rate it can never contribute to, which reads as a venue that
+// never publishes rather than one we cannot ask.
 const METRICS = {
   up: {
     key: "up",
+    den: "vol",
     kind: "share",
     label: "Checks with new listings",
     axis: "% of checks",
@@ -156,6 +174,7 @@ const METRICS = {
   },
   chg: {
     key: "chg",
+    den: "cmp",
     kind: "share",
     label: "Checks where anything moved",
     axis: "% of checks",
@@ -165,6 +184,7 @@ const METRICS = {
   },
   add: {
     key: "add",
+    den: "vol",
     kind: "mean",
     label: "Listings added",
     axis: "added per check",
@@ -179,7 +199,7 @@ const METRICS = {
 // ---------------------------------------------------------------------------
 
 let blob;
-let scope; // { label, venues: [id], granularities: Set }
+let scope; // { value, kind, label, venues: [id] }
 let metric = "up";
 let grid;
 
@@ -215,7 +235,6 @@ function setScope(value) {
     kind,
     label,
     venues,
-    granularities: new Set(venues.map((v) => blob.venues[v].granularity)),
   };
   el("scope").value = value;
   syncGrid();
@@ -298,19 +317,33 @@ const zeros = () => new Array(24).fill(0);
 // checks (or, for `add`, of listings), so they add — the reason `up` rather than
 // `add` is the default metric is that only the former is unit-free and therefore
 // safe to sum across chains that count different things.
+//
+// `vol` is `cmp` restricted to the venues that report a listing volume: the
+// denominator for `up` and `add`, which the rest cannot contribute to. It is
+// built here rather than committed per day because a venue's granularity is a
+// property of the venue, not of the check — so the split can be re-derived from
+// day files written before anyone knew it was needed.
 function weekTotals(venues) {
   const out = {
     cmp: Array.from({ length: 7 }, zeros),
+    vol: Array.from({ length: 7 }, zeros),
     chg: Array.from({ length: 7 }, zeros),
     up: Array.from({ length: 7 }, zeros),
     add: Array.from({ length: 7 }, zeros),
   };
   for (const id of venues) {
     const venue = blob.venues[id];
-    for (const key of ["cmp", "chg", "up", "add"]) {
-      for (let day = 0; day < 7; day++) {
-        for (let hour = 0; hour < 24; hour++)
-          out[key][day][hour] += venue[key][day][hour];
+    const volume = hasVolume(id);
+    for (let day = 0; day < 7; day++) {
+      for (let hour = 0; hour < 24; hour++) {
+        out.cmp[day][hour] += venue.cmp[day][hour];
+        out.chg[day][hour] += venue.chg[day][hour];
+        // Zero at these venues anyway; guarded so the numerator and the
+        // denominator are visibly governed by the same test.
+        if (!volume) continue;
+        out.vol[day][hour] += venue.cmp[day][hour];
+        out.up[day][hour] += venue.up[day][hour];
+        out.add[day][hour] += venue.add[day][hour];
       }
     }
   }
@@ -325,6 +358,19 @@ function kindTotals(venues) {
   }
   return kinds;
 }
+
+// Whether a venue reports a number that says how much it is listing. Chains
+// answer at different granularities, and one of them — `film-and-date-totals` —
+// gives only how many films and how many dates, so a venue can add a screening
+// of a film it already lists on a date it already lists and move neither figure.
+// "New listings" is unanswerable there, and answering 0% would put a venue that
+// we cannot ask at the bottom of the table beside venues that genuinely never
+// publish. Defaulted rather than read straight off the blob, like `isExpected`
+// below, so a checkout holding a health.json built before this existed renders.
+const hasVolume = (id) =>
+  (blob.volumeGranularities ?? ["performance", "film-date"]).includes(
+    blob.venues[id].granularity,
+  );
 
 const isFailure = (kind) => blob.failureKinds.includes(kind);
 // A closure we declared upstream, and therefore neither an answer nor a fault.
@@ -363,9 +409,9 @@ const outcomeLabel = (kind) =>
 // slot could be compared with the one before it. Null is not zero: it means we
 // never looked, and the heatmap has to be able to say so.
 function cellValue(totals, day, hour) {
-  const compared = totals.cmp[day][hour];
-  if (!compared) return null;
   const spec = METRICS[metric];
+  const compared = totals[spec.den][day][hour];
+  if (!compared) return null;
   const value = totals[spec.key][day][hour];
   return spec.kind === "share" ? (100 * value) / compared : value / compared;
 }
@@ -397,7 +443,7 @@ function renderUptime(totals) {
     let compared = 0;
     for (let day = 0; day < 7; day++) {
       up += totals.up[day][hour];
-      compared += totals.cmp[day][hour];
+      compared += totals.vol[day][hour];
     }
     if (compared > 0 && up / compared > best.rate)
       best = { hour, rate: up / compared };
@@ -584,7 +630,9 @@ function renderWeek(totals) {
         day: name,
         hour: hh(hour).slice(0, 2),
         value: cellValue(totals, index, hour),
-        checks: totals.cmp[index][hour],
+        // The comparisons the cell above it was actually divided by, which is
+        // the metric's own pool — not every comparison in the hour.
+        checks: totals[spec.den][index][hour],
         up: totals.up[index][hour],
         chg: totals.chg[index][hour],
         add: totals.add[index][hour],
@@ -675,7 +723,7 @@ function renderWeek(totals) {
       for (let hour = 0; hour < 24; hour++) {
         if (!test(index, hour)) continue;
         value += totals[spec.key][index][hour];
-        compared += totals.cmp[index][hour];
+        compared += totals[spec.den][index][hour];
       }
     }
     return { value, compared };
@@ -721,7 +769,7 @@ const HOUR_GROUPS = [
 function renderHours(totals) {
   const spec = METRICS[metric];
   const present = HOUR_GROUPS.filter(({ days }) =>
-    days.some((day) => totals.cmp[day].some((n) => n > 0)),
+    days.some((day) => totals[spec.den][day].some((n) => n > 0)),
   );
   // With only one group sampled, splitting says nothing — show the whole window
   // as one series and name it for what it is.
@@ -745,7 +793,7 @@ function renderHours(totals) {
       let compared = 0;
       for (const day of group.days) {
         value += totals[spec.key][day][hour];
-        compared += totals.cmp[day][hour];
+        compared += totals[spec.den][day][hour];
       }
       row[group.key] = compared
         ? spec.kind === "share"
@@ -823,12 +871,13 @@ function renderHours(totals) {
 function venueRows() {
   return Object.entries(blob.venues).map(([id, venue]) => {
     const totals = weekTotals([id]);
+    const volume = hasVolume(id);
     let compared = 0;
     let up = 0;
     let added = 0;
     for (let day = 0; day < 7; day++) {
       for (let hour = 0; hour < 24; hour++) {
-        compared += totals.cmp[day][hour];
+        compared += totals.vol[day][hour];
         up += totals.up[day][hour];
         added += totals.add[day][hour];
       }
@@ -854,16 +903,31 @@ function venueRows() {
       // column as the worst venue on the estate rather than a closed one.
       answered: open ? (100 * (venue.kinds.ok ?? 0)) / open : null,
       issues: issues.length ? issues.join(", ") : "—",
-      publishRate: compared ? (100 * up) / compared : 0,
-      added,
+      // null, not 0, for a venue whose granularity reports no listing volume:
+      // the same reasoning as `answered` above. 0% would sort it in among the
+      // venues that genuinely never publish, when the truth is that this is a
+      // question its answers cannot be asked.
+      publishRate: !volume ? null : compared ? (100 * up) / compared : 0,
+      added: volume ? added : null,
       // Named so the column header can say what "added" is counting, since a
       // film × date chain and a per-performance chain are not counting the same
       // thing and the total over both would be meaningless.
-      granularity:
-        venue.granularity === "film-date" ? "film × date" : "performances",
+      granularity: UNITS[venue.granularity]?.unit ?? venue.granularity,
     };
   });
 }
+
+// Three of this table's columns are null where the question does not apply — a
+// venue closed for the whole window, a venue whose granularity reports no
+// listing volume. The default comparator puts null first, which in a column
+// sorted worst-first is exactly where those belong least, so null is pinned to
+// the bottom in both directions using the direction AG Grid passes in.
+const nullsLast = (a, b, _nodeA, _nodeB, isDescending) => {
+  if (a === null && b === null) return 0;
+  if (a === null) return isDescending ? -1 : 1;
+  if (b === null) return isDescending ? 1 : -1;
+  return a - b;
+};
 
 function renderGrid() {
   const theme = themeQuartz.withPart(colorSchemeDark).withParams({
@@ -922,16 +986,7 @@ function renderGrid() {
         sort: "asc", // anything that is not 100% is what this column is for
         filter: "agNumberColumnFilter",
         filterParams: { defaultOption: "lessThanOrEqual" },
-        // A venue with no open checks has no rate to sort on. The default
-        // comparator puts null first, which in a column sorted worst-first is
-        // exactly where a closed venue should not be, so it is pinned to the
-        // bottom in both directions using the direction AG Grid passes in.
-        comparator: (a, b, _nodeA, _nodeB, isDescending) => {
-          if (a === null && b === null) return 0;
-          if (a === null) return isDescending ? -1 : 1;
-          if (b === null) return isDescending ? 1 : -1;
-          return a - b;
-        },
+        comparator: nullsLast,
         valueFormatter: ({ value }) =>
           value === null ? "—" : `${value.toFixed(1)}%`,
         cellStyle: ({ value }) =>
@@ -942,22 +997,25 @@ function renderGrid() {
         field: "publishRate",
         headerName: "New listings",
         headerTooltip:
-          "Share of hourly checks that found more listed than an hour before",
+          "Share of hourly checks that found more listed than an hour before — blank where the venue reports no listing volume to compare",
         width: 140,
         filter: "agNumberColumnFilter",
         filterParams: { defaultOption: "greaterThanOrEqual" },
-        valueFormatter: ({ value }) => `${value.toFixed(1)}%`,
+        comparator: nullsLast,
+        valueFormatter: ({ value }) =>
+          value === null ? "—" : `${value.toFixed(1)}%`,
       },
       {
         field: "added",
         headerName: "Listings added",
         headerTooltip:
-          "Total added over the window, in this venue's own unit — not comparable between chains",
+          "Total added over the window, in this venue's own unit — not comparable between chains, and blank where the venue reports no listing volume",
         width: 160,
         filter: "agNumberColumnFilter",
         filterParams: { defaultOption: "greaterThanOrEqual" },
+        comparator: nullsLast,
         valueFormatter: ({ value, data }) =>
-          `${fmtInt.format(value)} ${data.granularity}`,
+          value === null ? "—" : `${fmtInt.format(value)} ${data.granularity}`,
       },
     ],
     onRowClicked: ({ data }) => setScope(`venue:${data.id}`),
@@ -967,21 +1025,41 @@ function renderGrid() {
 // ---------------------------------------------------------------------------
 
 function render() {
-  // `add` counts whatever each chain's API answers with — performances for five
-  // of them, film × date pairs for three — so a total over a mixed selection is a
-  // number with no meaning. Offer it only where the selection speaks one unit.
-  const mixed = scope.granularities.size > 1;
+  // Two different reasons a metric can have nothing to say about a selection.
+  // `add` counts whatever each chain's API answers with — performances for some,
+  // film × date pairs for others — so a total over a mixed selection is a number
+  // with no meaning. And a selection made only of venues that report no listing
+  // volume at all cannot answer either publish metric, however few chains it
+  // spans. Offer each one only where the selection can actually answer it.
+  const units = new Set(
+    scope.venues.filter(hasVolume).map((id) => blob.venues[id].granularity),
+  );
+  const why = {
+    up:
+      units.size === 0
+        ? "These venues report how many films and dates they list, not how much — there is no volume to compare"
+        : null,
+    chg: null,
+    add:
+      units.size === 0
+        ? "These venues report how many films and dates they list, not how much — there is nothing to total"
+        : units.size > 1
+          ? "Chains count different things — pick one chain to see listings added"
+          : null,
+  };
   for (const input of document.querySelectorAll('input[name="metric"]')) {
-    const disabled = input.value === "add" && mixed;
-    input.disabled = disabled;
-    input.parentElement.classList.toggle("disabled", disabled);
-    input.parentElement.title = disabled
-      ? "Chains count different things — pick one chain to see listings added"
-      : "";
+    const reason = why[input.value];
+    input.disabled = !!reason;
+    input.parentElement.classList.toggle("disabled", !!reason);
+    input.parentElement.title = reason ?? "";
   }
-  if (mixed && metric === "add") {
-    metric = "up";
-    document.querySelector('input[name="metric"][value="up"]').checked = true;
+  // `chg` is the fallback of last resort because it is the one metric every
+  // venue that answered twice running can contribute to.
+  if (why[metric]) {
+    metric = why.up ? "chg" : "up";
+    document.querySelector(
+      `input[name="metric"][value="${metric}"]`,
+    ).checked = true;
   }
 
   const totals = weekTotals(scope.venues);
@@ -996,12 +1074,20 @@ function render() {
     `, over ${blob.days.length} day(s). Sort or filter in any column; ` +
     `click a row to scope the charts above to that venue.`;
 
-  el("scopeNote").textContent =
-    scope.kind === "venue"
-      ? `1 venue · ${scope.granularities.has("film-date") ? "film × date" : "per-performance"} listings`
-      : `${scope.venues.length} venues · ${
-          mixed ? "mixed listing units" : scope.granularities.has("film-date") ? "film × date listings" : "per-performance listings"
-        }`;
+  const unitNote =
+    units.size === 0
+      ? "no listing volume reported"
+      : units.size > 1
+        ? "mixed listing units"
+        // Falls back to the raw granularity rather than throwing, so a volume
+        // granularity added to health.mjs but not to UNITS degrades to an ugly
+        // note instead of a blank page.
+        : (UNITS[[...units][0]]?.listings ?? `${[...units][0]} listings`);
+  // Counted rather than branching on `scope.kind`: picking a chain of one — of
+  // which there are now nine — is a different kind of selection from picking its
+  // venue, but it is still one venue and should not say "1 venues".
+  const count = scope.venues.length;
+  el("scopeNote").textContent = `${count} venue${count === 1 ? "" : "s"} · ${unitNote}`;
 }
 
 const load = (path) =>

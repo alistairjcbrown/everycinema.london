@@ -81,9 +81,24 @@ const FAILURE_KINDS = new Set(["unknown-venue-id", "probe-error"]);
 const EXPECTED_KINDS = new Set(["expected-closure"]);
 
 // The one number per venue that says how much is listed. Chains answer at
-// different granularities — five report individual performances, three a film ×
+// different granularities — some report individual performances, some a film ×
 // date matrix — so this is never summed across chains, only differenced against
 // the same venue's previous check.
+//
+// A granularity absent from here is one whose answer carries no volume at all:
+// `film-and-date-totals` says how many films and how many dates, and a venue can
+// add a screening of a film it already lists on a date it already lists and move
+// neither number. There is no honest scalar to difference, so `up` and `add`
+// stay at zero for those venues.
+//
+// Their `cmp` and `chg` are still real — "did anything move" is answerable
+// without a volume — so the counters stay, and it is the *rate* that has to know
+// the difference: a venue that can never reach the numerator must not sit in the
+// denominator, or it reads as a venue that never publishes. The site therefore
+// reads this list off the blob (`volumeGranularities`) and drops those venues
+// from the publish denominator alone. `build` warns when the log carries a
+// granularity that is not in here, because upstream adds venues on its own
+// schedule and a silent 0% is exactly what this is meant to prevent.
 const METRIC = { performance: "performances", "film-date": "filmDatePairs" };
 
 const argv = process.argv.slice(2);
@@ -487,7 +502,7 @@ async function build() {
 
   const names = nameLookup();
   const venues = {};
-  const chains = {};
+  const groupNames = {};
   const dayList = [];
 
   for (const day of all) {
@@ -514,8 +529,11 @@ async function build() {
         add: Array.from({ length: 7 }, zeros),
       });
       if (entry.g) venue.granularity = entry.g;
-      // A solo venue has no groupName; it is a chain of one and says so.
-      chains[chain] ??= names[id]?.groupName ?? names[id]?.name ?? chain;
+      // Collected, not resolved: what a groupName is worth as a chain label
+      // depends on how many other chains claim it, which is not known until
+      // every venue is in. `??=` so a chain whose first venue carries no
+      // groupName can still take one from a later venue.
+      groupNames[chain] ??= names[id]?.groupName;
 
       venue.daily[asDate(day.day)] = entry.k;
       for (const [kind, n] of Object.entries(entry.k))
@@ -528,12 +546,77 @@ async function build() {
     }
   }
 
+  // Chain labels, resolved now that every venue is in. `groupName` is the label
+  // a reader recognises — "Odeon", not "odeon.co.uk" — but it only names a chain
+  // while exactly one chain claims it, and that is no longer a given: upstream
+  // probes three Olympic Studios sites and two Castle Cinemas under ids that
+  // share no prefix, so each is a chain of one here and all three would answer
+  // to "Olympic Studios". Indistinguishable in the picker, and worse in the
+  // venue table, whose chain filter matches on the label (see `syncGrid`) and
+  // would pull in all three while the charts above showed one.
+  //
+  // So a groupName more than one chain claims gives way to what does tell them
+  // apart: the venue's own name for a chain of one, and the id for a chain with
+  // no single venue to name it — a case the combined data does not currently
+  // produce, but the fallback is a line and a silent collision is not.
+  const members = {};
+  for (const [id, venue] of Object.entries(venues))
+    (members[venue.chain] ??= []).push(id);
+  const claims = {};
+  for (const group of Object.values(groupNames))
+    if (group) claims[group] = (claims[group] ?? 0) + 1;
+
+  const chains = {};
+  for (const [chain, ids] of Object.entries(members)) {
+    const group = groupNames[chain];
+    chains[chain] =
+      group && claims[group] === 1
+        ? group
+        : ids.length === 1
+          ? venues[ids[0]].name
+          : chain;
+  }
+  // The disambiguation above is only worth having if it actually disambiguates.
+  const labelCounts = {};
+  for (const label of Object.values(chains))
+    labelCounts[label] = (labelCounts[label] ?? 0) + 1;
+  const collisions = Object.keys(labelCounts).filter((l) => labelCounts[l] > 1);
+  if (collisions.length)
+    warn(
+      `Chains still sharing a display name: ${collisions.join(", ")}. ` +
+        `The venue table's chain filter matches on the label, so it will show ` +
+        `more venues than the selection above it.`,
+    );
+
+  // A granularity with no volume metric cannot answer "new listings" at all (see
+  // METRIC). The page handles it, but upstream adding one is worth saying out
+  // loud: it means a venue is on the page that the publish charts leave out.
+  const unmeasured = [
+    ...new Set(
+      Object.values(venues)
+        .map((venue) => venue.granularity)
+        .filter((g) => g && !METRIC[g]),
+    ),
+  ];
+  if (unmeasured.length)
+    warn(
+      `No listing-volume metric for granularity: ${unmeasured.join(", ")}. ` +
+        `Venues reporting it are excluded from the publish charts. ` +
+        `Add it to METRIC in health.mjs if the log gained a countable field.`,
+    );
+
   const blob = {
     generatedAt: new Date().toISOString(),
     timezone: "Europe/London",
     source: `https://github.com/${REPO}/releases`,
     failureKinds: [...FAILURE_KINDS],
     expectedKinds: [...EXPECTED_KINDS],
+    // Which granularities carry a listing volume, and therefore which venues the
+    // publish charts can say anything about. Shipped rather than hard-coded on
+    // the page so the rule lives in one place: the same list decides here that a
+    // check scores no `up` and there that the venue leaves the publish rate's
+    // denominator rather than scoring zero in it.
+    volumeGranularities: Object.keys(METRIC),
     from: dayList[0].day,
     to: dayList.at(-1).day,
     days: dayList,
