@@ -137,9 +137,18 @@ Three things the page is careful about:
   day that just ended drops out of every venue's listings at once, so a third of
   the estate reads as "changed" with nobody having published anything; an
   increase can only be new listings. It is also unit-free, which matters because
-  five chains report individual performances and three report a film × date
-  matrix — a total over both would mean nothing, so the raw "listings added"
-  figure is only offered where the selection speaks one unit.
+  some chains report individual performances and some a film × date matrix — a
+  total over both would mean nothing, so the raw "listings added" figure is only
+  offered where the selection speaks one unit.
+- **What cannot be asked at all.** A third granularity, `film-and-date-totals`,
+  reports only how many films and how many dates a venue lists — so a venue can
+  add a screening of a film it already lists on a date it already lists and move
+  neither figure. There is no volume to difference, so those venues leave the
+  publish rate's *denominator* rather than scoring zero in it, and the table
+  shows them a dash: 0% would sort a venue we cannot ask in among the venues that
+  genuinely never publish. "Did anything move" needs no volume, so that metric
+  still counts them. `health.mjs` warns when the log carries a granularity it has
+  no volume metric for, since upstream adds venues on its own schedule.
 - **What counts as downtime.** Upstream declares venues it knows are shut — a
   cited, windowed refurbishment — and labels their checks `expected-closure`
   rather than treating a delisted venue or an empty listing as a breakage. Those
@@ -152,6 +161,15 @@ Venue and chain display names come from the Clusterflick combined data the site
 build already downloads, keyed by the same cinema id the health log uses. Nothing
 about the venue list is written down in this repo: whatever the log carries is
 what the page offers, so a venue added upstream appears on its own.
+
+A chain is the id prefix its venues share, which is how upstream groups its
+probes. Its label is the venues' `groupName` — but only while one chain claims
+it: several sites that share a group are probed under ids that share no prefix
+(three Olympic Studios, two Castle Cinemas), so each is a chain of one here and
+all three would otherwise read as "Olympic Studios" — indistinguishable in the
+picker, and wrong in the venue table, whose chain filter matches on the label. A
+shared `groupName` therefore gives way to the venue's own name, and `build` warns
+if two chains still end up sharing one.
 
 ## Getting started
 
