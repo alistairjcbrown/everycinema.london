@@ -84,7 +84,7 @@
       #runChart { height: 460px; }
       /* the flow chart carries 16 category rows; the scatter has no such floor,
          so it is matched to it rather than sized on its own */
-      #flowChart, #changeChart { flex: none; height: 420px; }
+      #flowChart, #openingRunChart { flex: none; height: 420px; }
       /* a column inside .split so each half keeps its own hint/chart/note stack */
       .panel { display: flex; flex-direction: column; min-width: 0; }
       .panel .note { margin-top: 10px; }
@@ -108,8 +108,13 @@
       .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; }
       /* heatmap needs the wider half — it has 24 columns to fit */
       .split.charts { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+      /* the mirror of that: the run chart reads first so it goes left, but the
+         flow bars beside it carry sixteen film titles and need the room */
+      .split.flow { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
       @media (max-width: 1200px) {
-        .split, .split.charts { grid-template-columns: minmax(0, 1fr); }
+        .split,
+        .split.charts,
+        .split.flow { grid-template-columns: minmax(0, 1fr); }
       }
       #filmGrid { height: 460px; }
 
@@ -198,23 +203,23 @@
           an estimate of it.
         </p>
         <div class="stats" id="changeStats"></div>
-        <div class="split charts">
+        <div class="split flow">
           <div class="panel">
             <p class="hint">
-              Biggest movers overnight, the day of the opening against the day
-              before it.
+              The fortnight either side. Dashed line marks the opening day.
+            </p>
+            <div class="chart" id="openingRunChart"></div>
+            <p class="note" id="openingRunNote"></p>
+          </div>
+          <div class="panel">
+            <p class="hint">
+              Biggest movers overnight, the day against the day before it.
             </p>
             <div class="chart" id="flowChart"></div>
             <p class="note" id="flowNote"></p>
           </div>
-          <div class="panel">
-            <p class="hint">
-              Every pair of consecutive days, gains against the incumbents.
-            </p>
-            <div class="chart" id="changeChart"></div>
-            <p class="note" id="changeNote"></p>
-          </div>
         </div>
+        <p class="note" id="changeSummary"></p>
       </section>
 
       <div class="split">
