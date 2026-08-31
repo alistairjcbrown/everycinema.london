@@ -74,16 +74,25 @@ release.
 One thing the history page is careful about, since it is the only claim there
 that is about cause rather than count: **what an opening costs**. For any two
 consecutive days, screenings gained by rising films minus screenings given up by
-falling ones is exactly the change in the day's total — it holds on all 241 day
-pairs in the data so far — so "the schedule only grew by X, the rest came off
-films already playing" is arithmetic and needs no assumption about why anyone was
-dropped. What the data cannot say is which film took which screen: two films
-opening the same Friday are indistinguishable claimants on the same freed slots,
-so the card names both sides and their sizes and stops there. The trend beside it
-is stated for Monday to Friday only, because at the weekend the estate opens up
-rather than reallocating and the relationship is simply absent (r = 0.01 over 70
-weekend day pairs) — pooling those in would dilute a real weekday effect with
-days it cannot apply to.
+falling ones is exactly the change in the day's total — it holds on every day
+pair in the data — so "the schedule only grew by X, the rest came off films
+already playing" is arithmetic and needs no assumption about why anyone was
+dropped. Run across every wide opening the page detects, that share lands in a
+narrow band (a median of 77% so far, never below 65%), which is how the card
+generalises without inferring anything.
+
+Two things it will not claim. It does not say which film took which screen: two
+films opening the same Friday are indistinguishable claimants on the same freed
+slots, so it names both sides and their sizes and stops there. And rather than
+assert that the opening caused the drop, it puts the fortnight either side on
+screen and lets the reader see whether the fall breaks the incumbents' trend or
+continues it — on most openings it breaks it, on a few it does not, and the chart
+shows that too. An earlier version made the general case with a scatter of every
+day pair instead, which was a mistake: the change for films already playing
+carries a large day-of-week term (a Friday sheds about 16% whatever opens, a
+Saturday gains), so a pooled correlation over all days is mostly measuring the
+calendar, and controlling for it properly asks a reader of a cinema listings site
+to follow a fixed-effects argument to reach a weaker version of the same point.
 
 Finalized windows live in `data-history/windows/YYYY-MM/<tag>.json` and **are
 committed** — they cannot be regenerated cheaply. Each is self-contained (it
