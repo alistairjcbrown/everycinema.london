@@ -908,7 +908,21 @@ const LOSS_INK = SERIES[7];
 // slate rather than one victim, few enough that every title still gets a
 // readable row.
 const FLOW_ROWS = 8;
-// The run chart traces the opening's biggest riser against the films that gave
+// What puts a film in this card's picker: picking up more than this share of a
+// day's screenings in a single night.
+//
+// It is deliberately NOT the concentration chart's OPENING_SHARE, and an earlier
+// version of this card reusing that was a bug. That threshold asks whether a film
+// is now DOMINANT — the right question for marking the share chart, where the
+// series is a level. This card is about the overnight CHANGE, and a film can
+// cross a level threshold on a night it barely moved. Supergirl opened on
+// Thursday 25 June with 547 screenings, 19.8% of the day, and drifted to 20.2%
+// the following afternoon: on the share test it "opened" on the Friday, a day it
+// gained 61 screenings, and the changeover that actually cost the slate 547 was
+// on a day the card never offered. Asking the question the card is about gets
+// the right night by construction, and names the right film with it.
+const MOVE_SHARE = 10;
+// The run chart traces the film that moved against the films that gave
 // up the most that day, for this many days either side. Two weeks is enough to
 // establish what the incumbents were doing before — the whole point of showing
 // time at all — without running so far past the opening that the lines have all
@@ -935,6 +949,38 @@ function flowOn(byDay, previous, date) {
   return { rows: rows.sort((a, b) => b.delta - a.delta), gains, losses };
 }
 
+// Every film's single biggest overnight gain, where that gain clears MOVE_SHARE
+// of the day it landed on. One entry per film — a film that opens and then
+// expands again is offered on whichever night it moved hardest, so the picker
+// reads as a list of films rather than a list of a few films several times. Two
+// films CAN share a night (Wuthering Heights and GOAT both moved on 13 February)
+// and each keeps its own entry, which is the whole reason the panels below take
+// a film and not just a date: on a shared night, "the day's biggest riser" is the
+// other one.
+function bigMoves(byDay) {
+  const dates = Object.keys(byDay).sort();
+  const best = new Map();
+  for (let i = 1; i < dates.length; i++) {
+    const previous = dates[i - 1];
+    const date = dates[i];
+    if (dayGap(previous, date) !== 1) continue;
+    const before = byDay[previous];
+    const after = byDay[date];
+    const total = Object.values(after).reduce((a, b) => a + b, 0);
+    if (!total) continue;
+    for (const id of new Set([...Object.keys(before), ...Object.keys(after)])) {
+      const was = before[id] || 0;
+      const now = after[id] || 0;
+      const delta = now - was;
+      if (delta <= 0 || (100 * delta) / total < MOVE_SHARE) continue;
+      const held = best.get(id);
+      if (!held || delta > held.delta)
+        best.set(id, { id, date, previous, was, now, delta });
+    }
+  }
+  return [...best.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
 // The share of a day's gains that came off films already playing. Losses is
 // what the falling films actually gave up, and gains is what the rising ones
 // took, so the smaller of the two is how much of the handover was funded by the
@@ -956,12 +1002,16 @@ let runOpeningChart = null;
 // claim — the flow bars can only ever show two days, so on their own they cannot
 // tell a film being evicted from a film that was already sliding. Here the run
 // before the vertical rule is on screen, and the reader decides.
-function renderOpeningRun(byDay, movies, previous, date) {
-  const { rows, gains, losses } = flowOn(byDay, previous, date);
-  const name = (id) => movies[id]?.t ?? id;
+function renderOpeningRun(byDay, movies, { id, previous, date }) {
+  const { rows } = flowOn(byDay, previous, date);
+  const name = (movieId) => movies[movieId]?.t ?? movieId;
   const dates = Object.keys(byDay).sort();
+  // The film the picker names leads, NOT whoever rose most that night. On a
+  // night two films move, those are different films, and tracing the other one
+  // would answer a question nobody asked.
+  const mover = rows.find((r) => r.id === id);
   const cast = [
-    rows[0], // the day's biggest riser: the opening itself
+    mover,
     ...rows
       .filter((r) => r.delta < 0)
       .slice(-RUN_CAST)
@@ -1025,7 +1075,9 @@ function renderOpeningRun(byDay, movies, previous, date) {
             strokeWidth: 1,
             lineDash: [4, 4],
             label: {
-              text: "opens",
+              // a film already playing did not "open" — Toy Story 5's biggest
+              // night was its expansion, from 394 screenings to 1,102
+              text: mover?.was ? "expands" : "opens",
               position: "top",
               color: AXIS_INK,
               fontSize: 11,
@@ -1047,36 +1099,30 @@ function renderOpeningRun(byDay, movies, previous, date) {
     legend: { ...legendBase },
   });
 
-  const opener = cast[0];
-  const hit = cast[1];
-  // What the fortnight before shows, said in numbers: the incumbents' own
-  // day-to-day drift over the week up to the opening, against what the opening
-  // day did to them. Derived rather than asserted, so it cannot go stale — and
-  // it is honest when the two are the same, which on a few openings they are.
-  const before = addDays(date, -7);
-  const drift = cast.slice(1).reduce(
-    (acc, r) => {
-      acc.was += byDay[before]?.[r.id] ?? 0;
-      acc.eve += r.was;
-      return acc;
-    },
-    { was: 0, eve: 0 },
-  );
-  const week = drift.was ? (100 * (drift.eve - drift.was)) / drift.was : 0;
-  const day = drift.eve
-    ? (100 * (cast.slice(1).reduce((a, r) => a + r.now, 0) - drift.eve)) /
-      drift.eve
-    : 0;
-  el("openingRunNote").textContent =
-    opener && hit
-      ? `In the week up to the opening these ${cast.length - 1} films drifted ` +
-        `${week >= 0 ? "up" : "down"} ${Math.abs(week).toFixed(0)}% between them. ` +
-        `On the day itself they lost ${Math.abs(day).toFixed(0)}% — ` +
-        `${Math.abs(day) > Math.abs(week) * 2 ? "a break in the trend, not a continuation of it" : "in line with the slide they were already in"}.`
-      : "";
+  // Descriptive, deliberately. An earlier version scored the night against the
+  // cast's own prior week and pronounced "a break in the trend" or not, which was
+  // unsound twice over. It compared magnitudes without signs, so a cast that rose
+  // 31% over the week and then fell 15% was reported as continuing a slide it was
+  // never in. And more fundamentally the cast is SELECTED for having fallen
+  // hardest that night, so a large drop on the night is true by construction:
+  // control for it by asking what these same films did on their worst other night
+  // in the fortnight and the opening night stops being remarkable — on 19 June
+  // they lost 36% to Toy Story 5 and 42% a week later to something else. A test
+  // that cannot fail is not a test, so the card states what happened and leaves
+  // the reading to the chart, which is what the fortnight is on screen for.
+  const eve = cast.slice(1).reduce((total, r) => total + r.was, 0);
+  const after = cast.slice(1).reduce((total, r) => total + r.now, 0);
+  el("openingRunNote").textContent = mover
+    ? `${name(mover.id)} against the ${cast.length - 1} films that gave up the ` +
+      `most that night: between them ${fmtInt.format(eve)} screenings on ` +
+      `${fmtDate.format(asDate(previous))}, ${fmtInt.format(after)} on ` +
+      `${fmtDate.format(asDate(date))}. They are picked for falling hardest, so ` +
+      `the drop itself is not the evidence — the fortnight either side is, and ` +
+      `what it shows differs from one night to the next.`
+    : "";
 }
 
-function renderFlow(byDay, movies, previous, date) {
+function renderFlow(byDay, movies, { id, previous, date }) {
   const { rows, gains, losses } = flowOn(byDay, previous, date);
   const name = (id) => movies[id]?.t ?? id;
   const up = rows.filter((r) => r.delta > 0).slice(0, FLOW_ROWS);
@@ -1174,62 +1220,60 @@ function renderFlow(byDay, movies, previous, date) {
     legend: { enabled: false },
   });
 
-  const biggest = up[0];
+  // The bars are the day's whole ledger and stay in size order, but the sentence
+  // under them is about the film the picker names — which is not always the one
+  // that rose most.
+  const biggest = rows.find((r) => r.id === id) ?? up[0];
   const hit = down.at(-1); // rows run high to low, so the biggest loss is last
+  // Two scales in one sentence, kept apart: what this film did, then what the
+  // whole night did. Running them together with a "so" made one film's gain look
+  // like the cause of the night's entire reallocation — plainly wrong on a night
+  // two films moved.
   el("flowNote").textContent = biggest
     ? `${name(biggest.id)} picked up ${fmtInt.format(biggest.delta)} screenings ` +
       `overnight${biggest.was ? ` (${fmtInt.format(biggest.was)} to ${fmtInt.format(biggest.now)})` : ""}. ` +
-      `The schedule ${grew >= 0 ? `only grew by ${fmtInt.format(grew)}` : `shrank by ${fmtInt.format(-grew)}`}, so ` +
-      `${fmtInt.format(Math.min(gains, losses))} of the day's gains came off films that were already playing` +
+      `Across the whole night rising films took ${fmtInt.format(gains)} while the ` +
+      `schedule ${grew >= 0 ? `grew by ${fmtInt.format(grew)}` : `shrank by ${fmtInt.format(-grew)}`}, ` +
+      `so ${fmtInt.format(Math.min(gains, losses))} came off films that were already playing` +
       (hit
         ? ` — ${name(hit.id)} hardest, down ${fmtInt.format(-hit.delta)} from ${fmtInt.format(hit.was)}.`
         : ".")
-    : "Nothing gained screenings on this day.";
+    : "Nothing gained screenings on this night.";
 }
 
 function renderChangeover(byDay, movies) {
-  const dates = Object.keys(byDay).sort();
-
-  // The same events the concentration chart marks, so the two cards are talking
-  // about one list of openings rather than each having its own idea of them.
-  // Ordered by date here: this is a picker, not a ranking.
-  const openings = wideOpenings(byDay, movies);
-  const byDate = new Map();
-  for (const { date, title } of openings)
-    byDate.set(date, [...(byDate.get(date) ?? []), title]);
-  const events = [...byDate.entries()]
-    .filter(([date]) => dates.indexOf(date) > 0)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([date, titles]) => {
-      const previous = dates[dates.indexOf(date) - 1];
-      const flow = flowOn(byDay, previous, date);
-      return { date, previous, titles, flow, funded: fundedBySlate(flow) };
-    });
+  const name = (id) => movies[id]?.t ?? id;
+  const events = bigMoves(byDay).map((move) => {
+    const flow = flowOn(byDay, move.previous, move.date);
+    return { ...move, flow, funded: fundedBySlate(flow) };
+  });
 
   const picker = el("changeDay");
   picker.innerHTML = events
     .map(
-      ({ date, titles }) =>
-        `<option value="${date}">${fmtDate.format(asDate(date))} · ${titles.join(", ")}</option>`,
+      (event, i) =>
+        `<option value="${i}">${fmtDate.format(asDate(event.date))} · ${name(event.id)}</option>`,
     )
     .join("");
 
   const draw = () => {
-    const event = events.find(({ date }) => date === picker.value);
+    const event = events[Number(picker.value)];
     if (!event) return;
-    renderOpeningRun(byDay, movies, event.previous, event.date);
-    renderFlow(byDay, movies, event.previous, event.date);
+    renderOpeningRun(byDay, movies, event);
+    renderFlow(byDay, movies, event);
   };
   picker.addEventListener("change", draw);
   // Land on the changeover that cost the existing slate the most, which is this
   // card's own subject — rather than the biggest opening, which is the
-  // concentration chart's. They are usually but not always the same day.
-  const costliest = [...events].sort(
-    (a, b) =>
-      Math.min(b.flow.gains, b.flow.losses) -
-      Math.min(a.flow.gains, a.flow.losses),
-  )[0];
-  if (costliest) picker.value = costliest.date;
+  // concentration chart's. They are usually but not always the same night.
+  const costliest = events.reduce(
+    (worst, event, i) =>
+      Math.min(event.flow.gains, event.flow.losses) > worst.cost
+        ? { i, cost: Math.min(event.flow.gains, event.flow.losses) }
+        : worst,
+    { i: 0, cost: -1 },
+  );
+  picker.value = String(costliest.i);
   draw();
 
   // The generalisation, and the reason there is no scatter here. Correlating
@@ -1239,12 +1283,20 @@ function renderChangeover(byDay, movies) {
   // mostly measuring the calendar, and splitting it out asks a reader of a
   // cinema listings site to follow a fixed-effects argument. This says the same
   // thing with the arithmetic the rest of the card already runs on.
-  const shares = events.map((e) => e.funded);
+  //
+  // Deduplicated by night before the median: two films moving on one Friday is
+  // one changeover, and counting it twice would weight that night double for no
+  // reason other than how many films happened to be in it.
+  const nights = new Map(events.map((e) => [e.date, e.funded]));
+  const shares = [...nights.values()];
+  const absorbed = shares.filter((share) => share < 50).length;
   el("changeSummary").textContent = shares.length
-    ? `Across all ${shares.length} wide openings so far this year, a median ` +
-      `${median(shares).toFixed(0)}% of the day's gains came off films that were ` +
-      `already playing — never below ${Math.min(...shares).toFixed(0)}%. The ` +
-      `schedule absorbs the rest, and it is never most of it.`
+    ? `Across the ${shares.length} nights a film picked up more than ` +
+      `${MOVE_SHARE}% of London's screenings this year, a median ` +
+      `${median(shares).toFixed(0)}% of that night's gains came off films that ` +
+      `were already playing, and the lowest was ` +
+      `${Math.min(...shares).toFixed(0)}%. The schedule absorbs the rest — on ` +
+      `${absorbed === 0 ? "no night did it absorb the larger half" : `${absorbed} of them it absorbed the larger half`}.`
     : "";
 }
 

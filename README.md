@@ -77,22 +77,41 @@ consecutive days, screenings gained by rising films minus screenings given up by
 falling ones is exactly the change in the day's total — it holds on every day
 pair in the data — so "the schedule only grew by X, the rest came off films
 already playing" is arithmetic and needs no assumption about why anyone was
-dropped. Run across every wide opening the page detects, that share lands in a
-narrow band (a median of 77% so far, never below 65%), which is how the card
-generalises without inferring anything.
+dropped. Run across every night a film picked up more than 10% of London's
+screenings, that share lands in a narrow band (a median of 83% so far), which is
+how the card generalises without inferring anything.
 
-Two things it will not claim. It does not say which film took which screen: two
-films opening the same Friday are indistinguishable claimants on the same freed
-slots, so it names both sides and their sizes and stops there. And rather than
-assert that the opening caused the drop, it puts the fortnight either side on
-screen and lets the reader see whether the fall breaks the incumbents' trend or
-continues it — on most openings it breaks it, on a few it does not, and the chart
-shows that too. An earlier version made the general case with a scatter of every
-day pair instead, which was a mistake: the change for films already playing
-carries a large day-of-week term (a Friday sheds about 16% whatever opens, a
-Saturday gains), so a pooled correlation over all days is mostly measuring the
-calendar, and controlling for it properly asks a reader of a cinema listings site
-to follow a fixed-effects argument to reach a weaker version of the same point.
+The picker's events come from that overnight **change**, not from the
+concentration chart's share threshold, and an earlier version reusing the latter
+was a bug worth recording. A share test asks whether a film is now dominant,
+which is the right question for marking the share chart; a film can cross it on a
+night it barely moved. Supergirl opened on Thursday 25 June with 547 screenings,
+19.8% of the day, and drifted over 20% the following afternoon — so the share test
+put its "opening" on the Friday, a night it gained 61 screenings, and the
+changeover that actually cost the slate 547 was never offered. Two films can also
+move on one night, so an event is a film *and* a night: both panels lead with the
+film the picker names rather than whoever rose most.
+
+Two things the card will not claim. It does not say which film took which screen:
+two films opening the same Friday are indistinguishable claimants on the same
+freed slots, so it names both sides and their sizes and stops there. And it does
+not score the night — it puts the fortnight either side on screen and leaves the
+reading there. An earlier version did score it, comparing the fallers' drop on
+the night against their own prior week, and that was unsound: it compared
+magnitudes without signs, and the films it traces are *selected* for having
+fallen hardest that night, so a large drop is true by construction. Control for
+it — ask what those same films did on their worst other night in the fortnight —
+and the opening night stops being remarkable: on 19 June they lost 36% to Toy
+Story 5 and 42% a week later to something else. A test that cannot fail is not a
+test.
+
+The general case is likewise made with arithmetic rather than a correlation. An
+earlier version used a scatter of every day pair, which was a mistake: the change
+for films already playing carries a large day-of-week term (a Friday sheds about
+16% whatever opens, a Saturday gains), so a pooled correlation over all days is
+mostly measuring the calendar, and controlling for it properly asks a reader of a
+cinema listings site to follow a fixed-effects argument to reach a weaker version
+of the same point.
 
 Finalized windows live in `data-history/windows/YYYY-MM/<tag>.json` and **are
 committed** — they cannot be regenerated cheaply. Each is self-contained (it
