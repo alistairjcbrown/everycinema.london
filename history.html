@@ -82,6 +82,21 @@
          layout decide the height instead, silently discarding that sizing. */
       #hoursChart { flex: none; height: 320px; width: 100%; margin-inline: auto; }
       #runChart { height: 460px; }
+      /* the flow chart carries 16 category rows; the scatter has no such floor,
+         so it is matched to it rather than sized on its own */
+      #flowChart, #changeChart { flex: none; height: 420px; }
+      /* a column inside .split so each half keeps its own hint/chart/note stack */
+      .panel { display: flex; flex-direction: column; min-width: 0; }
+      .panel .note { margin-top: 10px; }
+      .picker {
+        margin-left: auto; display: flex; align-items: center; gap: 8px;
+        font-size: 12px; font-weight: 400; color: #a1a1aa;
+      }
+      .picker select {
+        background: #18181b; color: #e4e4e7; border: 1px solid #3f3f46;
+        border-radius: 6px; padding: 4px 8px; font: inherit; max-width: 340px;
+      }
+      .picker select:hover { border-color: #52525b; }
       .empty {
         height: 460px; display: flex; flex-direction: column; gap: 4px;
         align-items: center; justify-content: center; text-align: center;
@@ -166,6 +181,41 @@
           <p class="note" id="shareNote"></p>
         </section>
       </div>
+
+      <section class="card">
+        <h2>
+          <span>What an opening costs</span>
+          <label class="picker">
+            Opening
+            <select id="changeDay"></select>
+          </label>
+        </h2>
+        <p class="sub">
+          London screens about the same number of films every day, so a release
+          going wide is mostly handed its screens by the films already playing.
+          Screenings gained minus screenings given up is exactly the change in
+          the day&rsquo;s total, so this is the arithmetic of a changeover, not
+          an estimate of it.
+        </p>
+        <div class="stats" id="changeStats"></div>
+        <div class="split charts">
+          <div class="panel">
+            <p class="hint">
+              Biggest movers overnight, the day of the opening against the day
+              before it.
+            </p>
+            <div class="chart" id="flowChart"></div>
+            <p class="note" id="flowNote"></p>
+          </div>
+          <div class="panel">
+            <p class="hint">
+              Every pair of consecutive days, gains against the incumbents.
+            </p>
+            <div class="chart" id="changeChart"></div>
+            <p class="note" id="changeNote"></p>
+          </div>
+        </div>
+      </section>
 
       <div class="split">
         <section class="card">

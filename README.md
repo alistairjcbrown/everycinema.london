@@ -17,8 +17,9 @@ London cinema performances, with three views over one dataset:
 - **Flat** — every performance, filterable by genre, format and accessibility
 
 Plus two charting pages over the same data's history: **Screening history**
-(what actually screened, day by day and film by film) and **Venue health** (which
-venues answer when we ask, and when they publish new showtimes).
+(what actually screened, day by day and film by film, and what a wide opening
+takes off everything already playing) and **Venue health** (which venues answer
+when we ask, and when they publish new showtimes).
 
 It's not a replacement for Clusterflick — it's a demonstration of what AG Grid's
 row grouping, pivoting and set-filtering can do with real, messy, real-world
@@ -69,6 +70,20 @@ simply absent and never counted. Buckets are whole **Europe/London** hours;
 because publish instants are arbitrary, a boundary usually falls mid-bucket, so
 that hour is split between the two windows and each side is counted from its own
 release.
+
+One thing the history page is careful about, since it is the only claim there
+that is about cause rather than count: **what an opening costs**. For any two
+consecutive days, screenings gained by rising films minus screenings given up by
+falling ones is exactly the change in the day's total — it holds on all 241 day
+pairs in the data so far — so "the schedule only grew by X, the rest came off
+films already playing" is arithmetic and needs no assumption about why anyone was
+dropped. What the data cannot say is which film took which screen: two films
+opening the same Friday are indistinguishable claimants on the same freed slots,
+so the card names both sides and their sizes and stops there. The trend beside it
+is stated for Monday to Friday only, because at the weekend the estate opens up
+rather than reallocating and the relationship is simply absent (r = 0.01 over 70
+weekend day pairs) — pooling those in would dilute a real weekday effect with
+days it cannot apply to.
 
 Finalized windows live in `data-history/windows/YYYY-MM/<tag>.json` and **are
 committed** — they cannot be regenerated cheaply. Each is self-contained (it

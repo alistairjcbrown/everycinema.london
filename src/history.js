@@ -27,6 +27,7 @@ import {
   NumberFilterModule,
   DateFilterModule, // agDateColumnFilter, for the Opening column
   RowSelectionModule, // select films to compare their runs
+  TooltipModule, // headerTooltip on the Week 2 column
   enableDevValidations,
 } from "ag-grid-community";
 
@@ -38,6 +39,7 @@ ModuleRegistry.registerModules([
   NumberFilterModule, // agNumberColumnFilter + its floating filter
   DateFilterModule, // agDateColumnFilter + its floating filter
   RowSelectionModule,
+  TooltipModule, // agColumnHeader's tooltip, for the one column that needs a gloss
 ]);
 ChartModuleRegistry.registerModules([
   ...AllChartModules,
@@ -729,8 +731,19 @@ function wideOpenings(byDay, movies) {
 // actually concentrated is any single DAY — its own top eight take a median 73% —
 // so the honest measure is that share plotted over time: one series, no
 // categorical palette, and it answers the same question.
-function renderShare(blob, boundary) {
-  // per day, per film: how many screenings
+// Per day, per film: how many screenings. Both the concentration chart and the
+// changeover card are about how one day's screenings were divided up, so they
+// share the roll-up rather than each walking the hour buckets themselves.
+//
+// The finalized/provisional boundary falls mid-day, so the last finalized day
+// holds only the hours before it — a handful of late-night screenings when the
+// boundary lands in the early morning. A part-day is not a day either question
+// can be asked of: eight films out of five is trivially 100% concentration, and
+// every film on it looks like it collapsed overnight. So complete the day from
+// the provisional window (the same split renderDaily makes, and safe from double
+// counting because the provisional window opens exactly where the finalized one
+// closes), or drop the day when there is nothing to complete it with.
+function dailyByFilm(blob, boundary) {
   const byDay = {};
   const add = (counts, onlyDay = null) => {
     for (const [id, hours] of Object.entries(counts))
@@ -742,18 +755,12 @@ function renderShare(blob, boundary) {
       }
   };
   add(blob.finalized.counts);
-
-  // The finalized/provisional boundary falls mid-day, so the last finalized day
-  // holds only the hours before it — a handful of late-night screenings when the
-  // boundary lands in the early morning, and eight films out of five is trivially
-  // 100%. A share over a part-day is not a measure of concentration, so complete
-  // the day from the provisional window (the same split renderDaily makes, and
-  // safe from double counting because the provisional window opens exactly where
-  // the finalized one closes), or drop the day when there is nothing to complete
-  // it with.
   if (blob.provisional) add(blob.provisional.counts, boundary);
   else delete byDay[boundary];
+  return byDay;
+}
 
+function renderShare(byDay, movies) {
   const data = Object.keys(byDay)
     .sort()
     .map((date) => {
@@ -768,7 +775,7 @@ function renderShare(blob, boundary) {
       };
     });
 
-  const openings = wideOpenings(byDay, blob.movies);
+  const openings = wideOpenings(byDay, movies);
   // more than one film can go wide on the same day, so a date maps to a list
   const openedOn = new Map();
   for (const { date, title } of openings)
@@ -863,6 +870,363 @@ function renderShare(blob, boundary) {
       ? `: ${biggest.title} reached ${biggest.peak.toFixed(0)}% of every ` +
         `screening in London.`
       : `.`);
+}
+
+// ---------------------------------------------------------------------------
+// The changeover
+// ---------------------------------------------------------------------------
+//
+// London's schedule holds a near-constant number of screenings a day — the daily
+// chart's whole point — so a film that picks up screens is very largely being
+// handed them by films that lost them. This card shows that handover on the day
+// it happens.
+//
+// It is accounting, not a model. For any two consecutive days, the screenings
+// gained by rising films minus those given up by falling ones IS the change in
+// the day's total, exactly, on all 241 day pairs in this data. So "gains minus
+// growth came off the existing slate" is arithmetic, and needs no assumption
+// about why anybody was dropped.
+//
+// What the data cannot say is which film took which screen: two films opening
+// the same Friday are indistinguishable claimants on the same freed slots. So
+// the chart names both sides and their sizes and stops there, rather than
+// drawing arrows it cannot support.
+
+// Gain and loss are a polarity, so they take the documented diverging pair
+// (blue <-> red) rather than two categorical slots. The sign of the bar and its
+// label carry the distinction too — the colour is never doing it alone.
+const GAIN_INK = SERIES[0];
+const LOSS_INK = SERIES[7];
+// Films shown each way. Enough to see that a big opening is funded by the whole
+// slate rather than one victim, few enough that every title still gets a
+// readable row.
+const FLOW_ROWS = 8;
+// Saturdays and Sundays are excluded from the trend below. The estate runs at its
+// floor on a weekday and opens up at the weekend, so a weekend's risers are
+// served by screenings that did not exist on Friday rather than by anyone else's:
+// across 70 weekend day pairs the correlation between what risers gained and what
+// the incumbents did is 0.01 — not a weak relationship, no relationship. Pooling
+// them in would dilute a real weekday effect with days the effect cannot apply to.
+const WEEKEND = new Set([0, 6]);
+
+// One day against the day before it, film by film. Sorted so the biggest gain is
+// first and the biggest loss last, which is also the order the chart draws.
+function flowOn(byDay, previous, date) {
+  const before = byDay[previous] ?? {};
+  const after = byDay[date] ?? {};
+  const rows = [];
+  let gains = 0;
+  let losses = 0;
+  for (const id of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    const was = before[id] || 0;
+    const now = after[id] || 0;
+    if (was === now) continue;
+    if (now > was) gains += now - was;
+    else losses += was - now;
+    rows.push({ id, was, now, delta: now - was });
+  }
+  return { rows: rows.sort((a, b) => b.delta - a.delta), gains, losses };
+}
+
+// Every consecutive day pair: what the day's risers took, and what happened to
+// everything that was already playing. Days either side of a gap in the data are
+// skipped — a two-day step is not a changeover, and there is no way to tell one
+// from the other after the fact.
+function changeovers(byDay) {
+  const dates = Object.keys(byDay).sort();
+  const out = [];
+  for (let i = 1; i < dates.length; i++) {
+    const previous = dates[i - 1];
+    const date = dates[i];
+    if (dayGap(previous, date) !== 1) continue;
+    const before = byDay[previous];
+    const after = byDay[date];
+    let held = 0;
+    let kept = 0;
+    for (const [id, was] of Object.entries(before)) {
+      held += was;
+      kept += after[id] || 0;
+    }
+    if (!held) continue;
+    const { gains, losses } = flowOn(byDay, previous, date);
+    out.push({
+      date,
+      previous,
+      gains,
+      losses,
+      change: (100 * (kept - held)) / held,
+      weekend: WEEKEND.has(asDate(date).getUTCDay()),
+    });
+  }
+  return out;
+}
+
+// Least squares through the weekday points. Reported in the note under the
+// chart rather than drawn on it — see the series comment below for why.
+function weekdayTrend(rows) {
+  const pts = rows.filter((r) => !r.weekend);
+  const mean = (pick) => pts.reduce((a, r) => a + pick(r), 0) / pts.length;
+  const mx = mean((r) => r.gains);
+  const my = mean((r) => r.change);
+  let cov = 0;
+  let vx = 0;
+  let vy = 0;
+  for (const r of pts) {
+    cov += (r.gains - mx) * (r.change - my);
+    vx += (r.gains - mx) ** 2;
+    vy += (r.change - my) ** 2;
+  }
+  const slope = cov / vx;
+  return {
+    n: pts.length,
+    slope,
+    intercept: my - slope * mx,
+    r: cov / Math.sqrt(vx * vy),
+  };
+}
+
+let flowChart = null;
+let changeChart = null;
+
+function renderFlow(byDay, movies, previous, date) {
+  const { rows, gains, losses } = flowOn(byDay, previous, date);
+  const name = (id) => movies[id]?.t ?? id;
+  const up = rows.filter((r) => r.delta > 0).slice(0, FLOW_ROWS);
+  const down = rows.filter((r) => r.delta < 0).slice(-FLOW_ROWS);
+  // Truncated here rather than in the axis label formatter: the category axis
+  // clips to the room it has and does it from the LEFT, which loses exactly the
+  // start of the title you need to recognise the film.
+  const data = [...up, ...down].map((r) => ({
+    ...r,
+    title: name(r.id),
+    label: name(r.id).length > 30 ? `${name(r.id).slice(0, 29)}…` : name(r.id),
+  }));
+  const grew = gains - losses;
+
+  el("changeStats").innerHTML = [
+    [
+      "Screenings picked up",
+      fmtInt.format(gains),
+      `by ${fmtInt.format(rows.filter((r) => r.delta > 0).length)} films`,
+    ],
+    [
+      "The schedule grew by",
+      grew >= 0 ? `+${fmtInt.format(grew)}` : fmtInt.format(grew),
+    ],
+    [
+      "Came off films already playing",
+      fmtInt.format(Math.min(gains, losses)),
+      `${((100 * Math.min(gains, losses)) / (gains || 1)).toFixed(0)}% of the gains`,
+    ],
+  ]
+    .map(
+      ([k, v, sub]) =>
+        `<div class="stat"><span class="v">${v}</span><span class="k">${k}${
+          sub ? ` · ${sub}` : ""
+        }</span></div>`,
+    )
+    .join("");
+
+  flowChart?.destroy();
+  flowChart = AgCharts.create({
+    ...chartBase,
+    container: el("flowChart"),
+    data,
+    series: [
+      {
+        type: "bar",
+        direction: "horizontal",
+        xKey: "label",
+        yKey: "delta",
+        yName: "Change",
+        cornerRadius: 3,
+        itemStyler: ({ datum }) => ({
+          fill: datum.delta > 0 ? GAIN_INK : LOSS_INK,
+        }),
+        tooltip: {
+          renderer: ({ datum }) => ({
+            title: datum.title,
+            data: [
+              {
+                label: fmtDate.format(asDate(previous)),
+                value: fmtInt.format(datum.was),
+              },
+              {
+                label: fmtDate.format(asDate(date)),
+                value: fmtInt.format(datum.now),
+              },
+              {
+                label: datum.delta > 0 ? "Picked up" : "Gave up",
+                value: fmtInt.format(Math.abs(datum.delta)),
+              },
+            ],
+          }),
+        },
+      },
+    ],
+    axes: [
+      {
+        type: "category",
+        position: "left",
+        label: { color: AXIS_INK, fontSize: 11 },
+        line: { stroke: GRID_INK },
+        gridLine: { enabled: false },
+      },
+      {
+        type: "number",
+        position: "bottom",
+        title: { enabled: false },
+        label: {
+          color: AXIS_INK,
+          formatter: ({ value }) => fmtInt.format(value),
+        },
+        gridLine: { style: [{ stroke: GRID_INK }] },
+      },
+    ],
+    legend: { enabled: false },
+  });
+
+  const biggest = up[0];
+  const hit = down.at(-1); // rows run high to low, so the biggest loss is last
+  el("flowNote").textContent = biggest
+    ? `${name(biggest.id)} picked up ${fmtInt.format(biggest.delta)} screenings ` +
+      `overnight${biggest.was ? ` (${fmtInt.format(biggest.was)} to ${fmtInt.format(biggest.now)})` : ""}. ` +
+      `The schedule ${grew >= 0 ? `only grew by ${fmtInt.format(grew)}` : `shrank by ${fmtInt.format(-grew)}`}, so ` +
+      `${fmtInt.format(Math.min(gains, losses))} of the day's gains came off films that were already playing` +
+      (hit
+        ? ` — ${name(hit.id)} hardest, down ${fmtInt.format(-hit.delta)} from ${fmtInt.format(hit.was)}.`
+        : ".")
+    : "Nothing gained screenings on this day.";
+}
+
+function renderChangeover(byDay, movies) {
+  const dates = Object.keys(byDay).sort();
+  const rows = changeovers(byDay);
+  const trend = weekdayTrend(rows);
+
+  // The same events the concentration chart marks, so the two cards are talking
+  // about one list of openings rather than each having its own idea of them.
+  // Ordered by date here: this is a picker, not a ranking.
+  const openings = wideOpenings(byDay, movies);
+  const byDate = new Map();
+  for (const { date, title } of openings)
+    byDate.set(date, [...(byDate.get(date) ?? []), title]);
+  const choices = [...byDate.entries()]
+    .filter(([date]) => dates.indexOf(date) > 0)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+
+  const picker = el("changeDay");
+  picker.innerHTML = choices
+    .map(
+      ([date, titles]) =>
+        `<option value="${date}">${fmtDate.format(asDate(date))} · ${titles.join(", ")}</option>`,
+    )
+    .join("");
+
+  const draw = () => {
+    const date = picker.value;
+    renderFlow(byDay, movies, dates[dates.indexOf(date) - 1], date);
+  };
+  picker.addEventListener("change", draw);
+  // Land on the changeover that cost the existing slate the most, which is this
+  // card's own subject — rather than the biggest opening, which is the
+  // concentration chart's. They are usually but not always the same day.
+  const costliest = choices
+    .map(([date]) => {
+      const { gains, losses } = flowOn(
+        byDay,
+        dates[dates.indexOf(date) - 1],
+        date,
+      );
+      return { date, cost: Math.min(gains, losses) };
+    })
+    .sort((a, b) => b.cost - a.cost)[0];
+  if (costliest) picker.value = costliest.date;
+  draw();
+
+  const point = (r) => ({
+    date: asDate(r.date),
+    gains: r.gains,
+    change: r.change,
+    label: fmtDay.format(asDate(r.date)),
+  });
+  changeChart?.destroy();
+  changeChart = AgCharts.create({
+    ...chartBase,
+    // chartBase leaves no bottom padding — every other chart here ends in tick
+    // labels. This axis carries a title under them, which that would clip.
+    padding: { ...chartBase.padding, bottom: 8, left: 8 },
+    // No fitted line: a line series binds itself to a CATEGORY x-axis whatever
+    // the axis declares or claims by key, which turns the scatter's numeric x
+    // into 241 unordered categories and makes the whole chart a lie. The fit is
+    // reported in the note underneath instead, where it cannot break the scale.
+    series: [
+      ["Monday–Friday", false, SERIES[0]],
+      ["Saturday & Sunday", true, SERIES[1]],
+    ].map(([yName, weekend, fill]) => ({
+      type: "scatter",
+      data: rows.filter((r) => r.weekend === weekend).map(point),
+      xKey: "gains",
+      yKey: "change",
+      yName,
+      fill,
+      fillOpacity: 0.85,
+      stroke: SURFACE,
+      strokeWidth: 1,
+      size: 9,
+      tooltip: {
+        renderer: ({ datum }) => ({
+          title: datum.label,
+          data: [
+            { label: "Rising films gained", value: fmtInt.format(datum.gains) },
+            {
+              label: "Films already playing",
+              value: `${datum.change.toFixed(1)}%`,
+            },
+          ],
+        }),
+      },
+    })),
+    axes: [
+      {
+        type: "number",
+        position: "bottom",
+        title: {
+          enabled: true,
+          text: "Screenings gained by rising films",
+          color: AXIS_INK,
+          fontSize: 11,
+        },
+        label: {
+          color: AXIS_INK,
+          formatter: ({ value }) => fmtInt.format(value),
+        },
+        gridLine: { style: [{ stroke: GRID_INK }] },
+      },
+      {
+        type: "number",
+        position: "left",
+        title: {
+          enabled: true,
+          text: "Change for films already playing",
+          color: AXIS_INK,
+          fontSize: 11,
+        },
+        label: { color: AXIS_INK, formatter: ({ value }) => `${value}%` },
+        gridLine: { style: [{ stroke: GRID_INK }] },
+      },
+    ],
+    legend: { ...legendBase },
+    container: el("changeChart"),
+  });
+
+  el("changeNote").textContent =
+    `One point per pair of consecutive days. Monday to Friday the two move ` +
+    `together (r = ${trend.r.toFixed(2)} over ${trend.n} day pairs): every 100 ` +
+    `screenings the day's risers pick up costs the films already playing about ` +
+    `${Math.abs(100 * trend.slope).toFixed(1)} points of their schedule. At the ` +
+    `weekend there is no relationship at all — the estate opens up rather than ` +
+    `reallocating, so a Saturday's risers are not served at anybody's expense.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -1027,6 +1391,25 @@ const T95 = [
   2.16, 2.14, 2.13,
 ];
 const t95 = (df) => (df < 1 ? T95[0] : (T95[df - 1] ?? 1.96));
+
+// Second week against the first, which is the shape of a release in one number.
+// The projection below leans on the same quantity: across the completed wide
+// releases here the median is 0.55, a film roughly halves every week. What the
+// column adds is the spread around it — under a quarter is a title being pulled
+// rather than fading, and over 100% is a platform release still widening, which
+// is a different animal from a hit.
+//
+// A share of the WHOLE run would be the more natural way to say "front-loaded",
+// and is the wrong measure here: two thirds of the films in this list are still
+// playing, so their run is not over to take a share of, and every one of them
+// would read as more front-loaded than it turns out to be. Week two against week
+// one is settled the moment both weeks are in.
+//
+// Below this many screenings in the opening week the ratio is arithmetic on
+// noise — a title with two bookings then one reads as a perfectly ordinary 50%
+// decline — so it is left blank rather than sorted in among the releases it
+// means something for.
+const RETENTION_MIN_WEEK = 25;
 
 // Weekly totals from the film's opening. A trailing week the data boundary cuts
 // short is dropped rather than plotted: a four-day week reads as a collapse, and
@@ -1624,21 +2007,38 @@ function renderFilms(blob, boundary) {
   // just the part of one the build happened to catch.
   dataEnd = blob.provisional ? boundary : addDays(boundary, -1);
 
-  let films = Object.entries(byFilm).map(([id, days]) => {
-    const dates = Object.keys(days).sort();
-    const meta = blob.movies[id] || {};
-    return {
-      id,
-      title: meta.t || id,
-      year: meta.y || null,
-      screenings: Object.values(days).reduce((a, b) => a + b, 0),
-      days: dates.length,
-      first: dates[0],
-      last: dates.at(-1),
-      opening: asDate(openingDay(days)),
-      series: days,
-    };
-  });
+  let films = Object.entries(byFilm)
+    // Dropping the part-measured boundary day above can empty a film out entirely:
+    // one whose only listed screening was on it now has no days, so no opening and
+    // no run. It would be filtered out below for having under two screenings
+    // anyway, but every date derived from it between here and there is built on a
+    // first day that does not exist.
+    .filter(([, days]) => Object.keys(days).length > 0)
+    .map(([id, days]) => {
+      const dates = Object.keys(days).sort();
+      const meta = blob.movies[id] || {};
+      const opening = openingDay(days);
+      const [week1, week2] = weeklyTotals(days, opening, dataEnd);
+      const screenings = Object.values(days).reduce((a, b) => a + b, 0);
+      return {
+        id,
+        title: meta.t || id,
+        year: meta.y || null,
+        screenings,
+        days: dates.length,
+        first: dates[0],
+        last: dates.at(-1),
+        opening: asDate(opening),
+        // null, not 0, for a film the data does not yet hold two whole weeks of:
+        // weeklyTotals drops a week the boundary cuts short, and a part week reads
+        // as a collapse the film never had
+        retained:
+          week2 !== undefined && week1 >= RETENTION_MIN_WEEK
+            ? (100 * week2) / week1
+            : null,
+        series: days,
+      };
+    });
   // A film with a single recorded screening is one point on the run chart — there
   // is no run to see. Most are one-off events, previews and hires rather than
   // releases, so they are noise in a list meant for picking something to chart.
@@ -1726,6 +2126,20 @@ function renderFilms(blob, boundary) {
         filterParams: { defaultOption: "greaterThanOrEqual" },
         valueFormatter: ({ value }) => fmtDate.format(value),
       },
+      {
+        field: "retained",
+        headerName: "Week 2",
+        width: 120,
+        headerTooltip:
+          "The film's second week as a share of its first. Over 100% means it " +
+          "widened after opening rather than starting to fade.",
+        filter: "agNumberColumnFilter",
+        // the question here is "which films held on", so the default reads as a
+        // threshold rather than an exact match on a percentage
+        filterParams: { defaultOption: "greaterThanOrEqual" },
+        valueFormatter: ({ value }) =>
+          value === null ? "—" : `${value.toFixed(0)}%`,
+      },
     ],
     onSelectionChanged: () => rechart(),
   });
@@ -1769,7 +2183,9 @@ load("/data/history-summary.json")
     el("dailyWeekends").addEventListener("change", redrawDailyBands);
     renderHours(summary);
     const blob = await load("/data/history.json");
-    renderShare(blob, summary.finalized.partialDay);
+    const byDay = dailyByFilm(blob, summary.finalized.partialDay);
+    renderShare(byDay, blob.movies);
+    renderChangeover(byDay, blob.movies);
     renderFilms(blob, summary.finalized.partialDay);
   })
   .catch((err) => {
