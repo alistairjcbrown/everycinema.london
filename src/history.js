@@ -1459,15 +1459,20 @@ function renderFlow(byDay, movies, { id, previous, date }) {
         },
       },
     ],
-    axes: [
-      {
+    // Object form, keyed by the series' own x and y — the bars are horizontal, so
+    // the category axis (xKey) is the one on the LEFT. The array form is not
+    // accepted here: AG Charts rejects the whole block and falls back to default
+    // axes, which is where the run chart's note about dropped crossLines comes
+    // from. Same trap, louder: everything below was being ignored.
+    axes: {
+      x: {
         type: "category",
         position: "left",
         label: { color: AXIS_INK, fontSize: 11 },
         line: { stroke: GRID_INK },
         gridLine: { enabled: false },
       },
-      {
+      y: {
         type: "number",
         position: "bottom",
         title: { enabled: false },
@@ -1477,7 +1482,7 @@ function renderFlow(byDay, movies, { id, previous, date }) {
         },
         gridLine: { style: [{ stroke: GRID_INK }] },
       },
-    ],
+    },
     legend: { enabled: false },
   });
 
