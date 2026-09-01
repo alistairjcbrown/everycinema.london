@@ -724,21 +724,23 @@ function wideOpenings(byDay, movies) {
     }
   }
 
-  return [...films]
-    // An opening cannot be observed on the first day of the data. A film already
-    // clearing the bar on day one was at that size before the window started, and
-    // there is no earlier day here to have opened from — the test that finds every
-    // other opening, "the first day it crosses the threshold", degenerates into
-    // "it was already big" at the boundary. Avatar: Fire and Ash is the case: it
-    // takes 20% of 1 January because it opened the previous December, and the
-    // chart marked that as the year's first wide opening.
-    .filter(([, film]) => film.opened !== null && film.opened !== dates[0])
-    .sort((a, b) => b[1].peak - a[1].peak)
-    .map(([id, film]) => ({
-      title: movies[id]?.t ?? id,
-      date: film.opened,
-      peak: film.peak,
-    }));
+  return (
+    [...films]
+      // An opening cannot be observed on the first day of the data. A film already
+      // clearing the bar on day one was at that size before the window started, and
+      // there is no earlier day here to have opened from — the test that finds every
+      // other opening, "the first day it crosses the threshold", degenerates into
+      // "it was already big" at the boundary. Avatar: Fire and Ash is the case: it
+      // takes 20% of 1 January because it opened the previous December, and the
+      // chart marked that as the year's first wide opening.
+      .filter(([, film]) => film.opened !== null && film.opened !== dates[0])
+      .sort((a, b) => b[1].peak - a[1].peak)
+      .map(([id, film]) => ({
+        title: movies[id]?.t ?? id,
+        date: film.opened,
+        peak: film.peak,
+      }))
+  );
 }
 
 // A stacked area of the top films' market share does not work on this data: the
@@ -812,9 +814,7 @@ function renderShare(byDay, movies) {
         marker: { enabled: false, size: 8 },
         tooltip: {
           renderer: ({ datum }) => {
-            const opened = openedOn.get(
-              datum.date.toISOString().slice(0, 10),
-            );
+            const opened = openedOn.get(datum.date.toISOString().slice(0, 10));
             return {
               title: fmtDay.format(datum.date),
               data: [
@@ -1036,7 +1036,6 @@ function renderReleases(byDay, movies) {
     if (!byMonth[month] || r.share > byMonth[month].share) byMonth[month] = r;
   }
   labelWhatFits(Object.values(byMonth), releases, el("releaseChart"));
-
 
   releaseChart?.destroy();
   releaseChart = AgCharts.create({
@@ -1724,8 +1723,8 @@ const PREVIEW_QUIET_SHARE = 0.05;
 // normal's 1.96 — using the normal here would draw a band less than half the
 // width it should be, on exactly the films with the least data behind them.
 const T95 = [
-  12.71, 4.30, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.20, 2.18,
-  2.16, 2.14, 2.13,
+  12.71, 4.3, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.2, 2.18, 2.16,
+  2.14, 2.13,
 ];
 const t95 = (df) => (df < 1 ? T95[0] : (T95[df - 1] ?? 1.96));
 
@@ -2383,14 +2382,12 @@ function renderFilms(blob, boundary) {
   films = films.filter((f) => f.screenings > 1);
   films.sort((a, b) => b.screenings - a.screenings);
 
-  const theme = themeQuartz
-    .withPart(colorSchemeDark)
-    .withParams({
-      rowHeight: 34,
-      headerHeight: 36,
-      accentColor: SERIES[0],
-      backgroundColor: SURFACE,
-    });
+  const theme = themeQuartz.withPart(colorSchemeDark).withParams({
+    rowHeight: 34,
+    headerHeight: 36,
+    accentColor: SERIES[0],
+    backgroundColor: SURFACE,
+  });
 
   // Declared before the grid so the selection handler cannot reach it in its
   // temporal dead zone; `grid` inside is only read once something is selected.
