@@ -684,8 +684,9 @@ const TOP_N = 8;
 
 // What counts as going wide: the share of one day's screenings a film has to take
 // for that day to be its opening. This threshold is the only thing selecting which
-// films get marked — every film that clears it is drawn (13 of them so far this
-// year), so it is also the dial for how busy the chart gets.
+// films get marked — every film that clears it and opened inside the window is
+// drawn (12 of them so far this year), so it is also the dial for how busy the
+// chart gets.
 const OPENING_SHARE = 20;
 
 // A wide release re-cuts the whole city's schedule overnight — on its first day a
@@ -716,7 +717,14 @@ function wideOpenings(byDay, movies) {
   }
 
   return [...films]
-    .filter(([, film]) => film.opened !== null)
+    // An opening cannot be observed on the first day of the data. A film already
+    // clearing the bar on day one was at that size before the window started, and
+    // there is no earlier day here to have opened from — the test that finds every
+    // other opening, "the first day it crosses the threshold", degenerates into
+    // "it was already big" at the boundary. Avatar: Fire and Ash is the case: it
+    // takes 20% of 1 January because it opened the previous December, and the
+    // chart marked that as the year's first wide opening.
+    .filter(([, film]) => film.opened !== null && film.opened !== dates[0])
     .sort((a, b) => b[1].peak - a[1].peak)
     .map(([id, film]) => ({
       title: movies[id]?.t ?? id,
