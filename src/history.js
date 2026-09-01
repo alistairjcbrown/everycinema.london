@@ -449,6 +449,12 @@ function renderDaily(summary) {
       x: {
         type: "time",
         position: "bottom",
+        // Same as the concentration chart: pin the domain to the plotted span so
+        // the axis cannot round out to the next two-month tick and leave weeks
+        // of empty plot on the right. Whole days, matching the bands.
+        nice: false,
+        min: startOfDay(dailySpan[0]),
+        max: startOfNextDay(dailySpan[1]),
         crossLines: dailyCrossLines(...dailySpan),
       },
       y: {
@@ -771,19 +777,18 @@ function dailyByFilm(blob, boundary) {
 }
 
 function renderShare(byDay, movies) {
-  const data = Object.keys(byDay)
-    .sort()
-    .map((date) => {
-      const counts = Object.values(byDay[date]).sort((a, b) => b - a);
-      const total = counts.reduce((a, b) => a + b, 0);
-      const top = counts.slice(0, TOP_N).reduce((a, b) => a + b, 0);
-      return {
-        date: asDate(date),
-        share: (100 * top) / total,
-        films: counts.length,
-        total,
-      };
-    });
+  const dates = Object.keys(byDay).sort();
+  const data = dates.map((date) => {
+    const counts = Object.values(byDay[date]).sort((a, b) => b - a);
+    const total = counts.reduce((a, b) => a + b, 0);
+    const top = counts.slice(0, TOP_N).reduce((a, b) => a + b, 0);
+    return {
+      date: asDate(date),
+      share: (100 * top) / total,
+      films: counts.length,
+      total,
+    };
+  });
 
   const openings = wideOpenings(byDay, movies);
   // more than one film can go wide on the same day, so a date maps to a list
@@ -832,6 +837,15 @@ function renderShare(byDay, movies) {
       x: {
         type: "time",
         position: "bottom",
+        // Pinned to the days plotted rather than left to the axis. A time axis
+        // rounds its domain out to the next TICK, and the ticks here are two
+        // months apart, so the series ending at midday on the 1st of a tick
+        // month (where asDate puts every point) buys two months of empty plot.
+        // Whole days, so the edges land on the same 00:00 the bands elsewhere
+        // use, and the tick labels still fall on month boundaries.
+        nice: false,
+        min: startOfDay(dates[0]),
+        max: startOfNextDay(dates.at(-1)),
         crossLines: openings.map(({ title, date }) => ({
           type: "line",
           value: asDate(date), // midday, where the day's own point sits
