@@ -211,6 +211,14 @@ const startOfDay = (iso) => new Date(`${iso}T00:00:00Z`);
 const startOfNextDay = (iso) =>
   new Date(Date.parse(`${iso}T00:00:00Z`) + DAY_MS);
 
+// Breathing room past the last day plotted, so a series ending hard against the
+// axis reads as finished rather than as cut off — which matters most on the daily
+// chart, where the line that reaches the edge is the dashed one and being cut off
+// is a thing it could plausibly be. A week: visible at a glance, and nothing
+// beside the two months the axis rounds out to when left to nice its own domain.
+const AXIS_TAIL_DAYS = 7;
+const axisEnd = (iso) => startOfNextDay(addDays(iso, AXIS_TAIL_DAYS));
+
 // Clamped to the plotted range, and dropped entirely when they fall outside it:
 // an unclamped band would stretch the axis domain into empty space (the summer
 // holiday runs weeks past the last day there is data for) and leave the series
@@ -449,6 +457,12 @@ function renderDaily(summary) {
       x: {
         type: "time",
         position: "bottom",
+        // Same as the concentration chart: pin the domain to the plotted span so
+        // the axis cannot round out to the next two-month tick and leave weeks
+        // of empty plot on the right. Whole days, matching the bands.
+        nice: false,
+        min: startOfDay(dailySpan[0]),
+        max: axisEnd(dailySpan[1]),
         crossLines: dailyCrossLines(...dailySpan),
       },
       y: {
@@ -718,21 +732,23 @@ function wideOpenings(byDay, movies) {
     }
   }
 
-  return [...films]
-    // An opening cannot be observed on the first day of the data. A film already
-    // clearing the bar on day one was at that size before the window started, and
-    // there is no earlier day here to have opened from — the test that finds every
-    // other opening, "the first day it crosses the threshold", degenerates into
-    // "it was already big" at the boundary. Avatar: Fire and Ash is the case: it
-    // takes 20% of 1 January because it opened the previous December, and the
-    // chart marked that as the year's first wide opening.
-    .filter(([, film]) => film.opened !== null && film.opened !== dates[0])
-    .sort((a, b) => b[1].peak - a[1].peak)
-    .map(([id, film]) => ({
-      title: movies[id]?.t ?? id,
-      date: film.opened,
-      peak: film.peak,
-    }));
+  return (
+    [...films]
+      // An opening cannot be observed on the first day of the data. A film already
+      // clearing the bar on day one was at that size before the window started, and
+      // there is no earlier day here to have opened from — the test that finds every
+      // other opening, "the first day it crosses the threshold", degenerates into
+      // "it was already big" at the boundary. Avatar: Fire and Ash is the case: it
+      // takes 20% of 1 January because it opened the previous December, and the
+      // chart marked that as the year's first wide opening.
+      .filter(([, film]) => film.opened !== null && film.opened !== dates[0])
+      .sort((a, b) => b[1].peak - a[1].peak)
+      .map(([id, film]) => ({
+        title: movies[id]?.t ?? id,
+        date: film.opened,
+        peak: film.peak,
+      }))
+  );
 }
 
 // A stacked area of the top films' market share does not work on this data: the
@@ -771,19 +787,18 @@ function dailyByFilm(blob, boundary) {
 }
 
 function renderShare(byDay, movies) {
-  const data = Object.keys(byDay)
-    .sort()
-    .map((date) => {
-      const counts = Object.values(byDay[date]).sort((a, b) => b - a);
-      const total = counts.reduce((a, b) => a + b, 0);
-      const top = counts.slice(0, TOP_N).reduce((a, b) => a + b, 0);
-      return {
-        date: asDate(date),
-        share: (100 * top) / total,
-        films: counts.length,
-        total,
-      };
-    });
+  const dates = Object.keys(byDay).sort();
+  const data = dates.map((date) => {
+    const counts = Object.values(byDay[date]).sort((a, b) => b - a);
+    const total = counts.reduce((a, b) => a + b, 0);
+    const top = counts.slice(0, TOP_N).reduce((a, b) => a + b, 0);
+    return {
+      date: asDate(date),
+      share: (100 * top) / total,
+      films: counts.length,
+      total,
+    };
+  });
 
   const openings = wideOpenings(byDay, movies);
   // more than one film can go wide on the same day, so a date maps to a list
@@ -807,9 +822,7 @@ function renderShare(byDay, movies) {
         marker: { enabled: false, size: 8 },
         tooltip: {
           renderer: ({ datum }) => {
-            const opened = openedOn.get(
-              datum.date.toISOString().slice(0, 10),
-            );
+            const opened = openedOn.get(datum.date.toISOString().slice(0, 10));
             return {
               title: fmtDay.format(datum.date),
               data: [
@@ -832,6 +845,15 @@ function renderShare(byDay, movies) {
       x: {
         type: "time",
         position: "bottom",
+        // Pinned to the days plotted rather than left to the axis. A time axis
+        // rounds its domain out to the next TICK, and the ticks here are two
+        // months apart, so the series ending at midday on the 1st of a tick
+        // month (where asDate puts every point) buys two months of empty plot.
+        // Whole days, so the edges land on the same 00:00 the bands elsewhere
+        // use, and the tick labels still fall on month boundaries.
+        nice: false,
+        min: startOfDay(dates[0]),
+        max: axisEnd(dates.at(-1)),
         crossLines: openings.map(({ title, date }) => ({
           type: "line",
           value: asDate(date), // midday, where the day's own point sits
@@ -1022,7 +1044,6 @@ function renderReleases(byDay, movies) {
     if (!byMonth[month] || r.share > byMonth[month].share) byMonth[month] = r;
   }
   labelWhatFits(Object.values(byMonth), releases, el("releaseChart"));
-
 
   releaseChart?.destroy();
   releaseChart = AgCharts.create({
@@ -1445,15 +1466,20 @@ function renderFlow(byDay, movies, { id, previous, date }) {
         },
       },
     ],
-    axes: [
-      {
+    // Object form, keyed by the series' own x and y — the bars are horizontal, so
+    // the category axis (xKey) is the one on the LEFT. The array form is not
+    // accepted here: AG Charts rejects the whole block and falls back to default
+    // axes, which is where the run chart's note about dropped crossLines comes
+    // from. Same trap, louder: everything below was being ignored.
+    axes: {
+      x: {
         type: "category",
         position: "left",
         label: { color: AXIS_INK, fontSize: 11 },
         line: { stroke: GRID_INK },
         gridLine: { enabled: false },
       },
-      {
+      y: {
         type: "number",
         position: "bottom",
         title: { enabled: false },
@@ -1463,7 +1489,7 @@ function renderFlow(byDay, movies, { id, previous, date }) {
         },
         gridLine: { style: [{ stroke: GRID_INK }] },
       },
-    ],
+    },
     legend: { enabled: false },
   });
 
@@ -1705,8 +1731,8 @@ const PREVIEW_QUIET_SHARE = 0.05;
 // normal's 1.96 — using the normal here would draw a band less than half the
 // width it should be, on exactly the films with the least data behind them.
 const T95 = [
-  12.71, 4.30, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.20, 2.18,
-  2.16, 2.14, 2.13,
+  12.71, 4.3, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.2, 2.18, 2.16,
+  2.14, 2.13,
 ];
 const t95 = (df) => (df < 1 ? T95[0] : (T95[df - 1] ?? 1.96));
 
@@ -2364,14 +2390,12 @@ function renderFilms(blob, boundary) {
   films = films.filter((f) => f.screenings > 1);
   films.sort((a, b) => b.screenings - a.screenings);
 
-  const theme = themeQuartz
-    .withPart(colorSchemeDark)
-    .withParams({
-      rowHeight: 34,
-      headerHeight: 36,
-      accentColor: SERIES[0],
-      backgroundColor: SURFACE,
-    });
+  const theme = themeQuartz.withPart(colorSchemeDark).withParams({
+    rowHeight: 34,
+    headerHeight: 36,
+    accentColor: SERIES[0],
+    backgroundColor: SURFACE,
+  });
 
   // Declared before the grid so the selection handler cannot reach it in its
   // temporal dead zone; `grid` inside is only read once something is selected.
