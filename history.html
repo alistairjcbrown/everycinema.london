@@ -77,6 +77,9 @@
       /* flex:none for the same reason as #hoursChart — its height is set in JS to
          match the heatmap, and .chart's flex:1 would override that */
       #dailyChart, #shareChart { flex: none; height: 300px; }
+      /* Taller than the half-width charts: it runs the full width of the page, and
+         the labelled openings need vertical room to sit clear of one another. */
+      #releaseChart { flex: none; height: 360px; }
       /* height + max-width are set by fitSquareCells() to keep cells square.
          flex:none is essential — .chart's flex:1 would let the card's column
          layout decide the height instead, silently discarding that sizing. */
@@ -186,6 +189,16 @@
           <p class="note" id="shareNote"></p>
         </section>
       </div>
+
+      <section class="card">
+        <h2>How big do films open?</h2>
+        <p class="sub">
+          Every film that opened in London this year, on the day it opened and
+          at the share of that day&rsquo;s screenings it took.
+        </p>
+        <div class="chart" id="releaseChart"></div>
+        <p class="note" id="releaseNote"></p>
+      </section>
 
       <section class="card">
         <h2>
