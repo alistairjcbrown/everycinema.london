@@ -156,6 +156,8 @@ const fmtDate = new Intl.DateTimeFormat("en-GB", {
   month: "short",
   year: "numeric",
 });
+// The note compares months, and the chart's axis already carries the year.
+const fmtMonth = new Intl.DateTimeFormat("en-GB", { month: "long" });
 const asDate = (iso) => new Date(`${iso}T12:00:00Z`); // midday avoids DST edges
 const DAY_MS = 86400000;
 const addDays = (iso, n) =>
@@ -870,6 +872,243 @@ function renderShare(byDay, movies) {
       ? `: ${biggest.title} reached ${biggest.peak.toFixed(0)}% of every ` +
         `screening in London.`
       : `.`);
+}
+
+// ---------------------------------------------------------------------------
+// Releases
+// ---------------------------------------------------------------------------
+//
+// The concentration chart above is about the shape of a day's programming; this
+// one is about what arrives to shape it. Every release is one mark, placed on the
+// day it opened and at the share of that day's screenings it took, so the card
+// answers "what opened, and how big" without the reader having to infer either
+// from a line that moved.
+//
+// The two facts it is built to show sit on top of each other. The floor is flat:
+// a median release takes about 2% of its opening day, every month of the year,
+// because London always has a dozen small films arriving. What moves is the
+// ceiling, and it moves seasonally.
+
+// What counts as a release rather than an event. Below this a film is a one-off
+// booking, a preview evening or a single cinema's run — 6,189 films have screened
+// this year and 308 cleared this bar, which is about the number of releases a year
+// actually has.
+const RELEASE_MIN = 20;
+
+let releaseChart = null;
+
+// Which of the candidate releases can actually carry their name, given how much
+// room the chart has. AG Charts draws every label it is given and lets them
+// overprint, and long film titles on a year-wide axis collide readily: at the
+// page's full width "The Super Mario Galaxy Movie" and "The Devil Wears Prada 2"
+// open a month apart at almost the same share and their labels touch; at phone
+// width most of the year's names land on top of each other.
+//
+// So the labels are chosen against the plot's measured size rather than a rule
+// picked to look right on a desktop. Latest first, because a reader coming to
+// this card is asking what is opening NOW: the newest month always keeps its
+// name, and it is the earlier ones that give way when the chart is narrow.
+//
+// The geometry is estimated, not measured — the chart does not exist yet, and the
+// axes size themselves to the data. A label is a text box centred on its mark, so
+// two of them clash only when they overlap on BOTH axes, which is what lets a
+// tentpole and a small opening in the same fortnight both keep their names.
+const LABEL_FONT_PX = 11;
+// Mean glyph width for the label font at that size, near enough. Titles are mixed
+// case and this errs wide, which is the safe direction: an overestimate drops a
+// borderline label, an underestimate prints two on top of each other.
+const LABEL_CHAR_PX = 6;
+// Clear air between two labels, and the gap that counts as vertically clear.
+const LABEL_GAP_PX = 10;
+
+function labelWhatFits(candidates, releases, container) {
+  const byDate = [...candidates].sort((a, b) => b.date - a.date);
+  // The axis spans every release, not just the ones up for a label. Measuring the
+  // span across the candidates instead put the newest of them at the plot's right
+  // edge by construction, where the overhang test below threw its label away —
+  // and the newest month is the one this card most needs to name.
+  const start = releases[0].date;
+  const end = releases.at(-1).date;
+  // What the axes will take out of the container: the y-axis labels and their
+  // tick marks on the left, the x-axis labels underneath, plus chartBase's own
+  // padding. Approximate on purpose — LABEL_GAP_PX covers the slack.
+  const plotWidth = Math.max(container.clientWidth - 70, 1);
+  const plotHeight = Math.max(container.clientHeight - 46, 1);
+  const days = (end - start) / DAY_MS || 1;
+  const pxPerDay = plotWidth / days;
+  // The y-axis runs from zero to a round number above the biggest opening
+  const top = Math.ceil(Math.max(...releases.map((r) => r.share)) / 10) * 10;
+  const pxPerShare = plotHeight / top;
+
+  const placed = [];
+  for (const release of byDate) {
+    const halfWidth = (release.title.length * LABEL_CHAR_PX) / 2;
+    const x = ((release.date - start) / DAY_MS) * pxPerDay;
+    const y = release.share * pxPerShare;
+    // A label centred on a mark at the very edge of the plot hangs off it and
+    // lands on the axis. That is the whole of January's problem, and the mark
+    // does not move, so it would stand for the rest of the year.
+    if (x < halfWidth || x > plotWidth - halfWidth) continue;
+    const clashes = placed.some(
+      (other) =>
+        Math.abs(x - other.x) < halfWidth + other.halfWidth + LABEL_GAP_PX &&
+        Math.abs(y - other.y) < LABEL_FONT_PX + LABEL_GAP_PX,
+    );
+    if (clashes) continue;
+    placed.push({ x, y, halfWidth });
+    release.label = release.title;
+  }
+}
+
+function renderReleases(byDay, movies) {
+  // Transposed from the same roll-up the concentration and changeover cards use
+  // rather than walking the hour buckets again — that roll-up is also where the
+  // part-measured boundary day is already resolved, and a film's opening is
+  // exactly the kind of thing a half-counted day would put on the wrong date.
+  const byFilm = {};
+  const cityDay = {};
+  for (const [date, films] of Object.entries(byDay)) {
+    let total = 0;
+    for (const [id, n] of Object.entries(films)) {
+      (byFilm[id] ||= {})[date] = n;
+      total += n;
+    }
+    cityDay[date] = total;
+  }
+  const firstDay = Object.keys(byDay).sort()[0];
+
+  const releases = [];
+  for (const [id, days] of Object.entries(byFilm)) {
+    // A film already screening on the first day of the data opened before the
+    // window did — there is no day here for it to have opened on, and dating it
+    // to 1 January would put December's releases in this year's new year.
+    if (days[firstDay] !== undefined) continue;
+    // openingDay walks day by day from a film's first screening, so running it on
+    // all 6,189 is most of a second of work to reject titles that never played
+    // enough in one day to be a release however you date them.
+    if (Math.max(...Object.values(days)) < RELEASE_MIN) continue;
+    // The day it OPENED, not the day it was first shown anywhere: previews and
+    // sparse lead-ins would otherwise date a summer tentpole to a Tuesday evening
+    // in May and size it at the twelve screenings that ran that night.
+    const opening = openingDay(days);
+    const screenings = days[opening] || 0;
+    if (screenings < RELEASE_MIN) continue;
+    const share = (100 * screenings) / cityDay[opening];
+    releases.push({
+      date: asDate(opening),
+      share,
+      screenings,
+      title: movies[id]?.t ?? id,
+      label: "",
+    });
+  }
+  releases.sort((a, b) => a.date - b.date);
+
+  // The biggest opening of each month is the candidate to be named on the chart.
+  // A share threshold was the obvious rule and the wrong one: it named nine films
+  // and none of them in the month the chart is most worth reading, because a month
+  // whose ceiling has dropped is exactly a month with nothing left over the bar.
+  const byMonth = {};
+  for (const r of releases) {
+    const month = r.date.toISOString().slice(0, 7);
+    if (!byMonth[month] || r.share > byMonth[month].share) byMonth[month] = r;
+  }
+  labelWhatFits(Object.values(byMonth), releases, el("releaseChart"));
+
+
+  releaseChart?.destroy();
+  releaseChart = AgCharts.create({
+    ...chartBase,
+    container: el("releaseChart"),
+    series: [
+      {
+        // A dot plot, drawn as a line series with no line. `scatter` is what this
+        // wants to be, but scatter and bubble both come out blank against a TIME
+        // axis in this version of AG Charts — no error, no warning, an empty plot
+        // and a missing x-axis — while the same series against a number axis draws
+        // fine. A strokeless line series with its markers on is the same picture
+        // and keeps the time axis. It is why `releases` is sorted by date: a line
+        // series joins its points in data order, and the join has to be invisible.
+        type: "line",
+        data: releases,
+        xKey: "date",
+        yKey: "share",
+        strokeWidth: 0,
+        marker: {
+          enabled: true,
+          size: 8,
+          fill: SERIES[0],
+          // The floor is a hundred-odd marks in a narrow band a few percent high,
+          // so they overlap however small they are drawn. Translucent, they read
+          // as the density they are — a busy week is visibly darker than a quiet
+          // one — where opaque they would read as one bar with a ragged top.
+          fillOpacity: 0.55,
+          stroke: SURFACE,
+          strokeWidth: 1,
+        },
+        label: {
+          enabled: true,
+          fontSize: 11,
+          color: AXIS_INK,
+          // Labels do not thin themselves out when they collide, so which releases
+          // get named is decided in the data, by RELEASE_LABEL_SHARE
+          formatter: ({ datum }) => datum.label,
+        },
+        tooltip: {
+          renderer: ({ datum }) => ({
+            title: datum.title,
+            data: [
+              { label: "Opened", value: fmtDay.format(datum.date) },
+              {
+                label: "Screenings that day",
+                value: fmtInt.format(datum.screenings),
+              },
+              {
+                label: "Share of the day",
+                value: `${datum.share.toFixed(1)}%`,
+              },
+            ],
+          }),
+        },
+      },
+    ],
+    axes: {
+      x: { type: "time", position: "bottom" },
+      y: {
+        type: "number",
+        position: "left",
+        min: 0,
+        title: { enabled: false },
+        label: { formatter: ({ value }) => `${value}%` },
+      },
+    },
+    legend: { enabled: false },
+  });
+
+  // The floor is a median and the ceiling is a monthly maximum, because that is
+  // how the card reads: a flat band of small releases with the big ones on top.
+  // Both films the sentence names are labelled on the chart at full width, and
+  // neither is at phone width — a title centred on a mark in the last weeks of
+  // the axis has nowhere to sit — so the prose has to carry them.
+  const months = Object.keys(byMonth).sort();
+  const latest = byMonth[months.at(-1)];
+  const peak = months
+    .map((m) => byMonth[m])
+    .reduce((a, b) => (b.share > a.share ? b : a));
+  const lowest = months.every((m) => byMonth[m].share >= latest.share);
+  el("releaseNote").textContent =
+    `${fmtInt.format(releases.length)} films opened in London this year, a ` +
+    `median of ${median(releases.map((r) => r.share)).toFixed(1)}% of their ` +
+    `opening day's screenings. That floor barely moves; the ceiling is ` +
+    `seasonal.` +
+    // With one month of data the ceiling has not gone anywhere yet
+    (months.length > 1
+      ? ` It reached ${peak.share.toFixed(0)}% for ${peak.title} in ` +
+        `${fmtMonth.format(peak.date)}, against ` +
+        `${latest.share.toFixed(0)}% for ${latest.title} in ` +
+        `${fmtMonth.format(latest.date)}` +
+        (lowest ? `, the smallest month of the year so far.` : `.`)
+      : ``);
 }
 
 // ---------------------------------------------------------------------------
@@ -2256,6 +2495,7 @@ load("/data/history-summary.json")
     const blob = await load("/data/history.json");
     const byDay = dailyByFilm(blob, summary.finalized.partialDay);
     renderShare(byDay, blob.movies);
+    renderReleases(byDay, blob.movies);
     renderChangeover(byDay, blob.movies);
     renderFilms(blob, summary.finalized.partialDay);
   })
