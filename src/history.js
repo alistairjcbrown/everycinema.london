@@ -211,6 +211,14 @@ const startOfDay = (iso) => new Date(`${iso}T00:00:00Z`);
 const startOfNextDay = (iso) =>
   new Date(Date.parse(`${iso}T00:00:00Z`) + DAY_MS);
 
+// Breathing room past the last day plotted, so a series ending hard against the
+// axis reads as finished rather than as cut off — which matters most on the daily
+// chart, where the line that reaches the edge is the dashed one and being cut off
+// is a thing it could plausibly be. A week: visible at a glance, and nothing
+// beside the two months the axis rounds out to when left to nice its own domain.
+const AXIS_TAIL_DAYS = 7;
+const axisEnd = (iso) => startOfNextDay(addDays(iso, AXIS_TAIL_DAYS));
+
 // Clamped to the plotted range, and dropped entirely when they fall outside it:
 // an unclamped band would stretch the axis domain into empty space (the summer
 // holiday runs weeks past the last day there is data for) and leave the series
@@ -454,7 +462,7 @@ function renderDaily(summary) {
         // of empty plot on the right. Whole days, matching the bands.
         nice: false,
         min: startOfDay(dailySpan[0]),
-        max: startOfNextDay(dailySpan[1]),
+        max: axisEnd(dailySpan[1]),
         crossLines: dailyCrossLines(...dailySpan),
       },
       y: {
@@ -845,7 +853,7 @@ function renderShare(byDay, movies) {
         // use, and the tick labels still fall on month boundaries.
         nice: false,
         min: startOfDay(dates[0]),
-        max: startOfNextDay(dates.at(-1)),
+        max: axisEnd(dates.at(-1)),
         crossLines: openings.map(({ title, date }) => ({
           type: "line",
           value: asDate(date), // midday, where the day's own point sits
