@@ -990,6 +990,8 @@ function labelWhatFits(candidates, releases, container) {
   }
 }
 
+const releaseDay = (release) => release.date.toISOString().slice(0, 10);
+
 function renderReleases(byDay, movies) {
   // Transposed from the same roll-up the concentration and changeover cards use
   // rather than walking the hour buckets again — that roll-up is also where the
@@ -1102,7 +1104,18 @@ function renderReleases(byDay, movies) {
       },
     ],
     axes: {
-      x: { type: "time", position: "bottom" },
+      x: {
+        type: "time",
+        position: "bottom",
+        // Pinned for the same reason as the daily and concentration charts: left
+        // to itself the axis rounds out to the next two-month tick, and the last
+        // opening lands months short of it. `releases` is sorted by date, and
+        // asDate puts every point at midday, so the ends recover their own day
+        // the same way the month grouping above does.
+        nice: false,
+        min: startOfDay(releaseDay(releases[0])),
+        max: axisEnd(releaseDay(releases.at(-1))),
+      },
       y: {
         type: "number",
         position: "left",
