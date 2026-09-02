@@ -20,6 +20,9 @@
       section { border-top: 1px solid #2e2e34; padding: 28px 0; }
       section h2 { font-size: 18px; margin: 0 0 10px; }
       section p { margin: 0 0 12px; }
+      section h3 { font-size: 14px; margin: 22px 0 8px; color: #d4d4d8; }
+      section ul { margin: 0 0 12px; padding-left: 20px; }
+      section li { margin: 0 0 8px; }
       .disclaimer {
         background: #202024; border: 1px solid #2e2e34; border-radius: 8px;
         padding: 12px 16px; font-size: 14px; color: #c4c4cc;
@@ -40,7 +43,7 @@
       </p>
 
       <section id="clusterflick">
-        <h2>Performance data — Clusterflick</h2>
+        <h2>Screening data — Clusterflick</h2>
         <a href="https://clusterflick.com" target="_blank" rel="noopener">
           <img class="cf-logo" src="/img/clusterflick.svg" alt="Clusterflick" />
         </a>
@@ -58,6 +61,51 @@
           The venue-health page is built from Clusterflick&rsquo;s hourly
           listing checks, published a day at a time as
           <a href="https://github.com/clusterflick/data-analysed/releases" target="_blank" rel="noopener">releases on github.com/clusterflick/data-analysed</a>.
+        </p>
+
+        <p>
+          Screening data from
+          <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick</a>
+          is published under
+          <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>,
+          per its
+          <a href="https://clusterflick.com/data-licence/" target="_blank" rel="noopener">data licence</a>.
+        </p>
+
+        <h3>What we&rsquo;ve changed</h3>
+        <p>
+          CC BY 4.0 asks that changes be stated, and this site makes plenty of
+          them. Nothing here is a verbatim copy of a Clusterflick release.
+        </p>
+        <ul>
+          <li>
+            The <a href="/">showtimes grid</a> ships a compacted, denormalised
+            blob &mdash; lookups extracted, movie fields stored once per movie,
+            performances reduced to id-referencing records &mdash; and expands
+            it back into rows in the browser.
+          </li>
+          <li>
+            <a href="/history.html">Screening history</a> is reconstructed
+            rather than republished. A release lists only <em>future</em>
+            performances, so the record of what actually screened is assembled
+            by partitioning consecutive releases into windows and bucketing each
+            window&rsquo;s performances by hour.
+          </li>
+          <li>
+            <a href="/health.html">Venue health</a> aggregates the hourly check
+            log into per-day, per-venue rates, and adds scoring Clusterflick
+            does not publish &mdash; deciding which outcomes count for or
+            against a venue&rsquo;s uptime, and leaving checks inside a declared
+            closure out of the rate entirely.
+          </li>
+        </ul>
+
+        <p class="disclaimer">
+          The CC BY 4.0 grant covers the screening data &mdash; performances,
+          venues, booking links, formats and accessibility. It does not cover
+          the film metadata shown alongside it in the same rows: posters,
+          genres, certificates, runtimes and directors come from TMDB under
+          separate terms, below.
         </p>
       </section>
 
