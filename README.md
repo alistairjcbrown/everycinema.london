@@ -16,10 +16,12 @@ London cinema performances, with three views over one dataset:
 - **Pivot** — venues × dates, reconfigurable live from the tool panel
 - **Flat** — every performance, filterable by genre, format and accessibility
 
-Plus two charting pages over the same data's history: **Screening history**
+Plus three charting pages over the same data's history: **Screening history**
 (what actually screened, day by day and film by film, and what a wide opening
-takes off everything already playing) and **Venue health** (which venues answer
-when we ask, and when they publish new showtimes).
+takes off everything already playing), **When venues publish** (how many new
+future performances each venue put on sale, day by day, and whether it is on a
+weekly cycle) and **Venue health** (which venues answer when we ask, and when
+they publish new showtimes).
 
 It's not a replacement for Clusterflick — it's a demonstration of what AG Grid's
 row grouping, pivoting and set-filtering can do with real, messy, real-world
@@ -214,6 +216,175 @@ picker, and wrong in the venue table, whose chain filter matches on the label. A
 shared `groupName` therefore gives way to the venue's own name, and `build` warns
 if two chains still end up sharing one.
 
+## When venues publish
+
+`diffs.mjs` builds the data behind the publishing page: how many new future
+performances each venue added, and on which day.
+
+A release is a snapshot of what every venue was listing at one instant, so two
+consecutive releases say what appeared between them, and a run of releases says
+when each venue put new screenings on sale. Nothing else in the pipeline records
+that — `history.mjs` counts what *screened*, and `health.mjs` counts whether a
+venue's listing total moved, in whatever unit that venue answers in.
+
+```bash
+npm run diffs:days      # diff consecutive releases -> data-diffs/days/YYYYMM/
+npm run diffs:build     # merge those                -> public/data/diffs.json
+npm run diffs:names     # backfill venue names        -> data-diffs/venues.json
+npm run diffs:verify -- --tag <data-diffed release>  # check against upstream
+```
+
+Like the history windows and the health days, a finished day is write-once and
+committed. `days` reads the release index `history.mjs` already maintains, so
+the two stages are looking at one list rather than each fetching their own.
+
+A day costs the two ~19 MB releases either side of it, but consecutive days
+share a release — the current snapshot of one pair is the previous snapshot of
+the next — so a run downloads each release once and the year is ~10.5 GB rather
+than twice that. It still takes about half an hour, so `--limit` (default 40)
+stops an incremental run from quietly attempting a backfill, and `--since` /
+`--to` chunk one deliberately:
+
+```bash
+npm run diffs:days -- --since 2026-01-01 --to 2026-02-01
+```
+
+Unlike `history:fetch`, nothing is written to disk but the aggregates: a release
+is parsed into per-venue showings, diffed against the one before it, and
+dropped.
+
+### The comparison is not ours
+
+[clusterflick/data-diffed](https://github.com/clusterflick/data-diffed) already
+publishes this diff — it backs Clusterflick's own New Listings and RSS feeds —
+and the code behind it lives in
+[clusterflick/scripts](https://github.com/clusterflick/scripts). Three files
+from `scripts/diff` are therefore vendored verbatim into
+`vendor/clusterflick-diff/` rather than reimplemented, because the interesting
+decisions in a diff are definitional rather than algorithmic and a second
+opinion about them would be worth nothing. Chief among them: performances are
+paired by nearest start time within an hour, so a showtime that moves reads as a
+**reschedule** rather than a removal plus an addition.
+
+We cannot consume data-diffed's releases directly. They start on 25 July 2026,
+they diff `data-transformed` (~400 assets per release, so a backfill would be
+200k requests against 538 for `data-combined`), and upstream is explicit that
+they are an internal build artifact, unlicensed, with no schema guarantees. So
+`diffs.mjs` runs their code over `data-combined` instead — the same data the
+site build already downloads, under the licence the rest of the site relies on.
+
+`npm run diffs:verify` holds the two to each other: it re-runs a published
+data-diffed release against the `data-combined` releases from the same pipeline
+run and compares per-venue counts. It reproduces upstream exactly across the
+overlap. Two things it knows about:
+
+- Some pipeline runs publish a transformed release and no combined one, so
+  there is no snapshot to compare against and `verify` says so rather than
+  reporting six hours of unrelated change as a disagreement.
+- A venue whose only movement was a sub-hour reschedule is legitimately absent
+  from data-diffed's published blob — `hasChanges` there publishes a venue only
+  when a *showing* changed — while it is present in ours.
+
+### What "added" has to mean here
+
+`compareVenue` reports `futurePerformances.added` for performances added to
+showings the venue was **already listing**, and reports a brand new showing
+separately, with its performance count on the showing entry. That is right for a
+feed, which renders a new title as one item and would double-count it otherwise,
+but it is not what a chart with "performances added" up the side can use: over
+six weeks the field alone misses 25% of what arrived. Removals are not symmetric
+— a removed showing's future performances *are* in `removed` — so `diffs.mjs`
+adds the two together.
+
+It also keeps them apart, because the split turns out to be the signal. On the
+estate-wide changeover days new titles are 7–22% of what arrives — the chains
+extending the booking window on films already on sale. On the quiet days it is
+40–85%, because what moves then is a venue announcing something new.
+
+### Which day a diff belongs to
+
+A diff covers the interval between two release publishes, and those do not
+respect midnight: releases land about twice a day, the median interval is ~12
+hours, and more than half of everything added arrives inside an interval that
+spans a midnight. So it is credited to the day the interval **started**.
+
+`asOf` names the far end and crediting that day is the obvious reading, but the
+venue-health log settles it the other way: its hourly probes put 39% of
+everything added between 19:00 and midnight against 5% between midnight and
+06:00, with 03:00–08:00 essentially dead. For the usual 19:00 → 06:00 interval
+the additions happened on the evening side by roughly 88% to 12%, and 23:00
+alone — the single largest hour at 22% — is exactly what end-of-interval
+attribution would push into tomorrow.
+
+Splitting a straddling interval between the two days in proportion to that
+hourly profile, the way `history.mjs` splits a boundary hour between two
+windows, is deliberately not done: the profile comes from the health log's first
+fortnight and only from venues reporting a countable volume, so it assumes a
+stationarity nobody has checked, and it would turn integer performance counts
+into fractions. A stated rule that is right ~88% of the time beats a weighted
+one that cannot be falsified.
+
+### Naming a venue that has left
+
+Display names come from the combined data the site build already downloads, but
+that is only ever the *current* release and this page reaches back to January. A
+venue tracked in February and dropped in June is not in today's venue list, so
+there is nothing to look up and it shows as its own id — `perivalehive.co.uk`
+sitting in a table of Vues and Odeons. Thirteen venues were in that position.
+
+The releases being diffed carry the names, so `days` writes down what it sees
+into `data-diffs/venues.json`, and `build` falls back to it. Unlike the history
+windows, which carry their own movie titles so a window stays a pure function of
+one release, this is one registry rather than a copy per day: a venue's name is
+a property of the venue, not of the day, and 300 names repeated across 242 days
+would be most of the bytes in `data-diffs/`. Last seen wins, so a rename tracks.
+
+`npm run diffs:names` backfills it for days aggregated before that existed. It
+looks for the fewest releases that answer for the most venues — thirteen names
+came out of three releases — and is only needed once.
+
+`groupName` rides along for the same reason, because it is what a chain label is
+built from and a chain whose every venue has left would otherwise be labelled by
+its id prefix.
+
+### Naming a chain
+
+A chain's label is its venues' `groupName`, but only while one chain claims it,
+and **a chain of one is settled first, before the remaining claims are counted**.
+
+The order is the whole of it. Several sites sharing a group are probed under ids
+that share no prefix — three Olympic Studios, two Castle Cinemas, Curzon Sea
+Containers apart from the other ten Curzons — so each is a chain of one here.
+Counting their claims alongside the real chain's makes every shared `groupName`
+look contested, and the ten-venue chain falls through to its id: `curzon.com` in
+the picker, beside a "Curzon Sea Containers" that has no such problem. But a
+singleton was never going to use the shared name — being identified by its own
+is what tells it apart — so its claim is not a claim.
+
+`health.mjs` carries the same rule, and settling singletons first improves it
+there too: `omniplex.co.uk` was labelled "Omniplex" though only Omniplex Sutton
+is probed. Two chains of *many* sharing a name is still a real collision with no
+better answer than their ids, and both files still warn about it.
+
+### Two things the page is careful about
+
+- **Venue ids changed shape on 27 January.** Until release `20260127.205759` a
+  venue was keyed by `sha256(name)` truncated to 8 hex characters; from that
+  release on, by domain — a schema change, with `socials`, `structure` and
+  `type` appearing in the same release. The venue list was identical either side
+  and no id disappeared during the hash era, so the map is exact rather than a
+  name match. Showing ids were already domain-based and are byte-identical
+  across the change, so the comparison itself is unaffected — only which venue
+  to credit.
+- **A venue listing nothing is not a venue we are not watching.** About 114 of
+  the 380 tracked venues are listing nothing at any moment. `data-transformed`
+  has no ambiguity here — every tracked venue is a file, empty array and all —
+  but rebuilding the map from `combined-data.json`'s showings alone would lose
+  those venues entirely, and a venue emptying out would read as silence rather
+  than as a removal. The estate is therefore seeded from `blob.venues`, which is
+  that list.
+
+
 ## Getting started
 
 ```bash
@@ -222,6 +393,7 @@ npm install
 npm run transform                        # build the compact blob   -> public/data/
 npm run history:build                    # merge history           -> public/data/
 npm run health:days && npm run health:build   # venue health       -> public/data/
+npm run diffs:days && npm run diffs:build     # publishing cadence -> public/data/
 npm run dev                              # http://localhost:5173
 ```
 
@@ -250,13 +422,16 @@ Deployed to [GitHub Pages](https://pages.github.com) via GitHub Actions
 every push to `main`, daily on a schedule (to pick up fresh data), or on manual
 dispatch, CI:
 
-1. runs `npm run history:update` and `npm run health:days` to close any history
-   windows the newest releases superseded and aggregate any venue-health day
-   that has finished, and commits both (the only job with write access; pushes
-   made with `github.token` do not re-trigger the workflow, so it cannot loop)
+1. runs `npm run history:update`, `npm run health:days` and `npm run diffs:days`
+   to close any history windows the newest releases superseded, aggregate any
+   venue-health day that has finished, and diff the release pairs whose interval
+   started on a day not yet held — and commits all three (the only job with
+   write access; pushes made with `github.token` do not re-trigger the workflow,
+   so it cannot loop)
 2. installs deps, then runs the fetch script + `npm run transform` to produce
    the data
-3. runs `npm run history:build` and `npm run health:build`, then `npm run build`
+3. runs `npm run history:build`, `npm run health:build` and
+   `npm run diffs:build`, then `npm run build`
 4. publishes `dist/` to GitHub Pages
 
 Step 2 pins its download to the release step 1 indexed

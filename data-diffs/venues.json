@@ -1,0 +1,1792 @@
+{
+ "229.london": {
+  "name": "229",
+  "seen": "20260829"
+ },
+ "acflondon.org": {
+  "name": "Austrian Cultural Forum London",
+  "seen": "20260829"
+ },
+ "actonecinema.co.uk": {
+  "name": "ActOne Cinema",
+  "seen": "20260829"
+ },
+ "adventurecinema.co.uk-kew-gardens": {
+  "name": "Adventure Cinema Kew Gardens",
+  "groupName": "Adventure Cinema",
+  "seen": "20260829"
+ },
+ "agakhancentre.org.uk": {
+  "name": "Aga Khan Centre",
+  "seen": "20260829"
+ },
+ "alexandrapalace.com": {
+  "name": "Alexandra Palace Theatre",
+  "seen": "20260829"
+ },
+ "allisjoysoho.com": {
+  "name": "All is Joy Studios",
+  "seen": "20260829"
+ },
+ "allsaintsislington.org": {
+  "name": "All Saints Church",
+  "seen": "20260829"
+ },
+ "allsaintskingston.co.uk": {
+  "name": "All Saints Kingston",
+  "seen": "20260829"
+ },
+ "ampstudios.co.uk": {
+  "name": "AMP Studios",
+  "seen": "20260829"
+ },
+ "angelcomedy.co.uk-bill-murray": {
+  "name": "The Bill Murray",
+  "seen": "20260829"
+ },
+ "antwerparms.co.uk": {
+  "name": "The Antwerp Arms",
+  "seen": "20260829"
+ },
+ "aplaceforchange.co.uk": {
+  "name": "The Foundry",
+  "seen": "20260829"
+ },
+ "arthousecrouchend.co.uk": {
+  "name": "ArtHouse Crouch End",
+  "seen": "20260829"
+ },
+ "artotel.com-battersea-power-station": {
+  "name": "JOIA",
+  "groupName": "Artotel",
+  "seen": "20260829"
+ },
+ "artotel.com-hoxton": {
+  "name": "Art'otel London Hoxton",
+  "groupName": "Artotel",
+  "seen": "20260829"
+ },
+ "backyardcinema.co.uk": {
+  "name": "Backyard Cinema",
+  "seen": "20260829"
+ },
+ "barbican.org.uk": {
+  "name": "The Barbican",
+  "seen": "20260829"
+ },
+ "bbk.ac.uk": {
+  "name": "Birkbeck",
+  "seen": "20260128"
+ },
+ "bbk.ac.uk-central": {
+  "name": "Birkbeck Central",
+  "groupName": "Birkbeck",
+  "seen": "20260829"
+ },
+ "bbk.ac.uk-cinema": {
+  "name": "Birkbeck Cinema",
+  "groupName": "Birkbeck",
+  "seen": "20260829"
+ },
+ "beehiven17.com": {
+  "name": "The Beehive Pub",
+  "seen": "20260829"
+ },
+ "beermerchantstap.com": {
+  "name": "Beer Merchants Tap",
+  "seen": "20260829"
+ },
+ "berniegrantcentre.co.uk": {
+  "name": "Bernie Grant Arts Centre",
+  "seen": "20260829"
+ },
+ "bethnalgreennaturereserve.org": {
+  "name": "Bethnal Green Nature Reserve",
+  "seen": "20260829"
+ },
+ "better.org.uk-croydon-sports-arena": {
+  "name": "Croydon Sports Arena",
+  "seen": "20260829"
+ },
+ "bfi.org.uk-imax": {
+  "name": "BFI IMAX",
+  "groupName": "BFI",
+  "seen": "20260829"
+ },
+ "bfi.org.uk-southbank": {
+  "name": "BFI Southbank",
+  "groupName": "BFI",
+  "seen": "20260829"
+ },
+ "bfi.org.uk-stephen-street": {
+  "name": "BFI Stephen Street",
+  "groupName": "BFI",
+  "seen": "20260829"
+ },
+ "bigpennysocial.co.uk": {
+  "name": "Big Penny Social",
+  "seen": "20260829"
+ },
+ "bloomsbury.org.uk": {
+  "name": "Bloomsbury Central Baptist Church",
+  "seen": "20260829"
+ },
+ "boathousebarkingstudios.com": {
+  "name": "The Boathouse Studios",
+  "seen": "20260829"
+ },
+ "boxpark.co.uk-wembley": {
+  "name": "Boxpark Wembley",
+  "groupName": "Boxpark",
+  "seen": "20260829"
+ },
+ "brenchleygardens.co.uk": {
+  "name": "Brenchley Gardens Community Centre",
+  "seen": "20260829"
+ },
+ "britishhome.org.uk": {
+  "name": "The British Home",
+  "seen": "20260829"
+ },
+ "buildingcentre.co.uk": {
+  "name": "Building Centre",
+  "seen": "20260829"
+ },
+ "bulgarihotels.com": {
+  "name": "The Private Cinema",
+  "seen": "20260829"
+ },
+ "bushtheatre.co.uk": {
+  "name": "Bush Theatre",
+  "seen": "20260829"
+ },
+ "cadoganhall.com": {
+  "name": "Cadogan Hall",
+  "seen": "20260829"
+ },
+ "callypark.london": {
+  "name": "Caledonian Park Clock Tower",
+  "seen": "20260829"
+ },
+ "camouflagecafe.co.uk": {
+  "name": "Camouflage Cafe",
+  "seen": "20260829"
+ },
+ "canarywharf.com-summer-screens": {
+  "name": "Canary Wharf Summer Screens",
+  "seen": "20260829"
+ },
+ "castlehaven.org.uk": {
+  "name": "Castlehaven Community Cinema",
+  "seen": "20260829"
+ },
+ "castlesidcup.com": {
+  "name": "The Castle Sidcup",
+  "groupName": "Castle Cinema",
+  "seen": "20260829"
+ },
+ "centre151.com": {
+  "name": "Centre 151",
+  "seen": "20260829"
+ },
+ "chcc.org.uk": {
+  "name": "Chadwell Heath Community Centre",
+  "seen": "20260829"
+ },
+ "chiswickcinema.co.uk": {
+  "name": "The Chiswick Cinema",
+  "seen": "20260829"
+ },
+ "christchurchpeckham.org": {
+  "name": "Christ Church Peckham",
+  "seen": "20260829"
+ },
+ "cine-real.com": {
+  "name": "Ciné-Real",
+  "seen": "20260829"
+ },
+ "cinemamuseum.org.uk": {
+  "name": "The Cinema Museum",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-bexleyheath": {
+  "name": "Cineworld Bexleyheath",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-enfield": {
+  "name": "Cineworld Enfield",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-feltham": {
+  "name": "Cineworld Feltham",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-hounslow": {
+  "name": "Cineworld Hounslow",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-ilford": {
+  "name": "Cineworld Ilford",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-leicester-square": {
+  "name": "Cineworld Leicester Square",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-south-ruislip": {
+  "name": "Cineworld South Ruislip",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-the-o2-greenwich": {
+  "name": "Cineworld The O2 Greenwich",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-wandsworth": {
+  "name": "Cineworld Wandsworth",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-wembley": {
+  "name": "Cineworld Wembley",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-west-india-quay": {
+  "name": "Cineworld West India Quay",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "cineworld.co.uk-wood-green": {
+  "name": "Cineworld Wood Green",
+  "groupName": "Cineworld",
+  "seen": "20260829"
+ },
+ "claphamgrand.com": {
+  "name": "The Clapham Grand",
+  "seen": "20260829"
+ },
+ "closeupfilmcentre.com": {
+  "name": "Close-Up Film Centre",
+  "seen": "20260829"
+ },
+ "coldharbourblue.com": {
+  "name": "Coldharbour Blue",
+  "seen": "20260829"
+ },
+ "commonpress.co.uk-dalston": {
+  "name": "The Common Press Dalston",
+  "groupName": "The Common Press",
+  "seen": "20260829"
+ },
+ "commonpress.co.uk-shoreditch": {
+  "name": "The Common Press Shoreditch",
+  "groupName": "The Common Press",
+  "seen": "20260829"
+ },
+ "contactthecaveldn.wixsite.com": {
+  "name": "The Cave",
+  "seen": "20260829"
+ },
+ "conwayhall.org.uk": {
+  "name": "Conway Hall",
+  "seen": "20260829"
+ },
+ "cossallresidents.wordpress.com": {
+  "name": "Cossall Community Hall",
+  "seen": "20260829"
+ },
+ "courthouse-hotel.com-shoreditch": {
+  "name": "Courthouse Hotel Shoreditch",
+  "groupName": "Courthouse Hotel",
+  "seen": "20260829"
+ },
+ "courthouse-hotel.com-soho": {
+  "name": "Courthouse Hotel Soho",
+  "groupName": "Courthouse Hotel",
+  "seen": "20260829"
+ },
+ "crick.ac.uk": {
+  "name": "The Francis Crick Institute",
+  "seen": "20260829"
+ },
+ "crossroadswomen.net": {
+  "name": "Crossroads Women's Centre",
+  "seen": "20260829"
+ },
+ "culture.hu-london": {
+  "name": "Liszt Institute",
+  "seen": "20260829"
+ },
+ "curzon.com-aldgate": {
+  "name": "Curzon Aldgate",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-bloomsbury": {
+  "name": "Curzon Bloomsbury",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-camden": {
+  "name": "Curzon Camden",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-hoxton": {
+  "name": "Curzon Hoxton",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-kingston": {
+  "name": "Curzon Kingston",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-mayfair": {
+  "name": "Curzon Mayfair",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-richmond": {
+  "name": "Curzon Richmond",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-soho": {
+  "name": "Curzon Soho",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-victoria": {
+  "name": "Curzon Victoria",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzon.com-wimbledon": {
+  "name": "Curzon Wimbledon",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "curzonseacontainers.com": {
+  "name": "Curzon Sea Containers",
+  "groupName": "Curzon",
+  "seen": "20260829"
+ },
+ "cyprusinuk.com": {
+  "name": "The Cyprus High Commission",
+  "seen": "20260829"
+ },
+ "dalstonsuperstore.com": {
+  "name": "Dalston Superstore",
+  "seen": "20260829"
+ },
+ "davidleancinema.org.uk": {
+  "name": "The David Lean Cinema",
+  "seen": "20260829"
+ },
+ "dehemspub.co.uk": {
+  "name": "De Hems Dutch Cafe Bar",
+  "seen": "20260829"
+ },
+ "drakeandmorgan.co.uk-the-moniker": {
+  "name": "The Moniker",
+  "groupName": "Drake & Morgan",
+  "seen": "20260829"
+ },
+ "drakeandmorgan.co.uk-the-refinery-citypoint": {
+  "name": "The Refinery Citypoint",
+  "groupName": "Drake & Morgan",
+  "seen": "20260829"
+ },
+ "dugdaleartscentre.co.uk": {
+  "name": "Dugdale Arts Centre",
+  "seen": "20260829"
+ },
+ "earthackney.co.uk": {
+  "name": "EartH",
+  "seen": "20260829"
+ },
+ "elchicos.co.uk": {
+  "name": "El Chico's",
+  "seen": "20260829"
+ },
+ "electriccinema.co.uk-portobello": {
+  "name": "Electric Cinema Portobello",
+  "groupName": "Electric Cinema",
+  "seen": "20260829"
+ },
+ "electriccinema.co.uk-white-city": {
+  "name": "Electric Cinema White City",
+  "groupName": "Electric Cinema",
+  "seen": "20260829"
+ },
+ "enfield.gov.uk-angel-community-centre": {
+  "name": "Angel Community Centre",
+  "seen": "20260829"
+ },
+ "eseacommunitycentre.org.uk": {
+  "name": "ESEA Community Centre",
+  "seen": "20260829"
+ },
+ "etceteratheatrecamden.com": {
+  "name": "The Etcetera Theatre",
+  "seen": "20260829"
+ },
+ "ethicalproperty.co.uk-the-green-house": {
+  "name": "The Green House",
+  "seen": "20260829"
+ },
+ "eventimapollo.com": {
+  "name": "Eventim Apollo",
+  "seen": "20260829"
+ },
+ "everymancinema.com-baker-street": {
+  "name": "Everyman Baker Street",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-barnet": {
+  "name": "Everyman Barnet",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-belsize-park": {
+  "name": "Everyman Belsize Park",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-borough-yards": {
+  "name": "Everyman Borough Yards",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-brentford": {
+  "name": "Everyman Brentford",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-broadgate": {
+  "name": "Everyman Broadgate",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-canary-wharf": {
+  "name": "Everyman Canary Wharf",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-chelsea": {
+  "name": "Everyman Chelsea",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-crystal-palace": {
+  "name": "Everyman Crystal Palace",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-everyman-on-the-canal-at-kings-cross": {
+  "name": "Everyman on the Canal at King's Cross",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-hampstead": {
+  "name": "Everyman Hampstead",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-kings-cross": {
+  "name": "Everyman King's Cross",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-maida-vale": {
+  "name": "Everyman Maida Vale",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-muswell-hill": {
+  "name": "Everyman Muswell Hill",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-screen-on-the-green": {
+  "name": "Everyman Screen on the Green",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-stratford-international": {
+  "name": "Everyman Stratford International",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "everymancinema.com-the-whiteley": {
+  "name": "Everyman at The Whiteley",
+  "groupName": "Everyman",
+  "seen": "20260829"
+ },
+ "exchangetwickenham.co.uk": {
+  "name": "The Exchange Twickenham",
+  "seen": "20260829"
+ },
+ "facebook.com-thehaggerston": {
+  "name": "The Haggerston",
+  "seen": "20260829"
+ },
+ "facebook.com-themanofkent": {
+  "name": "The Man of Kent",
+  "seen": "20260829"
+ },
+ "fellowshipinn.co.uk": {
+  "name": "The Fellowship Inn",
+  "seen": "20260829"
+ },
+ "feministlibrary.co.uk": {
+  "name": "The Feminist Library",
+  "seen": "20260829"
+ },
+ "fen-court.com": {
+  "name": "Fen Court",
+  "seen": "20260829"
+ },
+ "finchcafe.co.uk": {
+  "name": "Finch Community Cinema",
+  "seen": "20260829"
+ },
+ "firmdalehotels.com-charlotte-street": {
+  "name": "Firmdale Charlotte Street Hotel",
+  "groupName": "Firmdale Hotels",
+  "seen": "20260829"
+ },
+ "firmdalehotels.com-covent-garden": {
+  "name": "Firmdale Covent Garden Hotel",
+  "groupName": "Firmdale Hotels",
+  "seen": "20260829"
+ },
+ "firmdalehotels.com-soho": {
+  "name": "Firmdale The Soho Hotel",
+  "groupName": "Firmdale Hotels",
+  "seen": "20260829"
+ },
+ "fonc.org.uk": {
+  "name": "Nunhead Cemetery",
+  "seen": "20260829"
+ },
+ "forestcinema.co.uk": {
+  "name": "The Forest Cinema",
+  "seen": "20260829"
+ },
+ "fortunegreen.org.uk": {
+  "name": "Fortune Green",
+  "seen": "20260829"
+ },
+ "freud.org.uk": {
+  "name": "Freud Museum London",
+  "seen": "20260829"
+ },
+ "frontlineclub.com": {
+  "name": "Frontline Club",
+  "seen": "20260829"
+ },
+ "fulhampier.com": {
+  "name": "Fulham Pier",
+  "seen": "20260829"
+ },
+ "genesiscinema.co.uk": {
+  "name": "Genesis Cinema",
+  "seen": "20260829"
+ },
+ "goethe.de": {
+  "name": "Goethe-Institut London",
+  "seen": "20260829"
+ },
+ "gold.ac.uk": {
+  "name": "Goldsmiths",
+  "seen": "20260829"
+ },
+ "goodenough.ac.uk": {
+  "name": "Goodenough College",
+  "seen": "20260829"
+ },
+ "goodhotel.co-london": {
+  "name": "Good Hotel London",
+  "seen": "20260829"
+ },
+ "goodluckhope.com-orchard-dry-dock": {
+  "name": "Orchard Dry Dock",
+  "seen": "20260829"
+ },
+ "goodshepherdstudios.com": {
+  "name": "Good Shepherd Studios",
+  "seen": "20260829"
+ },
+ "greeneking.co.uk-leather-bottle": {
+  "name": "The Leather Bottle",
+  "groupName": "Greene King",
+  "seen": "20260829"
+ },
+ "greenerandcleaner.co.uk": {
+  "name": "Greener and Cleaner",
+  "seen": "20260829"
+ },
+ "greenfordquay.com": {
+  "name": "Greenford Quay",
+  "seen": "20260829"
+ },
+ "griffinwhetstone.pub": {
+  "name": "The Griffin",
+  "seen": "20260829"
+ },
+ "hackney.gov.uk-morland-community-hall": {
+  "name": "Morland Community Hall",
+  "seen": "20260829"
+ },
+ "hackney.gov.uk-shoreditch-library": {
+  "name": "Shoreditch Library",
+  "seen": "20260829"
+ },
+ "hackneyshowroom.com": {
+  "name": "Hackney Showroom",
+  "seen": "20260829"
+ },
+ "harrisinstitute.org.uk": {
+  "name": "Harris Institute of Teaching and Leadership",
+  "seen": "20260829"
+ },
+ "hausulondon.co.uk": {
+  "name": "Hausu",
+  "seen": "20260829"
+ },
+ "heathcoteandstar.co.uk": {
+  "name": "Heathcote & Star",
+  "seen": "20260829"
+ },
+ "hillsidegardenspark.co.uk": {
+  "name": "Hillside Gardens Park",
+  "seen": "20260829"
+ },
+ "hk.uk": {
+  "name": "HKUK Kingston Community Centre",
+  "seen": "20260829"
+ },
+ "hounslow.gov.uk-feltham-park": {
+  "name": "Feltham Park",
+  "seen": "20260829"
+ },
+ "hounslow.gov.uk-heston-park": {
+  "name": "Heston Park",
+  "seen": "20260829"
+ },
+ "hounslow.gov.uk-thornbury-playing-fields": {
+  "name": "Thornbury Playing Fields",
+  "seen": "20260829"
+ },
+ "hyphastudios.com-kentish-town": {
+  "name": "Hypha Studio Kentish Town",
+  "seen": "20260829"
+ },
+ "ibraaz.org": {
+  "name": "Ibraaz",
+  "seen": "20260829"
+ },
+ "ica.art": {
+  "name": "Institute of Contemporary Arts",
+  "seen": "20260829"
+ },
+ "imperial.ac.uk": {
+  "name": "Imperial College London",
+  "seen": "20260829"
+ },
+ "instagram.com-buchanhall": {
+  "name": "Buchan Tenants and Residents Hall",
+  "seen": "20260829"
+ },
+ "instagram.com-canalfilmclub": {
+  "name": "Canal Film Club",
+  "seen": "20260829"
+ },
+ "instagram.com-casalavandauk": {
+  "name": "Casa Lavanda",
+  "seen": "20260829"
+ },
+ "instagram.com-green-alley-studios": {
+  "name": "Green Alley Studios",
+  "seen": "20260829"
+ },
+ "institut-francais.org.uk": {
+  "name": "Ciné Lumière",
+  "seen": "20260829"
+ },
+ "irishculturalcentre.co.uk": {
+  "name": "Irish Cultural Centre",
+  "seen": "20260829"
+ },
+ "islington.gov.uk-black-cultural-centre": {
+  "name": "The Black Cultural Centre Islington",
+  "seen": "20260829"
+ },
+ "islington.gov.uk-islington-museum": {
+  "name": "Islington Museum",
+  "seen": "20260829"
+ },
+ "ivyhousenunhead.com": {
+  "name": "The Ivy House",
+  "seen": "20260829"
+ },
+ "jaguarshoes.com-the-victoria": {
+  "name": "The Victoria Dalston",
+  "seen": "20260829"
+ },
+ "japanhouselondon.uk": {
+  "name": "Japan House London",
+  "seen": "20260829"
+ },
+ "jw3.org.uk": {
+  "name": "JW3",
+  "seen": "20260829"
+ },
+ "kanaloa.org": {
+  "name": "Kanaloa House",
+  "seen": "20260829"
+ },
+ "kcl.ac.uk-strand": {
+  "name": "Strand Building",
+  "seen": "20260829"
+ },
+ "kerbsocialclub.com": {
+  "name": "KERB Social Club",
+  "seen": "20260829"
+ },
+ "khccc.com": {
+  "name": "Kingsley Hall Church & Community Centre",
+  "seen": "20260829"
+ },
+ "kilntheatre.com": {
+  "name": "Kiln Theatre",
+  "seen": "20260829"
+ },
+ "labs.thedrum.com": {
+  "name": "The Drum Labs",
+  "seen": "20260829"
+ },
+ "lacamionera.com": {
+  "name": "La Camionera",
+  "seen": "20260829"
+ },
+ "ladbrokehall.com": {
+  "name": "Ladbroke Hall",
+  "seen": "20260829"
+ },
+ "lambeth.gov.uk-streatham-library": {
+  "name": "Streatham Library",
+  "seen": "20260829"
+ },
+ "lambeth.gov.uk-vauxhall-pleasure-gardens": {
+  "name": "Vauxhall Pleasure Gardens",
+  "seen": "20260829"
+ },
+ "langleyfilmbox.com": {
+  "name": "Langley Park FILMBOX",
+  "seen": "20260829"
+ },
+ "lanzaroteworks.com": {
+  "name": "Lanzarote Works",
+  "seen": "20260829"
+ },
+ "lbhf.gov.uk-lyric-square": {
+  "name": "Lyric Square",
+  "seen": "20260829"
+ },
+ "lewisham.gov.uk-deptford-lounge": {
+  "name": "Deptford Lounge",
+  "seen": "20260829"
+ },
+ "linktr.ee-thecarpetshoppeckham": {
+  "name": "The Carpet Shop",
+  "seen": "20260829"
+ },
+ "littlenans.co.uk-2-0": {
+  "name": "Little Nan's 2.0",
+  "seen": "20260829"
+ },
+ "liveseyexchange.com": {
+  "name": "LEX2 Livesey Exchange",
+  "seen": "20260829"
+ },
+ "london.czechcentres.cz": {
+  "name": "Czech Centre",
+  "seen": "20260829"
+ },
+ "londonartbar.com": {
+  "name": "The London Art Bar",
+  "seen": "20260829"
+ },
+ "londonbridgecity.co.uk": {
+  "name": "London Bridge City",
+  "seen": "20260829"
+ },
+ "londonwelsh.org": {
+  "name": "London Welsh Centre",
+  "seen": "20260829"
+ },
+ "londres.cervantes.es": {
+  "name": "Instituto Cervantes",
+  "seen": "20260829"
+ },
+ "lordshiphub.org": {
+  "name": "Lordship Hub Co-op",
+  "seen": "20260829"
+ },
+ "lost.org": {
+  "name": "Lost Cinema",
+  "seen": "20260128"
+ },
+ "lostsoulspizza.com": {
+  "name": "Lost Souls Pizza",
+  "seen": "20260829"
+ },
+ "loveaffairbasement.co.uk": {
+  "name": "Love Affair Basement",
+  "seen": "20260829"
+ },
+ "loveanddye.com": {
+  "name": "Love & Dye",
+  "seen": "20260829"
+ },
+ "lowermarshmarket.com": {
+  "name": "Lower Marsh",
+  "seen": "20260829"
+ },
+ "lumiereromford.com": {
+  "name": "Lumiere Cinema Romford",
+  "seen": "20260829"
+ },
+ "lux.org.uk": {
+  "name": "LUX",
+  "seen": "20260829"
+ },
+ "marriott.com-w-london": {
+  "name": "W London",
+  "groupName": "Marriott",
+  "seen": "20260829"
+ },
+ "mason-fifth.com-westbourne-park": {
+  "name": "Mason & Fifth",
+  "seen": "20260829"
+ },
+ "maydayrooms.org": {
+  "name": "MayDay Rooms",
+  "seen": "20260829"
+ },
+ "metrocinema.co.uk": {
+  "name": "Metro Cinema",
+  "seen": "20260829"
+ },
+ "metrolandcultures.com": {
+  "name": "Metroland Studios",
+  "seen": "20260829"
+ },
+ "mildmay.club": {
+  "name": "The Mildmay Club",
+  "seen": "20260829"
+ },
+ "mothclub.co.uk": {
+  "name": "MOTH Club",
+  "seen": "20260829"
+ },
+ "mountview.org.uk": {
+  "name": "Mountview Academy of Theatre Arts",
+  "seen": "20260829"
+ },
+ "museumofthehome.org.uk": {
+  "name": "Museum of the Home",
+  "seen": "20260829"
+ },
+ "myheathway.com": {
+  "name": "My Heathway",
+  "seen": "20260829"
+ },
+ "myvue.com-bromley": {
+  "name": "Vue Bromley",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-croydon-grants": {
+  "name": "Vue Croydon Grant's",
+  "groupName": "Vue",
+  "seen": "20260128"
+ },
+ "myvue.com-croydon-purley-way": {
+  "name": "Vue Croydon Purley Way",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-dagenham": {
+  "name": "Vue Dagenham",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-eltham": {
+  "name": "Vue Eltham",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-finchley-road": {
+  "name": "Vue Finchley Road",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-fulham-broadway": {
+  "name": "Vue Fulham Broadway",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-harrow": {
+  "name": "Vue Harrow",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-islington": {
+  "name": "Vue Islington",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-leicester-square": {
+  "name": "Vue West End",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-north-finchley": {
+  "name": "Vue North Finchley",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-piccadilly": {
+  "name": "Vue Piccadilly",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-romford": {
+  "name": "Vue Romford",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-shepherds-bush": {
+  "name": "Vue Shepherd's Bush",
+  "groupName": "Vue",
+  "seen": "20260128"
+ },
+ "myvue.com-westfield": {
+  "name": "Vue Westfield London",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-westfield-stratford-city": {
+  "name": "Vue Westfield Stratford",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "myvue.com-wood-green": {
+  "name": "Vue Wood Green",
+  "groupName": "Vue",
+  "seen": "20260829"
+ },
+ "nehrucentre.org.uk": {
+  "name": "The Nehru Centre",
+  "seen": "20260829"
+ },
+ "newcrossinn.com": {
+  "name": "New Cross Inn",
+  "seen": "20260829"
+ },
+ "newingtongreenmeetinghouse.org.uk": {
+  "name": "Newington Green Meeting House",
+  "seen": "20260829"
+ },
+ "newtownculture.org-womens-museum": {
+  "name": "Women's Museum",
+  "seen": "20260829"
+ },
+ "not-nowhere.org": {
+  "name": "not/nowhere",
+  "seen": "20260829"
+ },
+ "objetstrouves.co.uk": {
+  "name": "Galleria Objets",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-acton": {
+  "name": "ODEON Luxe Acton",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-beckenham": {
+  "name": "ODEON Beckenham",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-camden": {
+  "name": "ODEON Camden",
+  "groupName": "Odeon",
+  "seen": "20260128"
+ },
+ "odeon.co.uk-greenwich": {
+  "name": "ODEON Greenwich",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-haymarket": {
+  "name": "ODEON Luxe Haymarket",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-holloway": {
+  "name": "ODEON Luxe Holloway",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-islington": {
+  "name": "ODEON Luxe & Dine Islington",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-kingston": {
+  "name": "ODEON Kingston",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-lee-valley": {
+  "name": "ODEON Luxe Lee Valley",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-leicester-square": {
+  "name": "ODEON Luxe Leicester Square",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-orpington": {
+  "name": "ODEON Orpington",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-putney": {
+  "name": "ODEON Luxe Putney",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-richmond": {
+  "name": "ODEON Richmond",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-south-woodford": {
+  "name": "ODEON South Woodford",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-streatham": {
+  "name": "ODEON Streatham",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-swiss-cottage": {
+  "name": "ODEON Luxe Swiss Cottage",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-tottenham-court-road": {
+  "name": "ODEON Tottenham Court Road",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-uxbridge": {
+  "name": "ODEON Luxe Uxbridge",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-west-end": {
+  "name": "ODEON Luxe West End",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "odeon.co.uk-wimbledon": {
+  "name": "ODEON Wimbledon",
+  "groupName": "Odeon",
+  "seen": "20260829"
+ },
+ "ogniskopolskie.org.uk": {
+  "name": "Ognisko Polskie",
+  "seen": "20260829"
+ },
+ "olympiccinema.com": {
+  "name": "The Olympic Cinema",
+  "groupName": "Olympic Studios",
+  "seen": "20260829"
+ },
+ "omniplex.co.uk-sutton": {
+  "name": "Omniplex Sutton",
+  "groupName": "Omniplex",
+  "seen": "20260829"
+ },
+ "oslohackney.com": {
+  "name": "Oslo Hackney",
+  "seen": "20260829"
+ },
+ "otterchaos.co.uk": {
+  "name": "Otter Chaos",
+  "seen": "20260829"
+ },
+ "oxfordhouse.org.uk": {
+  "name": "Oxford House",
+  "seen": "20260829"
+ },
+ "parksideca.org.uk": {
+  "name": "Parkside Community Centre",
+  "seen": "20260829"
+ },
+ "parlourkensal.com": {
+  "name": "Parlour",
+  "seen": "20260829"
+ },
+ "peckhamlevels.org": {
+  "name": "Peckham Levels",
+  "seen": "20260829"
+ },
+ "peckhampalms.com": {
+  "name": "Peckham Palms",
+  "seen": "20260829"
+ },
+ "peckhamplex.london": {
+  "name": "Peckhamplex",
+  "seen": "20260829"
+ },
+ "pelicanhouse.org": {
+  "name": "Pelican House",
+  "seen": "20260829"
+ },
+ "perivalehive.co.uk": {
+  "name": "Perivale Community Hive",
+  "seen": "20260829"
+ },
+ "phoenixcinema.co.uk": {
+  "name": "Phoenix Cinema",
+  "seen": "20260829"
+ },
+ "phonicarecords.com": {
+  "name": "Phonica Records",
+  "seen": "20260829"
+ },
+ "picturehouses.com-central": {
+  "name": "Picturehouse Central",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-clapham": {
+  "name": "Clapham Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-crouch-end": {
+  "name": "Crouch End Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-ealing": {
+  "name": "Ealing Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-east-dulwich": {
+  "name": "East Dulwich Picturehouse & Cafe",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-finsbury-park": {
+  "name": "Finsbury Park Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-greenwich": {
+  "name": "Greenwich Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-hackney": {
+  "name": "Hackney Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-the-gate": {
+  "name": "The Gate Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-the-ritzy": {
+  "name": "The Ritzy Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "picturehouses.com-west-norwood": {
+  "name": "West Norwood Library & Picturehouse",
+  "groupName": "Picturehouse",
+  "seen": "20260829"
+ },
+ "piehousecoop.co.uk": {
+  "name": "Piehouse Co-Op",
+  "seen": "20260829"
+ },
+ "placesleisure.org-tooting-bec-lido": {
+  "name": "Tooting Bec Lido",
+  "groupName": "Places Leisure",
+  "seen": "20260829"
+ },
+ "plantroom.space": {
+  "name": "Algha's Plantroom",
+  "seen": "20260829"
+ },
+ "poppysfunerals.co.uk-raynes-park": {
+  "name": "Poppy's Funerals",
+  "groupName": "Poppy's",
+  "seen": "20260829"
+ },
+ "posk.org": {
+  "name": "Polish Social and Cultural Association POSK",
+  "seen": "20260829"
+ },
+ "powku1.wixsite.com-batchandco": {
+  "name": "Batch & Co. Coffee",
+  "seen": "20260829"
+ },
+ "princecharlescinema.com": {
+  "name": "Prince Charles Cinema",
+  "seen": "20260829"
+ },
+ "princeofpeckham.co.uk": {
+  "name": "Prince of Peckham",
+  "seen": "20260829"
+ },
+ "professional.dolby.com-soho": {
+  "name": "Dolby Screening Room Soho",
+  "seen": "20260829"
+ },
+ "qmul.ac.uk-bloc": {
+  "name": "BLOC Cinema",
+  "seen": "20260829"
+ },
+ "rafmuseum.org.uk-london": {
+  "name": "RAF Museum",
+  "seen": "20260829"
+ },
+ "rbkc.gov.uk-kensington-central-library": {
+  "name": "Kensington Central Library",
+  "seen": "20260829"
+ },
+ "rbkc.gov.uk-north-kensington-library": {
+  "name": "North Kensington Library",
+  "seen": "20260829"
+ },
+ "rca.ac.uk": {
+  "name": "Royal College of Art",
+  "seen": "20260128"
+ },
+ "rca.ac.uk-battersea": {
+  "name": "RCA Battersea",
+  "groupName": "Royal College of Art",
+  "seen": "20260829"
+ },
+ "rca.ac.uk-kensington": {
+  "name": "RCA Kensington",
+  "groupName": "Royal College of Art",
+  "seen": "20260829"
+ },
+ "reference-point.uk": {
+  "name": "Reference Point",
+  "seen": "20260829"
+ },
+ "regentstreetcinema.com": {
+  "name": "Regent Street Cinema",
+  "seen": "20260829"
+ },
+ "reinstate.info": {
+  "name": "The Tate Institute",
+  "seen": "20260829"
+ },
+ "richmix.org.uk": {
+  "name": "Rich Mix",
+  "seen": "20260829"
+ },
+ "richmond.gov.uk-whitton-library": {
+  "name": "Whitton Library",
+  "seen": "20260829"
+ },
+ "riocinema.org.uk": {
+  "name": "Rio Cinema",
+  "seen": "20260829"
+ },
+ "riversidestudios.co.uk": {
+  "name": "Riverside Studios",
+  "seen": "20260829"
+ },
+ "rivoliballroom.com": {
+  "name": "Rivoli Ballroom",
+  "seen": "20260829"
+ },
+ "rocketvan.co.uk": {
+  "name": "The Rocketvan Coffee Shop and The Box Shop Bar",
+  "seen": "20260829"
+ },
+ "ronspeckham.com": {
+  "name": "Rons Coffee House",
+  "seen": "20260829"
+ },
+ "rooftopcinemaclub.com-peckham": {
+  "name": "Rooftop Cinema Club Peckham",
+  "groupName": "Rooftop Cinema Club",
+  "seen": "20260829"
+ },
+ "rooftopcinemaclub.com-stratford": {
+  "name": "Rooftop Cinema Club Stratford",
+  "groupName": "Rooftop Cinema Club",
+  "seen": "20260829"
+ },
+ "rosettaarts.org": {
+  "name": "Rosetta Arts",
+  "seen": "20260829"
+ },
+ "rosslynhillchapel.org.uk": {
+  "name": "Rosslyn Hill Chapel",
+  "seen": "20260829"
+ },
+ "royalalberthall.com": {
+  "name": "Royal Albert Hall",
+  "seen": "20260829"
+ },
+ "royalgreenwich.gov.uk-eltham-park-south": {
+  "name": "Eltham Park South",
+  "seen": "20260829"
+ },
+ "royalparks.org.uk-hyde-park": {
+  "name": "Hyde Park",
+  "seen": "20260829"
+ },
+ "ruachcitychurch.org-streatham": {
+  "name": "Ruach City Church",
+  "seen": "20260829"
+ },
+ "salvationarmy.org.uk-raynes-park": {
+  "name": "Raynes Park Community Church",
+  "groupName": "The Salvation Army",
+  "seen": "20260829"
+ },
+ "sanctumsoho.com": {
+  "name": "Karma Sanctum Soho Hotel",
+  "seen": "20260829"
+ },
+ "sandsfilms.co.uk": {
+  "name": "Sands Films Cinema",
+  "seen": "20260829"
+ },
+ "scarlettmalone.com-subtitlecinema": {
+  "name": "Subtitle Cinema",
+  "seen": "20260829"
+ },
+ "sccoop.org.uk": {
+  "name": "The Rookery",
+  "seen": "20260829"
+ },
+ "sciencemuseum.org.uk": {
+  "name": "Science Museum",
+  "seen": "20260829"
+ },
+ "scrt.onl": {
+  "name": "SCRT",
+  "seen": "20260829"
+ },
+ "setspace.uk": {
+  "name": "SET Social",
+  "seen": "20260829"
+ },
+ "shaispace.com": {
+  "name": "Shai Space",
+  "seen": "20260829"
+ },
+ "shapeslewisham.co.uk": {
+  "name": "Shapes Lewisham",
+  "seen": "20260829"
+ },
+ "signaturebrew.co.uk-blackhorseroad": {
+  "name": "Signature Brewery",
+  "seen": "20260829"
+ },
+ "siobhandavies.com": {
+  "name": "Siobhan Davies Studios",
+  "seen": "20260829"
+ },
+ "sohoscreeningrooms.co.uk": {
+  "name": "The Soho Screening Rooms",
+  "seen": "20260829"
+ },
+ "southlondongallery.org": {
+  "name": "South London Gallery",
+  "seen": "20260829"
+ },
+ "spanners.club": {
+  "name": "Spanners",
+  "seen": "20260829"
+ },
+ "spitalfields.church": {
+  "name": "Christ Church Spitalfields",
+  "seen": "20260829"
+ },
+ "stanleyarts.org": {
+  "name": "Stanley Arts",
+  "seen": "20260829"
+ },
+ "stbarnabas-southfields.org.uk": {
+  "name": "St Barnabas Church",
+  "seen": "20260829"
+ },
+ "stgeorgeswoolwich.org": {
+  "name": "St George's Garrison Church",
+  "seen": "20260829"
+ },
+ "stkatharinecree.org": {
+  "name": "The Guild Church of St Katharine Cree",
+  "seen": "20260829"
+ },
+ "stlawrencejewry.org.uk": {
+  "name": "St Lawrence Jewry",
+  "seen": "20260829"
+ },
+ "stleonard-streatham.org.uk": {
+  "name": "St Leonard's Church Hall",
+  "seen": "20260829"
+ },
+ "stmarys.ac.uk-the-1850": {
+  "name": "The 1850",
+  "seen": "20260829"
+ },
+ "stmaryswalthamstow.org": {
+  "name": "St Mary's Church Walthamstow",
+  "seen": "20260829"
+ },
+ "stmatthewswimbledon.org": {
+  "name": "St Matthew's Church",
+  "seen": "20260829"
+ },
+ "stmchurch.co.uk": {
+  "name": "St Matthias Church",
+  "seen": "20260829"
+ },
+ "strongroombar.com": {
+  "name": "Strongroom Bar",
+  "seen": "20260829"
+ },
+ "sydenhamarts.co.uk": {
+  "name": "Sydenham Arts",
+  "seen": "20260829"
+ },
+ "tate.org.uk-tate-britain": {
+  "name": "Tate Britain",
+  "groupName": "Tate",
+  "seen": "20260829"
+ },
+ "tate.org.uk-tate-modern": {
+  "name": "Tate Modern",
+  "groupName": "Tate",
+  "seen": "20260829"
+ },
+ "thamesmeadnow.org.uk-the-nest": {
+  "name": "The Nest",
+  "seen": "20260829"
+ },
+ "thcentre.com": {
+  "name": "Telegraph Hill Centre",
+  "seen": "20260829"
+ },
+ "thearzner.com": {
+  "name": "The Arzner",
+  "seen": "20260829"
+ },
+ "theatreship.co.uk": {
+  "name": "Theatreship",
+  "seen": "20260829"
+ },
+ "thebathhouse.co": {
+  "name": "The Bath House",
+  "seen": "20260829"
+ },
+ "thebedford.com": {
+  "name": "The Bedford",
+  "seen": "20260829"
+ },
+ "theblackeel.uk": {
+  "name": "The Black Eel",
+  "seen": "20260829"
+ },
+ "thebrookmill.co.uk": {
+  "name": "The Brookmill",
+  "seen": "20260829"
+ },
+ "thecastlecinema.com": {
+  "name": "The Castle Cinema",
+  "groupName": "Castle Cinema",
+  "seen": "20260829"
+ },
+ "thecavernfreehouse.co.uk": {
+  "name": "The Cavern",
+  "seen": "20260829"
+ },
+ "thecinemaatselfridges.com": {
+  "name": "The Cinema at Selfridges",
+  "groupName": "Olympic Studios",
+  "seen": "20260829"
+ },
+ "thecinemainthepowerstation.com": {
+  "name": "The Cinema in the Power Station (and the Arches)",
+  "groupName": "Olympic Studios",
+  "seen": "20260829"
+ },
+ "thecornerhouse.org": {
+  "name": "The cornerHOUSE Community Arts Centre",
+  "seen": "20260829"
+ },
+ "thedivine.co.uk": {
+  "name": "The Divine",
+  "seen": "20260829"
+ },
+ "theeaglehoxton.co.uk": {
+  "name": "The Eagle Hoxton",
+  "seen": "20260829"
+ },
+ "theexhibit.co.uk": {
+  "name": "The Exhibit",
+  "seen": "20260829"
+ },
+ "thegardencinema.co.uk": {
+  "name": "The Garden Cinema",
+  "seen": "20260829"
+ },
+ "thegreennunhead.org": {
+  "name": "The Green",
+  "seen": "20260829"
+ },
+ "thehammondtheatre.co.uk": {
+  "name": "The Hammond Theatre",
+  "seen": "20260829"
+ },
+ "thehenandchickenstheatrebar.co.uk": {
+  "name": "The Hen & Chickens Theatre Bar",
+  "seen": "20260829"
+ },
+ "thehorsehospital.com": {
+  "name": "The Horse Hospital",
+  "seen": "20260829"
+ },
+ "thelexicinema.co.uk": {
+  "name": "The Lexi Cinema",
+  "seen": "20260829"
+ },
+ "theleytonengineer.co.uk": {
+  "name": "The Leyton Engineer",
+  "seen": "20260829"
+ },
+ "thelondonarchives.org": {
+  "name": "The London Archives",
+  "seen": "20260829"
+ },
+ "themanorarms.com": {
+  "name": "The Manor Arms",
+  "seen": "20260829"
+ },
+ "themayfairhotel.co.uk": {
+  "name": "May Fair Theatre",
+  "seen": "20260829"
+ },
+ "themudroomlondon.com": {
+  "name": "The Mud Room",
+  "seen": "20260829"
+ },
+ "thenickel.co.uk": {
+  "name": "The Nickel",
+  "seen": "20260829"
+ },
+ "theothers.uk.com": {
+  "name": "The Others",
+  "seen": "20260829"
+ },
+ "thersa.org": {
+  "name": "The RSA",
+  "seen": "20260829"
+ },
+ "theshowroom.org": {
+  "name": "The Showroom",
+  "seen": "20260829"
+ },
+ "thethomaswallcentre.harleystreethypnosis.co.uk": {
+  "name": "Thomas Wall Centre",
+  "seen": "20260829"
+ },
+ "thevinenw5.co.uk": {
+  "name": "The Vine",
+  "seen": "20260829"
+ },
+ "thewellwalktheatre.com": {
+  "name": "The Well Walk Theatre",
+  "seen": "20260829"
+ },
+ "thewildsbarkingriverside.london": {
+  "name": "The Wilds at Barking Riverside",
+  "seen": "20260829"
+ },
+ "thewinchesterhighgate.co.uk": {
+  "name": "The Winchester",
+  "seen": "20260829"
+ },
+ "thewoodfield.org": {
+  "name": "The Woodfield Pavilion",
+  "seen": "20260829"
+ },
+ "thexchange.org.uk": {
+  "name": "The Exchange at W9",
+  "seen": "20260829"
+ },
+ "towerbridgecollective.co.uk": {
+  "name": "Tower Bridge Collective",
+  "seen": "20260829"
+ },
+ "triangledeptford.org": {
+  "name": "Triangle LGBTQ+ Cultural Centre",
+  "seen": "20260829"
+ },
+ "ucl.ac.uk-bentham-house": {
+  "name": "UCL Bentham House",
+  "groupName": "University College London",
+  "seen": "20260829"
+ },
+ "ucl.ac.uk-ssees": {
+  "name": "UCL School of Slavonic and East European Studies",
+  "groupName": "University College London",
+  "seen": "20260829"
+ },
+ "ucl.ac.uk-ucl-east-community-cinema": {
+  "name": "UCL East Community Cinema",
+  "groupName": "University College London",
+  "seen": "20260829"
+ },
+ "uel.ac.uk-the-source": {
+  "name": "The Source",
+  "groupName": "University of East London",
+  "seen": "20260829"
+ },
+ "uel.ac.uk-univeristy-square-stratford": {
+  "name": "University Square Stratford",
+  "groupName": "University of East London",
+  "seen": "20260829"
+ },
+ "uk.kef.com": {
+  "name": "KEF Music Gallery London",
+  "seen": "20260829"
+ },
+ "unionchapel.org.uk": {
+  "name": "Union Chapel",
+  "seen": "20260829"
+ },
+ "upminsterwindmill.org": {
+  "name": "Upminster Windmill",
+  "seen": "20260829"
+ },
+ "vaginamuseum.co.uk": {
+  "name": "Vagina Museum",
+  "seen": "20260829"
+ },
+ "walthamforest.gov.uk": {
+  "name": "Waltham Forest Town Hall",
+  "seen": "20260829"
+ },
+ "walthamforest.gov.uk-langthorne-park": {
+  "name": "Langthorne Park",
+  "seen": "20260829"
+ },
+ "walthamforest.gov.uk-leyton-library": {
+  "name": "Leyton Library",
+  "seen": "20260829"
+ },
+ "walthamforest.gov.uk-leytonstone-library": {
+  "name": "Leytonstone Library",
+  "seen": "20260829"
+ },
+ "walthamforest.gov.uk-stoneydown-park": {
+  "name": "Stoneydown Park",
+  "seen": "20260829"
+ },
+ "walthamstowtradeshall.com": {
+  "name": "Walthamstow Trades Hall",
+  "seen": "20260829"
+ },
+ "wansteadfringe.org-the-wanstead-curtain": {
+  "name": "The Wanstead Curtain",
+  "seen": "20260829"
+ },
+ "watsonstelegraph.pub": {
+  "name": "Watson's General Telegraph",
+  "seen": "20260829"
+ },
+ "wearebojangles.com": {
+  "name": "Bojangles Brasserie",
+  "seen": "20260829"
+ },
+ "westminster.gov.uk-maida-vale-library": {
+  "name": "Maida Vale Library",
+  "seen": "20260829"
+ },
+ "westwimbledonsociety.org": {
+  "name": "West Wimbledon Hall",
+  "seen": "20260829"
+ },
+ "wheatsheafhall.org.uk": {
+  "name": "Wheatsheaf Community Hall",
+  "seen": "20260829"
+ },
+ "whitechapelgallery.org": {
+  "name": "Whitechapel Gallery",
+  "seen": "20260829"
+ },
+ "whitelionsw16.co.uk": {
+  "name": "The White Lion Pub",
+  "seen": "20260829"
+ },
+ "wienerholocaustlibrary.org": {
+  "name": "The Wiener Holocaust Library",
+  "seen": "20260829"
+ },
+ "william-the-fourth.com": {
+  "name": "William The Fourth",
+  "seen": "20260829"
+ },
+ "wiltons.org.uk": {
+  "name": "Wilton's Music Hall",
+  "seen": "20260829"
+ },
+ "winchmorehillurc.co.uk": {
+  "name": "Waterhouse Hall Theatre",
+  "seen": "20260829"
+ },
+ "wpp.com-sea-containers": {
+  "name": "WPP Sea Containers Campus",
+  "seen": "20260829"
+ },
+ "writersroom.org.uk": {
+  "name": "The Writers' Room",
+  "seen": "20260829"
+ }
+}

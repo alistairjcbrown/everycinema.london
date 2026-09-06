@@ -30,8 +30,9 @@ const buildStamp = () => ({
 });
 
 // Multi-page build: the app (index.html), the performance-history charts
-// (history.html), the venue-health charts (health.html) and the standalone
-// attributions page. Separate entries keep AG Charts out of the main grid bundle.
+// (history.html), the publishing-cadence charts (publishing.html), the
+// venue-health charts (health.html) and the standalone attributions page.
+// Separate entries keep AG Charts out of the main grid bundle.
 export default defineConfig({
   plugins: [buildStamp()],
   build: {
@@ -39,6 +40,7 @@ export default defineConfig({
       input: {
         main: "index.html",
         history: "history.html",
+        publishing: "publishing.html",
         health: "health.html",
         attributions: "attributions.html",
       },

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#18181b" />
+    <title>When venues publish — Every Cinema London</title>
+    <meta
+      name="description"
+      content="When each London cinema puts new screenings on sale — new future performances added per venue per day, from every Clusterflick release since January."
+    />
+    <meta property="og:title" content="When venues publish — Every Cinema London" />
+    <meta
+      property="og:description"
+      content="The weekly changeover, venue by venue: how many new future performances each London cinema added, day by day. Powered by Clusterflick."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Every Cinema London" />
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; font-family: system-ui, sans-serif; }
+      body { display: flex; flex-direction: column; min-height: 100vh;
+        background: #18181b; color: #e4e4e7; }
+
+      /* chrome — matches index.html */
+      header {
+        padding: 10px 16px; border-bottom: 1px solid #2e2e34;
+        display: flex; align-items: center; gap: 8px 40px; flex-wrap: wrap;
+      }
+      .brand { display: flex; flex-direction: column; gap: 2px; }
+      header h1 { font-size: 16px; margin: 0; line-height: 1.1; }
+      .tagline { font-size: 12px; color: #a1a1aa; margin-top: 8px; }
+      .tagline a { color: #93b4f5; text-decoration: none; font-weight: 600; }
+      .tagline a:hover { text-decoration: underline; }
+      header .meta { font-size: 13px; opacity: 0.6; }
+      .views { display: flex; gap: 6px; margin-left: auto; }
+      .views a {
+        font-size: 13px; padding: 4px 12px; border: 1px solid #3f3f46;
+        border-radius: 6px; text-decoration: none; color: inherit;
+      }
+      .views a.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+      footer {
+        padding: 8px 16px; border-top: 1px solid #2e2e34; font-size: 12px;
+        color: #a1a1aa; display: flex; gap: 8px 20px; flex-wrap: wrap; align-items: center;
+      }
+      footer a { color: #93b4f5; text-decoration: none; }
+      footer a:hover { text-decoration: underline; }
+      footer .sep { opacity: 0.35; }
+
+      /* page */
+      main { flex: 1; min-height: 0; padding: 16px; display: flex;
+        flex-direction: column; gap: 16px; }
+      .card {
+        background: #1c1c20; border: 1px solid #2e2e34; border-radius: 10px;
+        padding: 14px 16px; display: flex; flex-direction: column; min-width: 0;
+      }
+      .card h2 {
+        font-size: 14px; margin: 0; font-weight: 600;
+        display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap;
+      }
+      .card .sub { font-size: 12px; color: #a1a1aa; margin: 3px 0 10px; }
+      .note { font-size: 12px; color: #a1a1aa; margin: 22px 0 0; }
+      .note strong { color: #e4e4e7; font-weight: 600; }
+
+      /* scope bar — the one control the whole page reads from */
+      .scope {
+        background: #1c1c20; border: 1px solid #2e2e34; border-radius: 10px;
+        padding: 10px 16px; display: flex; align-items: center;
+        gap: 10px 18px; flex-wrap: wrap;
+      }
+      .scope label { font-size: 12px; color: #a1a1aa; }
+      .scope select {
+        font: inherit; font-size: 13px; color: inherit; background: #26262b;
+        border: 1px solid #3f3f46; border-radius: 6px; padding: 5px 10px;
+        min-width: 260px; max-width: 100%; cursor: pointer;
+      }
+      .scope select:hover { border-color: #52525b; }
+      .scope-note { font-size: 12px; color: #71717a; }
+
+      /* headline figures above the daily chart */
+      .stats { display: flex; gap: 8px 32px; flex-wrap: wrap; margin: 2px 0 12px; }
+      .stat { display: flex; flex-direction: column; gap: 2px; }
+      .stat .value { font-size: 20px; font-weight: 600; line-height: 1.1; }
+      .stat .label { font-size: 11px; color: #a1a1aa; }
+
+      .chart { width: 100%; min-width: 0; }
+      #dailyChart { height: 300px; }
+      #weekdayChart { height: 260px; }
+      #calendarChart { height: 260px; }
+
+      #venueGrid { width: 100%; height: 460px; }
+
+      .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; }
+      @media (max-width: 1200px) { .split { grid-template-columns: minmax(0, 1fr); } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <h1>🎬 Every Cinema London</h1>
+        <span class="tagline">
+          London showtimes, all in one place · powered by
+          <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick →</a>
+        </span>
+      </div>
+      <span class="meta" id="meta">loading…</span>
+      <nav class="views">
+        <a href="/">Showtimes grid</a>
+        <a href="/history.html">Screening history</a>
+        <a href="/publishing.html" class="active">When venues publish</a>
+        <a href="/health.html">Venue health</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="scope">
+        <label for="scope">Showing</label>
+        <select id="scope"><option>loading…</option></select>
+        <span class="scope-note" id="scopeNote"></span>
+      </div>
+
+      <section class="card">
+        <h2>New performances added, by day</h2>
+        <p class="sub" id="dailySub">&nbsp;</p>
+        <div class="stats" id="stats"></div>
+        <div class="chart" id="dailyChart"></div>
+        <p class="note" id="dailyNote"></p>
+      </section>
+
+      <div class="split">
+        <section class="card">
+          <h2>Which day of the week?</h2>
+          <p class="sub" id="weekdaySub">&nbsp;</p>
+          <div class="chart" id="weekdayChart"></div>
+          <p class="note" id="weekdayNote"></p>
+        </section>
+
+        <section class="card">
+          <h2>Week by week</h2>
+          <p class="sub" id="calendarSub">&nbsp;</p>
+          <div class="chart" id="calendarChart"></div>
+          <p class="note" id="calendarNote"></p>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>Every venue</h2>
+        <p class="sub" id="venueSub">&nbsp;</p>
+        <div id="venueGrid"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>
+        <a href="/attributions.html#clusterflick">Listings</a> from
+        <a href="https://github.com/clusterflick/data-combined/releases" target="_blank" rel="noopener">Clusterflick</a>
+        (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>)
+      </span>
+      <span class="sep">·</span>
+      <span>
+        <a href="/attributions.html#ag-charts">Charts</a> and
+        <a href="/attributions.html#ag-grid">grid</a> by
+        <a href="https://www.ag-grid.com" target="_blank" rel="noopener">AG Grid</a>
+      </span>
+      <span class="sep">·</span>
+      <span>
+        <a href="https://github.com/alistairjcbrown/everycinema.london" target="_blank" rel="noopener">Source on GitHub</a>
+      </span>
+      <span class="sep">·</span>
+      <span>
+        Generated <time datetime="%BUILD_TIME_ISO%">%BUILD_TIME%</time>
+      </span>
+    </footer>
+    <script type="module" src="/src/publishing.js"></script>
+  </body>
+</html>

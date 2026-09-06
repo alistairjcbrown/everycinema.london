@@ -14,6 +14,10 @@
     "history:latest-tag": "node history.mjs latest-tag",
     "health:days": "node health.mjs days",
     "health:build": "node health.mjs build",
+    "diffs:days": "node diffs.mjs days",
+    "diffs:build": "node diffs.mjs build",
+    "diffs:names": "node diffs.mjs names",
+    "diffs:verify": "node diffs.mjs verify",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

@@ -25,11 +25,13 @@ permissions: {}
 
 jobs:
   # Close whatever the newest upstream releases have now superseded, and commit
-  # it: performance-history windows, and venue-health day aggregates. Both are
-  # write-once — a window is a pure function of one release, a day aggregate of
-  # one finished London day — so this only ever adds files.
+  # it: performance-history windows, venue-health day aggregates, and the
+  # release-to-release diffs behind the publishing page. All three are
+  # write-once — a window is a pure function of one release, a health day of one
+  # finished London day, a diff day of the release pairs whose interval started
+  # in it — so this only ever adds files.
   #
-  # Both live in one job because both push to the same branch, and two jobs
+  # They live in one job because they push to the same branch, and separate jobs
   # racing to do that would just conflict. Unlike every other job here it needs
   # write access and therefore keeps its checkout credentials; pushes made with
   # github.token deliberately do NOT trigger another workflow run, so this
@@ -44,7 +46,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
-      # neither history.mjs nor health.mjs has dependencies, so no npm ci here
+      # none of history.mjs, health.mjs or diffs.mjs has an npm dependency, so no
+      # npm ci here — the diff code diffs.mjs runs is vendored into the repo
+      # (see vendor/clusterflick-diff/), not installed
       - name: Finalize newly-closed history windows
         run: npm run history:update
         env:
@@ -55,16 +59,27 @@ jobs:
       # asset URL is derived from its date, so nothing here touches the API.
       - name: Aggregate finished venue-health days
         run: npm run health:days
+      # Diffs the release pairs whose interval started on any day that has no
+      # file yet, which on a normal run is yesterday and nothing else. It reads
+      # the same release index history:update just refreshed, so the two stages
+      # are looking at one list rather than racing to fetch their own.
+      #
+      # Each day costs the two combined releases either side of it (~40MB), so
+      # this is only cheap while it stays incremental — a checkout that has
+      # fallen weeks behind should be backfilled locally in chunks and committed,
+      # not caught up here. --limit (default 40) is what stops it trying.
+      - name: Aggregate finished publishing days
+        run: npm run diffs:days
       - name: Commit new data
         run: |
-          if [ -z "$(git status --porcelain data-history data-health)" ]; then
+          if [ -z "$(git status --porcelain data-history data-health data-diffs)" ]; then
             echo "No data changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data-history data-health
-          git commit -m "Update performance history and venue health data"
+          git add data-history data-health data-diffs
+          git commit -m "Update performance history, venue health and publishing data"
           git push
 
   build:
@@ -104,6 +119,10 @@ jobs:
       # checkout, so today's cannot be handed over from there.
       - name: Build venue health blob
         run: npm run health:build
+      # Purely local: every day it reads is already committed, so unlike the
+      # health blob there is no still-open day to fetch and no network here.
+      - name: Build publishing blob
+        run: npm run diffs:build
       - name: Build site
         run: npm run build
       - uses: actions/upload-pages-artifact@v5

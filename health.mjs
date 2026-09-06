@@ -562,19 +562,29 @@ async function build() {
   const members = {};
   for (const [id, venue] of Object.entries(venues))
     (members[venue.chain] ??= []).push(id);
-  const claims = {};
-  for (const group of Object.values(groupNames))
-    if (group) claims[group] = (claims[group] ?? 0) + 1;
-
+  // A chain of one is named after its venue, whatever its groupName says, and
+  // that is settled BEFORE the remaining claims on a groupName are counted.
+  // The order is the point: a singleton was never going to use the shared name
+  // — being identified by its own is what tells it apart — so counting its
+  // claim alongside the real chain's makes every shared groupName look
+  // contested and denies it to the chain that had the better title to it. On
+  // the publishing page, whose eight months see Curzon Sea Containers probed
+  // apart from the other ten Curzons, that put `curzon.com` in the picker
+  // beside a "Curzon Sea Containers" that had no such problem.
+  //
+  // Two chains of MANY sharing a groupName is still a real collision with no
+  // better answer than their ids, and is still warned about below.
   const chains = {};
+  const claims = {};
   for (const [chain, ids] of Object.entries(members)) {
+    if (ids.length === 1) chains[chain] = venues[ids[0]].name;
+    else if (groupNames[chain])
+      claims[groupNames[chain]] = (claims[groupNames[chain]] ?? 0) + 1;
+  }
+  for (const [chain, ids] of Object.entries(members)) {
+    if (ids.length === 1) continue;
     const group = groupNames[chain];
-    chains[chain] =
-      group && claims[group] === 1
-        ? group
-        : ids.length === 1
-          ? venues[ids[0]].name
-          : chain;
+    chains[chain] = group && claims[group] === 1 ? group : chain;
   }
   // The disambiguation above is only worth having if it actually disambiguates.
   const labelCounts = {};
