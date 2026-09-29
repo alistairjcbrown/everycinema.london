@@ -6,7 +6,7 @@ on:
   # Rebuild daily in the evening to pick up fresh Clusterflick data. Late rather
   # than midday because cinema chains publish the coming week's schedule in bulk
   # during the day: a midday build caught the "before" state and listings for
-  # days 3+ out came in ~30% short (see clipProvisional in src/history.js). A
+  # days 3+ out came in ~30% short (see clipProvisional in src/scripts/history.js). A
   # late build also puts the finalized/provisional boundary after the 20:00 peak
   # rather than in the small hours.
   # GitHub cron is UTC (no DST): 21:00 UTC = 21:00 London in winter (GMT),
@@ -123,6 +123,9 @@ jobs:
       # health blob there is no still-open day to fetch and no network here.
       - name: Build publishing blob
         run: npm run diffs:build
+      # Astro renders every page here, including one per venue, and reads the
+      # blobs the steps above wrote into public/data/ to do it — so this has to
+      # stay after them.
       - name: Build site
         run: npm run build
       - uses: actions/upload-pages-artifact@v5
@@ -154,9 +157,10 @@ jobs:
         env:
           INDEXNOW_KEY: 7e376ae76b808d7a3c3a957018d7da41
         run: |
-          # Nudge IndexNow (Bing, Yandex, ...) to recrawl. The site is a single
-          # page whose data changes on each daily rebuild, so we submit the home
-          # URL. First wait for the deployed key file so validation succeeds.
+          # Nudge IndexNow (Bing, Yandex, ...) to recrawl the pages whose content
+          # changes on every daily rebuild. The ~350 venue pages are listed in
+          # /sitemap.xml rather than here. First wait for the deployed key file so
+          # validation succeeds.
           for i in $(seq 1 20); do
             if curl -sf "https://everycinema.london/${INDEXNOW_KEY}.txt" >/dev/null; then
               echo "Key file live."; break
@@ -171,7 +175,9 @@ jobs:
             "key": "${INDEXNOW_KEY}",
             "keyLocation": "https://everycinema.london/${INDEXNOW_KEY}.txt",
             "urlList": [
-              "https://everycinema.london/"
+              "https://everycinema.london/",
+              "https://everycinema.london/london/",
+              "https://everycinema.london/venues/"
             ]
           }
           JSON

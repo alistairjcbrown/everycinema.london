@@ -1,0 +1,169 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base
+  title="Method & attributions"
+  description="Where Every Cinema London's data comes from, what we change about it, and how the figures on each page are defined."
+  section="about"
+>
+  <div class="wrap">
+    <h1>Method &amp; attributions</h1>
+    <p class="lede">
+      Every Cinema London is built on data and services generously provided by others. This page
+      credits them, says what we change, and defines the figures the rest of the site shows.
+    </p>
+
+    <section id="clusterflick">
+      <h2>Screening data — Clusterflick</h2>
+      <a href="https://clusterflick.com" target="_blank" rel="noopener">
+        <img class="cf-logo" src="/img/clusterflick.svg" alt="Clusterflick" />
+      </a>
+      <p>
+        Cinema listings and showtimes (performances, venues, formats and accessibility details) are
+        compiled by <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick</a>,
+        which aggregates what&rsquo;s on across London&rsquo;s cinemas and venues.
+      </p>
+      <p>
+        This project uses the published combined dataset from
+        <a href="https://github.com/clusterflick/data-combined" target="_blank" rel="noopener">github.com/clusterflick/data-combined</a>,
+        and Clusterflick&rsquo;s hourly listing checks, published a day at a time as
+        <a href="https://github.com/clusterflick/data-analysed/releases" target="_blank" rel="noopener">releases on github.com/clusterflick/data-analysed</a>.
+      </p>
+      <p>
+        What each venue put on sale, and when, comes from comparing consecutive
+        <a href="https://github.com/clusterflick/data-combined" target="_blank" rel="noopener">data-combined</a>
+        releases to each other. The comparison itself is Clusterflick&rsquo;s own, vendored from
+        <a href="https://github.com/clusterflick/scripts" target="_blank" rel="noopener">github.com/clusterflick/scripts</a>
+        (MIT) so that what counts as a new performance &mdash; and what counts as a rescheduled one
+        &mdash; is decided in one place rather than two.
+      </p>
+      <p>
+        Screening data from <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick</a>
+        is published under
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>,
+        per its <a href="https://clusterflick.com/data-licence/" target="_blank" rel="noopener">data licence</a>.
+      </p>
+
+      <h3>What we&rsquo;ve changed</h3>
+      <p>
+        CC BY 4.0 asks that changes be stated, and this site makes plenty of them. Nothing here is a
+        verbatim copy of a Clusterflick release.
+      </p>
+      <ul>
+        <li>
+          <a href="/venues/">Venue pages</a> show each venue&rsquo;s showtimes from the latest release,
+          regrouped by day and film, with performances that have already started removed. The
+          release is compacted first &mdash; lookups extracted, film fields stored once per film,
+          performances reduced to id-referencing records.
+        </li>
+        <li>
+          <a href="/london/">Screening history</a> is reconstructed rather than republished. A release
+          lists only <em>future</em> performances, so the record of what actually screened is
+          assembled by partitioning consecutive releases into windows and bucketing each window&rsquo;s
+          performances by hour.
+        </li>
+        <li>
+          What each venue <strong>published</strong> is derived by diffing consecutive releases, with
+          performances added to a run already listed and performances on a newly listed title counted
+          separately, and each diff credited to the London day its interval started.
+        </li>
+        <li>
+          Each venue&rsquo;s <strong>listing checks</strong> are aggregated from the hourly log into
+          per-day, per-venue rates, with scoring Clusterflick does not publish &mdash; deciding which
+          outcomes count for or against a venue, and leaving checks inside a declared closure out of
+          the rate entirely.
+        </li>
+      </ul>
+
+      <p class="disclaimer">
+        The CC BY 4.0 grant covers the screening data &mdash; performances, venues, booking links,
+        formats and accessibility. It does not cover the film metadata shown alongside it: posters,
+        genres, certificates, runtimes and directors come from TMDB under separate terms, below.
+      </p>
+    </section>
+
+    <section id="method">
+      <h2>How the figures are defined</h2>
+      <p>
+        The short version of the rules the charts follow. The full reasoning, including the mistakes
+        that led to each one, is in the
+        <a href="https://github.com/alistairjcbrown/everycinema.london#readme" target="_blank" rel="noopener">project README</a>.
+      </p>
+      <h3>A day is a London day</h3>
+      <p>
+        Every date and hour on the site is Europe/London, across the BST/GMT change. A release
+        comparison is credited to the day its interval <em>started</em>: releases land about twice a
+        day, and the hourly checks put most publishing in the evening side of an overnight interval.
+      </p>
+      <h3>Screenings are counted, not inferred</h3>
+      <p>
+        What an opening &ldquo;costs&rdquo; the films already playing is arithmetic: screenings gained
+        minus screenings given up is exactly the change in the day&rsquo;s total. The site names both
+        sides of a changeover and does not say which film took which screen.
+      </p>
+      <h3>Publishing means more was listed</h3>
+      <p>
+        On a venue&rsquo;s listing checks, &ldquo;new listings&rdquo; means its own listing count went
+        <em>up</em> since the previous hour &mdash; not merely changed, since at midnight every venue
+        drops the day that just ended. Venues whose source reports no countable volume are left out of
+        that rate rather than scored zero.
+      </p>
+      <h3>A declared closure is not downtime</h3>
+      <p>
+        Checks inside a closure Clusterflick has written down leave the &ldquo;answered&rdquo; rate
+        rather than counting against it, and are shown in their own colour instead.
+      </p>
+      <h3>What isn&rsquo;t recorded yet</h3>
+      <p>
+        Screening history is kept per film, not per venue, so venue pages show what&rsquo;s coming up
+        rather than what played. Per-venue history is planned.
+      </p>
+    </section>
+
+    <section id="tmdb">
+      <h2>Film metadata — The Movie Database (TMDB)</h2>
+      <a href="https://www.themoviedb.org" target="_blank" rel="noopener">
+        <img class="tmdb-logo" src="/img/tmdb.svg" alt="The Movie Database (TMDB)" />
+      </a>
+      <p>
+        Film metadata &mdash; titles, posters, genres, classifications, runtimes and directors &mdash;
+        is sourced from <a href="https://www.themoviedb.org" target="_blank" rel="noopener">The Movie Database (TMDB)</a>.
+      </p>
+      <p class="disclaimer">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+    </section>
+
+    <section id="ag-charts">
+      <h2>Charts — AG Charts</h2>
+      <p>
+        The interactive charts on the <a href="/london/">London</a> page are
+        <a href="https://www.ag-charts.com" target="_blank" rel="noopener">AG Charts</a>. The charts on
+        venue pages and the home page are drawn at build time and need no charting library.
+      </p>
+    </section>
+
+    <p class="muted">
+      Source code:
+      <a href="https://github.com/alistairjcbrown/everycinema.london" target="_blank" rel="noopener">github.com/alistairjcbrown/everycinema.london</a>
+    </p>
+  </div>
+</Base>
+
+<style>
+  .wrap { max-width: 720px; width: 100%; margin: 0 auto; padding: 24px 8px 64px; line-height: 1.6; }
+  h1 { font-size: 26px; margin: 0 0 8px; }
+  .lede { color: var(--muted); margin: 0 0 32px; }
+  section { border-top: 1px solid var(--line); padding: 28px 0; }
+  section h2 { font-size: 18px; margin: 0 0 10px; }
+  section p { margin: 0 0 12px; }
+  section h3 { font-size: 14px; margin: 22px 0 6px; color: #d4d4d8; }
+  section ul { margin: 0 0 12px; padding-left: 20px; }
+  section li { margin: 0 0 8px; }
+  .disclaimer {
+    background: #202024; border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 16px; font-size: 14px; color: #c4c4cc;
+  }
+  .tmdb-logo { width: 200px; max-width: 60%; height: auto; display: block; margin: 4px 0 16px; }
+  .cf-logo { width: 72px; height: 72px; border-radius: 12px; display: block; margin: 4px 0 16px; }
+  .muted { color: var(--faint); font-size: 13px; }
+</style>

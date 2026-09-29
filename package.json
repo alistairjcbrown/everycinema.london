@@ -18,17 +18,13 @@
     "diffs:build": "node diffs.mjs build",
     "diffs:names": "node diffs.mjs names",
     "diffs:verify": "node diffs.mjs verify",
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "6.4.3"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
   },
   "dependencies": {
     "ag-charts-community": "^14.0.2",
     "ag-charts-enterprise": "^14.0.2",
-    "ag-grid-community": "36.0.1",
-    "ag-grid-enterprise": "36.0.1"
+    "astro": "7.3.5"
   }
 }

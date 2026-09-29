@@ -17,30 +17,8 @@ import {
   HeatmapSeriesModule,
   GradientLegendModule,
 } from "ag-charts-enterprise";
-import {
-  createGrid,
-  ModuleRegistry,
-  themeQuartz,
-  colorSchemeDark,
-  ClientSideRowModelModule,
-  TextFilterModule,
-  NumberFilterModule,
-  DateFilterModule, // agDateColumnFilter, for the Opening column
-  RowSelectionModule, // select films to compare their runs
-  TooltipModule, // headerTooltip on the Week 2 column
-  enableDevValidations,
-} from "ag-grid-community";
+import { createFilmTable } from "./film-table.js";
 
-if (import.meta.env.DEV) enableDevValidations();
-
-ModuleRegistry.registerModules([
-  ClientSideRowModelModule,
-  TextFilterModule, // agTextColumnFilter + its floating filter
-  NumberFilterModule, // agNumberColumnFilter + its floating filter
-  DateFilterModule, // agDateColumnFilter + its floating filter
-  RowSelectionModule,
-  TooltipModule, // agColumnHeader's tooltip, for the one column that needs a gloss
-]);
 ChartModuleRegistry.registerModules([
   ...AllChartModules,
   HeatmapSeriesModule,
@@ -151,6 +129,7 @@ const fmtDay = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
 });
 // No weekday: a grid column, not a chart tooltip, so it stays narrow.
+const fmtDayMonth = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 const fmtDate = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -2403,106 +2382,27 @@ function renderFilms(blob, boundary) {
   films = films.filter((f) => f.screenings > 1);
   films.sort((a, b) => b.screenings - a.screenings);
 
-  const theme = themeQuartz.withPart(colorSchemeDark).withParams({
-    rowHeight: 34,
-    headerHeight: 36,
-    accentColor: SERIES[0],
-    backgroundColor: SURFACE,
-  });
-
-  // Declared before the grid so the selection handler cannot reach it in its
-  // temporal dead zone; `grid` inside is only read once something is selected.
+  // Selected films are charted in the order they were ticked, as the grid did.
+  // Held here so the run chart's toggles can redraw the same selection.
+  let picked = [];
   const rechart = () =>
-    renderRun(
-      grid.getSelectedRows().map((r) => ({ title: r.title, days: r.series })),
-    );
-
-  const grid = createGrid(el("filmGrid"), {
-    theme,
-    rowData: films,
-    getRowId: ({ data }) => data.id,
-    // headerCheckbox gives a one-click clear (and select-all) at the top of the
-    // checkbox column; 'filtered' scopes select-all to what the filters have left
-    // showing, which is both more useful and far less of a foot-gun than all 2,519
-    rowSelection: {
-      mode: "multiRow",
-      checkboxes: true,
-      headerCheckbox: true,
-      selectAll: "filtered",
+    renderRun(picked.map((f) => ({ title: f.title, days: f.series })));
+  createFilmTable(el("filmGrid"), films, {
+    onSelectionChange: (next) => {
+      picked = next;
+      rechart();
     },
-    // floating filters put AG Grid's own filter components inline under each
-    // header — searching a 5,660-row list is the grid's job, not a bespoke input
-    defaultColDef: { sortable: true, resizable: true, floatingFilter: true },
-    columnDefs: [
-      {
-        field: "title",
-        headerName: "Film",
-        flex: 2,
-        minWidth: 160,
-        filter: "agTextColumnFilter",
-        filterParams: {
-          filterOptions: ["contains"],
-          maxNumConditions: 1,
-          debounceMs: 150,
-        },
-      },
-      {
-        field: "year",
-        headerName: "Year",
-        width: 110,
-        filter: "agNumberColumnFilter",
-      },
-      {
-        field: "screenings",
-        headerName: "Screenings",
-        width: 140,
-        sort: "desc",
-        filter: "agNumberColumnFilter",
-        // "at least N" is the question worth asking of a count; an exact match on
-        // a screening total is almost never what anyone wants
-        filterParams: { defaultOption: "greaterThanOrEqual" },
-        valueFormatter: ({ value }) => fmtInt.format(value),
-      },
-      {
-        field: "days",
-        headerName: "Days",
-        width: 110,
-        filter: "agNumberColumnFilter",
-        filterParams: { defaultOption: "greaterThanOrEqual" },
-      },
-      {
-        field: "opening",
-        headerName: "Opening",
-        width: 130,
-        // the day the wide release started — the same "opening" the run
-        // chart's lead-in trim and decline projection anchor on, not the day
-        // it was first (often sparsely, or in previews) shown anywhere
-        filter: "agDateColumnFilter",
-        filterParams: { defaultOption: "greaterThanOrEqual" },
-        valueFormatter: ({ value }) => fmtDate.format(value),
-      },
-      {
-        field: "retained",
-        headerName: "Week 2",
-        width: 120,
-        headerTooltip:
-          "The film's second week as a share of its first. Over 100% means it " +
-          "widened after opening rather than starting to fade.",
-        filter: "agNumberColumnFilter",
-        // the question here is "which films held on", so the default reads as a
-        // threshold rather than an exact match on a percentage
-        filterParams: { defaultOption: "greaterThanOrEqual" },
-        valueFormatter: ({ value }) =>
-          value === null ? "—" : `${value.toFixed(0)}%`,
-      },
-    ],
-    onSelectionChanged: () => rechart(),
+    formatInt: (n) => fmtInt.format(n),
+    // the year only where it isn't this one, to keep the column narrow enough
+    // for the table to sit beside the run chart
+    formatDate: (d) =>
+      (d.getUTCFullYear() === new Date().getUTCFullYear() ? fmtDayMonth : fmtDate).format(d),
   });
 
   el("filmGridSub").innerHTML =
     `${fmtInt.format(films.length)} films with more than one recorded screening ` +
     `(${fmtInt.format(oneOff)} one-off screenings excluded).<br>` +
-    `Filter in any column, then tick films to compare their runs.`;
+    `Search or sort, then tick films to compare their runs.`;
 
   // Re-chart the current selection when any toggle flips
   el("runNormalise").addEventListener("change", rechart);

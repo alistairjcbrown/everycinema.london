@@ -1,0 +1,83 @@
+---
+// A static line with a soft area under it, rendered at build time. Same
+// construction as Bars: marks in a stretched SVG, labels in HTML. The stroke
+// uses non-scaling-stroke so it stays a hairline however far the SVG stretches.
+import { niceMax, axisLabel } from "../lib/scale.js";
+
+interface Props {
+  values: number[];
+  ticks?: { index: number; label: string }[];
+  height?: number;
+  label: string;
+  color?: string;
+  // a second, thinner series drawn over the first — a rolling average, say
+  overlay?: (number | null)[];
+  overlayColor?: string;
+}
+
+const {
+  values,
+  ticks = [],
+  height = 160,
+  label,
+  color = "#3b82f6",
+  overlay,
+  overlayColor = "#e4e4e7",
+} = Astro.props;
+
+const n = values.length;
+const W = Math.max(1, n - 1) * 10;
+const ceiling = niceMax(Math.max(0, ...values));
+const x = (i: number) => (i * 10).toFixed(1);
+const y = (v: number) => (100 - (100 * v) / ceiling).toFixed(2);
+
+const line = values.map((v, i) => `${i ? "L" : "M"}${x(i)},${y(v)}`).join(" ");
+const area = `${line} L${x(n - 1)},100 L0,100 Z`;
+let over = "";
+if (overlay) {
+  let pen = false;
+  over = overlay
+    .map((v, i) => {
+      if (v === null) {
+        pen = false;
+        return "";
+      }
+      const cmd = `${pen ? "L" : "M"}${x(i)},${y(v)}`;
+      pen = true;
+      return cmd;
+    })
+    .join(" ");
+}
+---
+
+<figure class="spark">
+  <div class="spark-plot" style="grid-template-columns: 40px minmax(0, 1fr)">
+    <div class="spark-y" aria-hidden="true" style={`height: ${height}px`}>
+      <span>{axisLabel(ceiling)}</span>
+      <span>{axisLabel(ceiling / 2)}</span>
+      <span>0</span>
+    </div>
+    <div class="spark-box" style={`height: ${height}px`}>
+      <svg viewBox={`0 0 ${W} 100`} preserveAspectRatio="none" role="img" aria-label={label}>
+        <title>{label}</title>
+        <line x1="0" x2={W} y1="50" y2="50" stroke="#2e2e34" stroke-width="1" vector-effect="non-scaling-stroke" />
+        <path d={area} fill={color} fill-opacity="0.16" />
+        <path d={line} fill="none" stroke={color} stroke-width="1.25" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+        {over && (
+          <path d={over} fill="none" stroke={overlayColor} stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+        )}
+      </svg>
+    </div>
+  </div>
+  {ticks.length > 0 && (
+    <div class="spark-x ticks" aria-hidden="true" style="--y-width: 48px">
+      {ticks.map((t) => (
+        <span style={`left: ${((t.index / Math.max(1, n - 1)) * 100).toFixed(2)}%`}>{t.label}</span>
+      ))}
+    </div>
+  )}
+</figure>
+
+<style>
+  figure { margin: 0; }
+</style>

@@ -1,0 +1,85 @@
+---
+// A static column chart, rendered at build time. Columns are drawn in an SVG
+// stretched to fill its box, and the axis labels are HTML around it, so the
+// chart is responsive without the text scaling with it.
+//
+// `series` stack bottom-up in the order given. A null in the first series marks
+// a column the data has nothing to say about (no release that day, say), which
+// is left empty rather than drawn as a zero.
+import { niceMax, axisLabel } from "../lib/scale.js";
+
+interface Series {
+  values: (number | null)[];
+  color: string;
+  name?: string;
+}
+interface Props {
+  series: Series[];
+  ticks?: { index: number; label: string }[];
+  height?: number;
+  label: string; // the accessible summary of what the chart shows
+  unit?: string; // appended to the top axis label, e.g. "%"
+  max?: number; // pin the axis ceiling instead of fitting it
+  gap?: number; // fraction of each slot left as space between columns
+}
+
+const { series, ticks = [], height = 140, label, unit = "", max, gap = 0.2 } = Astro.props;
+const n = series[0]?.values.length ?? 0;
+const totals = Array.from({ length: n }, (_, i) =>
+  series.reduce((sum, s) => sum + (s.values[i] ?? 0), 0),
+);
+const ceiling = max ?? niceMax(Math.max(0, ...totals));
+const SLOT = 10;
+const inset = (SLOT * gap) / 2;
+
+const rects: { x: number; y: number; w: number; h: number; fill: string }[] = [];
+for (let i = 0; i < n; i++) {
+  if (series[0].values[i] === null) continue;
+  let base = 100;
+  for (const s of series) {
+    const v = s.values[i] ?? 0;
+    if (v <= 0) continue;
+    const h = (100 * v) / ceiling;
+    base -= h;
+    rects.push({ x: i * SLOT + inset, y: base, w: SLOT - 2 * inset, h, fill: s.color });
+  }
+}
+const named = series.filter((s) => s.name);
+---
+
+<figure class="spark" style={`--y-width: 48px`}>
+  <div class="spark-plot" style={`grid-template-columns: 40px minmax(0, 1fr)`}>
+    <div class="spark-y" aria-hidden="true" style={`height: ${height}px`}>
+      <span>{axisLabel(ceiling)}{unit}</span>
+      <span>{axisLabel(ceiling / 2)}{unit}</span>
+      <span>0</span>
+    </div>
+    <div class="spark-box" style={`height: ${height}px`}>
+      <svg viewBox={`0 0 ${n * SLOT} 100`} preserveAspectRatio="none" role="img" aria-label={label}>
+        <title>{label}</title>
+        <line x1="0" x2={n * SLOT} y1="50" y2="50" stroke="#2e2e34" stroke-width="1" vector-effect="non-scaling-stroke" />
+        {rects.map((r) => (
+          <rect x={r.x.toFixed(2)} y={r.y.toFixed(3)} width={r.w.toFixed(2)} height={r.h.toFixed(3)} fill={r.fill} />
+        ))}
+      </svg>
+    </div>
+  </div>
+  {ticks.length > 0 && (
+    <div class="spark-x ticks" aria-hidden="true">
+      {ticks.map((t) => (
+        <span style={`left: ${(((t.index + 0.5) / n) * 100).toFixed(2)}%`}>{t.label}</span>
+      ))}
+    </div>
+  )}
+  {named.length > 1 && (
+    <figcaption class="legend">
+      {named.map((s) => (
+        <span><i style={`background: ${s.color}`}></i>{s.name}</span>
+      ))}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  figure { margin: 0; }
+</style>

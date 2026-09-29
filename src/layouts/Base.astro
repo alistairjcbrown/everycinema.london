@@ -1,0 +1,84 @@
+---
+// The one copy of the site's chrome. Every page renders inside this, so the
+// header, nav and footer can no longer drift apart the way four hand-copied
+// versions did.
+import "../styles/site.css";
+import { builtAt, builtAtLabel } from "../lib/build.js";
+
+interface Props {
+  title: string;
+  description: string;
+  // which top-level section the page belongs to, for the nav's current marker
+  section?: "home" | "london" | "venues" | "about";
+}
+
+const { title, description, section } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const fullTitle = section === "home" ? title : `${title} — Every Cinema London`;
+
+const nav = [
+  { key: "home", href: "/", label: "Home" },
+  { key: "london", href: "/london/", label: "London" },
+  { key: "venues", href: "/venues/", label: "Venues" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#18181b" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Every Cinema London" />
+    <slot name="head" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <a class="name" href="/">🎬 Every Cinema London</a>
+        <span class="tagline">
+          London cinema, by the numbers · data from{" "}
+          <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick →</a>
+        </span>
+      </div>
+      <nav class="site-nav" aria-label="Sections">
+        {nav.map((item) => (
+          <a href={item.href} aria-current={item.key === section ? "page" : undefined}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <span>
+        <a href="/about/#clusterflick">Screening data</a> from{" "}
+        <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick</a>{" "}
+        (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>)
+      </span>
+      <span class="sep">·</span>
+      <span>
+        <a href="/about/#tmdb">Film metadata</a> from{" "}
+        <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a>
+      </span>
+      <span class="sep">·</span>
+      <a href="/about/">Method &amp; attributions</a>
+      <span class="sep">·</span>
+      <a href="https://github.com/alistairjcbrown/everycinema.london" target="_blank" rel="noopener">Source on GitHub</a>
+      <span class="sep">·</span>
+      <span>Generated <time datetime={builtAt.toISOString()}>{builtAtLabel}</time></span>
+    </footer>
+  </body>
+</html>

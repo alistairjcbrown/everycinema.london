@@ -1,0 +1,202 @@
+/* Shared chrome and card styles for every page. Page-specific layout lives in
+   each page's own <style>; anything a script creates at runtime (the stat rows
+   the chart modules build) has to be here, since Astro scopes page styles to
+   the markup it rendered. */
+
+:root {
+  color-scheme: dark;
+  --bg: #18181b;
+  --surface: #1c1c20;
+  --line: #2e2e34;
+  --line-2: #3f3f46;
+  --ink: #e4e4e7;
+  --muted: #a1a1aa;
+  --faint: #71717a;
+  --link: #93b4f5;
+  --accent: #3b82f6;
+  /* the chart inks, named for what they mean on this site */
+  --extended: #3b82f6; /* more of something already listed */
+  --fresh: #199e70; /* something that was not listed at all */
+  --ok: #199e70;
+  --source: #c98500;
+  --fail: #e66767;
+  --closed: #71717a;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: system-ui, sans-serif; }
+body {
+  display: flex; flex-direction: column; min-height: 100vh;
+  background: var(--bg); color: var(--ink);
+}
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px;
+}
+
+/* ---------- chrome ---------- */
+
+.site-header {
+  padding: 10px 16px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: 8px 40px; flex-wrap: wrap;
+}
+.brand { display: flex; flex-direction: column; gap: 2px; }
+.brand .name { font-size: 16px; font-weight: 700; margin: 0; line-height: 1.1; color: var(--ink); }
+.brand .name:hover { text-decoration: none; }
+.tagline { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.tagline a { font-weight: 600; }
+.site-nav { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.site-nav a {
+  font-size: 13px; padding: 4px 12px; border: 1px solid var(--line-2);
+  border-radius: 6px; color: inherit;
+}
+.site-nav a:hover { border-color: #52525b; text-decoration: none; }
+.site-nav a[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.site-footer {
+  padding: 8px 16px; border-top: 1px solid var(--line); font-size: 12px;
+  color: var(--muted); display: flex; gap: 8px 20px; flex-wrap: wrap; align-items: center;
+}
+.site-footer .sep { opacity: 0.35; }
+
+main { flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- page heading ---------- */
+
+.page-head { display: flex; flex-direction: column; gap: 4px; padding: 4px 2px 0; }
+.page-head h1 { font-size: 22px; margin: 0; line-height: 1.2; text-wrap: balance; }
+.page-head .lede { font-size: 14px; color: var(--muted); margin: 0; max-width: 78ch; line-height: 1.5; }
+.crumbs { font-size: 12px; color: var(--faint); }
+
+/* ---------- cards ---------- */
+
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 16px; display: flex; flex-direction: column; min-width: 0;
+}
+.card h2 {
+  font-size: 14px; margin: 0; font-weight: 600;
+  display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap;
+}
+.card .sub { font-size: 12px; color: var(--muted); margin: 3px 0 10px; line-height: 1.45; }
+.note { font-size: 12px; color: var(--muted); margin: 22px 0 0; line-height: 1.5; max-width: 110ch; }
+.hint { font-size: 12px; color: var(--faint); margin: 0 0 8px; }
+
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; }
+.split.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 1200px) {
+  .split, .split.even { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- KPI rows ----------
+   Two vocabularies, because two chart modules build them: the history module
+   writes .v / .k, the publishing module .value / .label. Both render alike. */
+
+.stats { display: flex; gap: 8px 32px; flex-wrap: wrap; margin: 2px 0 12px; }
+.stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat .v, .stat .value { font-size: 22px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .k, .stat .label { font-size: 11px; color: var(--muted); letter-spacing: 0.02em; }
+
+/* ---------- controls ---------- */
+
+.toggle-controls {
+  margin-left: auto;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+}
+.toggle {
+  font-size: 12px; font-weight: 400; color: var(--muted);
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+  user-select: none; white-space: nowrap;
+}
+.toggle input { accent-color: var(--accent); margin: 0; cursor: pointer; }
+.toggle:hover { color: var(--ink); }
+.picker {
+  margin-left: auto; display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 400; color: var(--muted);
+}
+.picker select, .search {
+  background: var(--bg); color: var(--ink); border: 1px solid var(--line-2);
+  border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 13px; max-width: 340px;
+}
+.picker select:hover, .search:hover { border-color: #52525b; }
+
+/* ---------- plain data tables ---------- */
+
+.table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+table.data { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.data th, table.data td {
+  padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+table.data td.wrap { white-space: normal; }
+table.data thead th {
+  position: sticky; top: 0; z-index: 1; background: #202025;
+  font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em;
+}
+table.data tbody tr:hover { background: #222228; }
+table.data tbody tr:last-child td { border-bottom: none; }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
+table.data .dim { color: var(--faint); }
+th .sort {
+  all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center;
+}
+th .sort:hover { color: var(--ink); }
+th[aria-sort="ascending"] .sort::after { content: "▲"; font-size: 9px; }
+th[aria-sort="descending"] .sort::after { content: "▼"; font-size: 9px; }
+th.num .sort { justify-content: flex-end; width: 100%; }
+
+.button {
+  font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--line-2); background: transparent; color: var(--ink); cursor: pointer;
+}
+.button:hover { border-color: #52525b; }
+.button:disabled { opacity: 0.4; cursor: default; }
+
+/* ---------- static SVG charts ----------
+   Marks are drawn in an SVG stretched to the box (preserveAspectRatio="none"),
+   and every label is HTML around it, so text stays legible at any width. */
+
+.spark { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.spark-plot { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
+.spark-y {
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-size: 11px; color: var(--faint); text-align: right; font-variant-numeric: tabular-nums;
+}
+.spark svg { display: block; width: 100%; height: 100%; }
+.spark-box { position: relative; border-bottom: 1px solid var(--line-2); min-width: 0; }
+.spark-x {
+  display: flex; justify-content: space-between; font-size: 11px; color: var(--faint);
+  margin-left: var(--y-width, 0px);
+}
+.spark-x.ticks { position: relative; height: 14px; display: block; }
+.spark-x.ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.legend { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+.absent {
+  border: 1px dashed var(--line-2); border-radius: 8px; padding: 14px 16px;
+  font-size: 13px; color: var(--muted); line-height: 1.5;
+}
+.absent strong { color: var(--ink); font-weight: 600; }
+
+.chip {
+  display: inline-block; font-size: 11px; line-height: 1; padding: 3px 6px; border-radius: 4px;
+  background: #27324a; color: #cfe0ff; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+a.chip:hover { background: #33416a; text-decoration: none; }
+.chip.sold { background: #3a2730; color: #e6a5a5; text-decoration: line-through; opacity: 0.8; }
+.badge {
+  display: inline-block; font-size: 10px; line-height: 1; padding: 3px 5px; border-radius: 3px;
+  border: 1px solid var(--line-2); color: var(--muted); white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

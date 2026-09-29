@@ -1,0 +1,407 @@
+---
+// One page per venue, everything known about it, rendered at build time.
+//
+// Four sources meet here, and a venue can be in any subset of them: what it has
+// on now (the latest release), what it has put on sale since January (release
+// diffs), whether it answers Clusterflick's hourly checks (the health log, which
+// covers a third of venues), and what screened there (not recorded per venue
+// yet). Every section therefore has an honest empty state, because for most
+// venues at least one of them is empty.
+//
+// No client JavaScript: the data is fixed when the page is built, so the charts
+// are too.
+import Base from "../../layouts/Base.astro";
+import Bars from "../../components/Bars.astro";
+import {
+  blob,
+  venueIndex,
+  venueDetail,
+  fmtInt,
+  fmtDay,
+  fmtShort,
+  fmtLong,
+  fmtMonth,
+  asDate,
+  addDays,
+  today,
+  longDay,
+  shortDay,
+  posterUrl,
+} from "../../lib/data.js";
+
+export function getStaticPaths() {
+  return venueIndex().venues.map((v) => ({ params: { id: v.id } }));
+}
+
+const { id } = Astro.params;
+const v = venueDetail(id);
+const { upcoming, publishing, health, siblings } = v;
+
+const INK = {
+  extended: "#3b82f6",
+  fresh: "#199e70",
+  ok: "#199e70",
+  source: "#c98500",
+  fail: "#e66767",
+  closed: "#52525b",
+  none: "#26262b",
+};
+
+const pct = (n: number | null, digits = 0) => (n === null ? "—" : `${n.toFixed(digits)}%`);
+const plural = (n: number, one: string, many = `${one}s`) => `${fmtInt.format(n)} ${n === 1 ? one : many}`;
+
+// --- what's on ------------------------------------------------------------
+
+const nextWeek = upcoming.ahead.slice(0, 7).reduce((s, d) => s + d.count, 0);
+const aheadTicks = upcoming.ahead
+  .map((d, index) => ({ index, day: d.day }))
+  .filter(({ index, day }) => index === 0 || asDate(day).getUTCDay() === 1)
+  .map(({ index, day }) => ({ index, label: index === 0 ? "Today" : fmtShort.format(asDate(day)) }));
+// Open the first week of listings, fold the rest: a busy multiplex lists two
+// months ahead, and a page that long buries everything below it.
+const OPEN_DAYS = 7;
+const openUntil = addDays(today, OPEN_DAYS);
+const openDays = upcoming.days.filter((d) => d.day < openUntil);
+const laterDays = upcoming.days.filter((d) => d.day >= openUntil);
+const dayHeading = (day: string) =>
+  day === today ? `Today · ${fmtDay.format(asDate(day))}` : day === addDays(today, 1) ? `Tomorrow · ${fmtDay.format(asDate(day))}` : longDay(day);
+const runtime = (mins: number | null) => (mins ? `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, "0")}m` : null);
+
+// --- publishing -------------------------------------------------------------
+
+let weekTicks: { index: number; label: string }[] = [];
+if (publishing) {
+  weekTicks = publishing.weeks
+    .map((w, index) => ({ index, week: w.week }))
+    .filter(({ week }) => {
+      // label a week if a month starts inside it
+      for (let i = 0; i < 7; i++) if (addDays(week, i).endsWith("-01")) return true;
+      return false;
+    })
+    .map(({ index, week }) => {
+      let first = week;
+      for (let i = 0; i < 7; i++) if (addDays(week, i).endsWith("-01")) first = addDays(week, i);
+      return { index, label: fmtMonth.format(asDate(first)) };
+    });
+}
+
+// --- health ------------------------------------------------------------------
+
+const stateLabel: Record<string, string> = {
+  ok: "every check answered",
+  source: "the source pushed back",
+  fail: "a check failed",
+  closed: "closed (declared)",
+  none: "not checked yet",
+};
+
+const title = `${v.name} showtimes`;
+const description = upcoming.total
+  ? `What's on at ${v.name}: ${plural(upcoming.total, "showing")} of ${plural(v.films, "film")} listed through ${shortDay(upcoming.last)}, plus when it puts new showtimes on sale and how reliably its listings answer.`
+  : `${v.name} has nothing listed right now. When it last put showtimes on sale, and how reliably its listings answer.`;
+---
+
+<Base title={title} description={description} section="venues">
+  <header class="page-head">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/venues/">Venues</a>
+      {v.chainLabel && <> › <a href={`/venues/#chain=${encodeURIComponent(v.chain)}`}>{v.chainLabel}</a></>}
+    </nav>
+    <h1>{v.name}</h1>
+    <p class="lede">
+      {v.type && <span>{v.type} · </span>}
+      {upcoming.total
+        ? <span>{plural(upcoming.total, "showing")} of {plural(v.films, "film")} listed, through {longDay(upcoming.last)}.</span>
+        : <span>Nothing listed right now.</span>}
+    </p>
+  </header>
+
+  <div class="stats headline">
+    <div class="stat"><span class="value">{fmtInt.format(nextWeek)}</span><span class="label">showings in the next 7 days</span></div>
+    <div class="stat"><span class="value">{fmtInt.format(v.films)}</span><span class="label">films listed</span></div>
+    {publishing && (
+      <div class="stat"><span class="value">{fmtInt.format(publishing.total)}</span><span class="label">performances put on sale since {fmtShort.format(asDate(publishing.from))}</span></div>
+    )}
+    {health && (
+      <div class="stat"><span class="value">{pct(health.answered, 1)}</span><span class="label">of listing checks answered</span></div>
+    )}
+  </div>
+
+  <section class="card" id="whats-on">
+    <h2>What&rsquo;s on</h2>
+    {upcoming.total ? (
+      <>
+        <p class="sub">
+          Showings per day over the next six weeks.
+          {upcoming.beyond > 0 && <> Another {plural(upcoming.beyond, "showing")} listed further out, to {shortDay(upcoming.last)}.</>}
+        </p>
+        <Bars
+          series={[{ values: upcoming.ahead.map((d) => d.count), color: INK.extended }]}
+          ticks={aheadTicks}
+          height={110}
+          gap={0.25}
+          label={`Showings per day at ${v.name} over the next six weeks: ${fmtInt.format(upcoming.ahead.reduce((s, d) => s + d.count, 0))} in total.`}
+        />
+
+        <div class="listings">
+          {openDays.map((d) => (
+            <section class="day">
+              <h3>{dayHeading(d.day)} <span class="count">{plural(d.count, "showing")}</span></h3>
+              <ul class="films">
+                {d.films.map(({ film, showings }) => (
+                  <li class="film">
+                    {film.poster
+                      ? <img class="poster" src={posterUrl(film.poster)} alt="" loading="lazy" width="34" height="51" />
+                      : <span class="poster none" aria-hidden="true"></span>}
+                    <div class="film-body">
+                      <div class="film-title">
+                        <strong>{film.title}</strong>
+                        {film.year && <span class="dim">{film.year}</span>}
+                        {film.cert && <span class="badge">{film.cert}</span>}
+                        {runtime(film.duration) && <span class="dim">{runtime(film.duration)}</span>}
+                      </div>
+                      <div class="times">
+                        {showings.map((s) => {
+                          const text = [s.time, ...s.tags].join(" · ");
+                          const hint = [s.screen, s.notes, s.soldOut ? "Sold out" : null].filter(Boolean).join(" — ") || undefined;
+                          return s.booking && !s.soldOut
+                            ? <a class="chip" href={s.booking} target="_blank" rel="noopener" title={hint}>{text}</a>
+                            : <span class={`chip${s.soldOut ? " sold" : ""}`} title={hint}>{text}</span>;
+                        })}
+                      </div>
+                      {showings[0].notes && showings.every((s) => s.notes === showings[0].notes) && (
+                        <p class="film-note">{showings[0].notes}</p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+          {laterDays.length > 0 && (
+            <details class="later">
+              <summary>
+                Later dates — {plural(laterDays.length, "day")}, {plural(laterDays.reduce((s, d) => s + d.count, 0), "showing")}
+              </summary>
+              {laterDays.map((d) => (
+                <section class="day compact">
+                  <h3>{dayHeading(d.day)} <span class="count">{plural(d.count, "showing")}</span></h3>
+                  <ul class="films">
+                    {d.films.map(({ film, showings }) => (
+                      <li class="film">
+                        <div class="film-body">
+                          <div class="film-title"><strong>{film.title}</strong>{film.year && <span class="dim">{film.year}</span>}</div>
+                          <div class="times">
+                            {showings.map((s) =>
+                              s.booking && !s.soldOut
+                                ? <a class="chip" href={s.booking} target="_blank" rel="noopener">{[s.time, ...s.tags].join(" · ")}</a>
+                                : <span class={`chip${s.soldOut ? " sold" : ""}`}>{[s.time, ...s.tags].join(" · ")}</span>,
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </details>
+          )}
+        </div>
+      </>
+    ) : (
+      <p class="absent">
+        <strong>Nothing listed.</strong> The latest Clusterflick release has no upcoming showings here.
+        {publishing?.lastAdded
+          ? <> The last time it put anything on sale was {fmtLong.format(asDate(publishing.lastAdded))}.</>
+          : null}
+      </p>
+    )}
+  </section>
+
+  <div class="split even">
+    <section class="card" id="publishing">
+      <h2>When it puts showtimes on sale</h2>
+      {publishing && publishing.total > 0 ? (
+        <>
+          <p class="sub">
+            Future performances added, week by week, from {fmtShort.format(asDate(publishing.from))} to {fmtShort.format(asDate(publishing.to))}.
+          </p>
+          <div class="stats">
+            <div class="stat"><span class="value">{fmtInt.format(publishing.total)}</span><span class="label">performances added</span></div>
+            <div class="stat"><span class="value">{publishing.activeDays}</span><span class="label">days of {publishing.coveredDays} with anything added</span></div>
+            {publishing.usualDay && (
+              <div class="stat"><span class="value">{publishing.usualDay}</span><span class="label">usual day · {pct(publishing.usualShare)} of additions</span></div>
+            )}
+          </div>
+          <Bars
+            series={[
+              { values: publishing.weeks.map((w) => (w.covered ? w.extended : null)), color: INK.extended, name: "Added to a run already listed" },
+              { values: publishing.weeks.map((w) => w.fresh), color: INK.fresh, name: "On a title that was not listed" },
+            ]}
+            ticks={weekTicks}
+            height={120}
+            label={`Performances ${v.name} put on sale each week since ${fmtShort.format(asDate(publishing.from))}: ${fmtInt.format(publishing.total)} in total.`}
+          />
+          <p class="hint by-day">By day of the week</p>
+          <Bars
+            series={[
+              { values: publishing.byWeekday.map((d) => d.extended), color: INK.extended },
+              { values: publishing.byWeekday.map((d) => d.fresh), color: INK.fresh },
+            ]}
+            ticks={publishing.byWeekday.map((d, index) => ({ index, label: d.name }))}
+            height={70}
+            gap={0.35}
+            label={`Performances added by day of the week. ${publishing.usualDay ? `${publishing.usualDay} carries the most.` : ""}`}
+          />
+          <p class="note">
+            {publishing.busiest && <>Biggest day: {fmtInt.format(publishing.busiest.total)} added on {fmtLong.format(asDate(publishing.busiest.day))}. </>}
+            A day is the day a release comparison <strong>started</strong> — releases land about twice a
+            day, and most publishing happens on the evening side of the gap.
+          </p>
+        </>
+      ) : publishing ? (
+        <p class="absent">
+          <strong>Nothing put on sale since {fmtShort.format(asDate(publishing.from))}.</strong> This venue is in
+          every release comparison, and none of them found a new performance here.
+        </p>
+      ) : (
+        <p class="absent">
+          <strong>No change recorded.</strong> No release comparison since
+          {" "}{fmtShort.format(asDate(blob("diffs").from))} has found anything added, removed or moved
+          here — its listings have stayed exactly as they are. (A venue new to Clusterflick has nothing
+          to be compared against until its second release.)
+        </p>
+      )}
+    </section>
+
+    <section class="card" id="checks">
+      <h2>Do its listings answer?</h2>
+      {health ? (
+        <>
+          <p class="sub">
+            Clusterflick asks every probed venue for its listings once an hour. {fmtShort.format(asDate(health.from))} to {fmtShort.format(asDate(health.to))}.
+          </p>
+          <div class="stats">
+            <div class="stat"><span class="value">{pct(health.answered, 1)}</span><span class="label">of {fmtInt.format(health.checks - health.closed)} checks answered</span></div>
+            {health.publishRate !== null && (
+              <div class="stat"><span class="value">{pct(health.publishRate, 1)}</span><span class="label">of checks found new listings</span></div>
+            )}
+            {health.closed > 0 && (
+              <div class="stat"><span class="value">{fmtInt.format(health.closed)}</span><span class="label">checks during a declared closure</span></div>
+            )}
+          </div>
+          <div class="strip" role="img" aria-label={`Listing checks at ${v.name} by day: ${health.days.filter((d) => d.state === "ok").length} of ${health.days.filter((d) => d.state !== "none").length} checked days fully answered.`}>
+            {health.days.map((d) => (
+              <span
+                class={`cell ${d.state}${d.provisional ? " today" : ""}`}
+                style={`background: ${INK[d.state]}`}
+                title={`${fmtDay.format(asDate(d.day))}: ${d.total ? `${d.ok} of ${d.total - d.shut} answered — ${stateLabel[d.state]}` : stateLabel.none}${d.provisional ? " (so far today)" : ""}`}
+              ></span>
+            ))}
+          </div>
+          <div class="strip-x"><span>{fmtShort.format(asDate(health.from))}</span><span>today</span></div>
+          <div class="legend">
+            <span><i style={`background:${INK.ok}`}></i>All answered</span>
+            <span><i style={`background:${INK.source}`}></i>Source pushed back</span>
+            <span><i style={`background:${INK.fail}`}></i>A check failed</span>
+            <span><i style={`background:${INK.closed}`}></i>Closed</span>
+          </div>
+          {health.issues.length > 0 && (
+            <p class="issues">
+              Not answered: {health.issues.map((i) => `${fmtInt.format(i.n)} × ${i.label.toLowerCase()}`).join(", ")}.
+            </p>
+          )}
+          {health.byHour ? (
+            <>
+              <p class="hint by-day">When new listings appear, by hour — share of checks that found more listed than an hour before</p>
+              <Bars
+                series={[{ values: health.byHour.map((h) => (h.compared ? h.share : null)), color: INK.fresh }]}
+                ticks={[0, 6, 12, 18].map((hour) => ({ index: hour, label: `${String(hour).padStart(2, "0")}:00` }))}
+                height={70}
+                gap={0.3}
+                unit="%"
+                label={`Share of hourly checks at ${v.name} that found new listings, by hour of day.`}
+              />
+            </>
+          ) : (
+            <p class="note">
+              This venue&rsquo;s source reports only how many films and dates it lists, not how many
+              showings, so it can&rsquo;t be asked when new listings appear.
+            </p>
+          )}
+        </>
+      ) : (
+        <p class="absent">
+          <strong>Not probed.</strong> Clusterflick&rsquo;s hourly listing checks cover
+          {" "}{venueIndex().venues.filter((x) => x.hasHealth).length} of London&rsquo;s venues so far, and
+          this isn&rsquo;t one of them yet.
+        </p>
+      )}
+    </section>
+  </div>
+
+  <section class="card" id="history">
+    <h2>What screened here</h2>
+    <p class="absent">
+      <strong>Not recorded per venue yet.</strong> Screening history is reconstructed film by film
+      across all of London, so it can&rsquo;t yet say what played at {v.name}. The London-wide record
+      is on the <a href="/london/">London page</a>.
+    </p>
+  </section>
+
+  {siblings.length > 0 && (
+    <section class="card" id="chain">
+      <h2>More from {v.chainLabel}</h2>
+      <ul class="siblings">
+        {siblings.map((s) => (
+          <li>
+            <a href={`/venues/${s.id}/`}>{s.name}</a>
+            <span class="dim">{s.listed ? plural(s.listed, "showing") : "nothing listed"}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Base>
+
+<style>
+  .headline { margin: 0; padding: 0 2px; }
+  .headline .value { font-size: 26px; }
+
+  .listings { display: flex; flex-direction: column; gap: 18px; margin-top: 18px; }
+  .day h3 {
+    font-size: 13px; margin: 0 0 6px; padding-bottom: 6px; border-bottom: 1px solid var(--line);
+    display: flex; gap: 10px; align-items: baseline;
+  }
+  .day .count { font-weight: 400; font-size: 12px; color: var(--faint); }
+  .films { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .film { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid #25252b; align-items: flex-start; }
+  .film:last-child { border-bottom: none; }
+  .poster { width: 34px; height: 51px; border-radius: 3px; object-fit: cover; flex: none; background: #26262b; }
+  .film-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+  .film-title { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; font-size: 13px; }
+  .film-title strong { font-weight: 600; }
+  .dim { color: var(--faint); font-size: 12px; }
+  .times { display: flex; flex-wrap: wrap; gap: 4px; }
+  .film-note { margin: 0; font-size: 12px; color: var(--muted); }
+  .later { margin-top: 4px; }
+  .later summary {
+    cursor: pointer; font-size: 13px; color: var(--link); padding: 8px 0; list-style-position: inside;
+  }
+  .later[open] summary { margin-bottom: 12px; }
+  .later .day { margin-bottom: 16px; }
+  .compact .film { padding: 5px 0; }
+
+  .hint.by-day { margin: 16px 0 6px; }
+  .strip { display: flex; gap: 2px; height: 26px; margin-top: 4px; }
+  .strip .cell { flex: 1; border-radius: 2px; min-width: 2px; }
+  .strip .cell.today { opacity: 0.6; }
+  .strip-x { display: flex; justify-content: space-between; font-size: 11px; color: var(--faint); margin-top: 4px; }
+  .issues { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+
+  .siblings {
+    list-style: none; margin: 8px 0 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px 20px;
+  }
+  .siblings li { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid #25252b; }
+</style>

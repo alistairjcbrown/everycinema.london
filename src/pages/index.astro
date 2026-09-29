@@ -1,0 +1,190 @@
+---
+// The front door: the headline figures, the year's screenings as one line, and
+// what's on this week — then the way into the London page and the venues.
+// Rendered entirely at build time; no JavaScript, no charting library, and none
+// of the data blobs are downloaded by the browser.
+import Base from "../layouts/Base.astro";
+import Line from "../components/Line.astro";
+import {
+  blob,
+  publishingRows,
+  screeningsByDay,
+  comingWeek,
+  listedNow,
+  venueIndex,
+  fmtInt,
+  fmtShort,
+  fmtMonth,
+  asDate,
+  longDay,
+  shortDay,
+  posterUrl,
+  WEEK,
+} from "../lib/data.js";
+
+const screened = screeningsByDay();
+const totalScreened = screened.reduce((s, d) => s + d.count, 0);
+const busiest = screened.reduce((b, d) => (d.count > b.count ? d : b), screened[0]);
+const perDay = Math.round(totalScreened / screened.length);
+const filmsScreened = blob("history-summary").finalized.movies;
+
+const diffs = blob("diffs");
+const rows = publishingRows(Object.keys(diffs.venues)).filter((r) => r.covered);
+const totalAdded = rows.reduce((s, r) => s + r.total, 0);
+const byWeekday = WEEK.map(([index, name]) => ({
+  name,
+  total: rows.filter((r) => r.weekday === index).reduce((s, r) => s + r.total, 0),
+}));
+const topDay = byWeekday.reduce((b, d) => (d.total > b.total ? d : b), byWeekday[0]);
+const dayNames: Record<string, string> = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday", Sat: "Saturday", Sun: "Sunday" };
+
+const now = listedNow();
+const week = comingWeek();
+const { venues } = venueIndex();
+
+// A seven-day rolling mean over the daily line, so the weekly rhythm (Saturday
+// peaks, Monday troughs) doesn't hide the shape of the year.
+const rolling = screened.map((_, i) =>
+  i < 6 ? null : screened.slice(i - 6, i + 1).reduce((s, d) => s + d.count, 0) / 7,
+);
+const ticks = screened
+  .map((d, index) => ({ index, day: d.day }))
+  .filter(({ day }) => day.endsWith("-01"))
+  .map(({ index, day }) => ({ index, label: fmtMonth.format(asDate(day)) }));
+---
+
+<Base
+  title="Every Cinema London — London cinema, by the numbers"
+  description={`Every screening at ${fmtInt.format(venues.length)} London venues, counted: ${fmtInt.format(totalScreened)} this year so far, what's on this week, and when each venue puts showtimes on sale.`}
+  section="home"
+>
+  <section class="hero">
+    <h1>London cinema, by the numbers</h1>
+    <p class="lede">
+      Every showing at every London venue Clusterflick tracks, counted — what screened, what&rsquo;s on,
+      and when it went on sale.
+    </p>
+  </section>
+
+  <section class="tiles" aria-label="Headline figures">
+    <div class="tile">
+      <span class="figure">{fmtInt.format(totalScreened)}</span>
+      <span class="what">screenings since {fmtShort.format(asDate(screened[0].day))}</span>
+      <span class="detail">about {fmtInt.format(perDay)} a day, across {fmtInt.format(filmsScreened)} films</span>
+    </div>
+    <div class="tile">
+      <span class="figure">{fmtInt.format(now.total)}</span>
+      <span class="what">showings listed right now</span>
+      <span class="detail">{fmtInt.format(now.films)} films at {fmtInt.format(now.venues)} venues, as far ahead as {shortDay(now.last)}</span>
+    </div>
+    <div class="tile">
+      <span class="figure">{fmtInt.format(week.total)}</span>
+      <span class="what">showings in the next 7 days</span>
+      <span class="detail">at {fmtInt.format(week.venues)} venues</span>
+    </div>
+    <div class="tile">
+      <span class="figure">{fmtInt.format(busiest.count)}</span>
+      <span class="what">screenings on the busiest day</span>
+      <span class="detail">{longDay(busiest.day)}</span>
+    </div>
+    <div class="tile">
+      <span class="figure">{Math.round((100 * topDay.total) / totalAdded)}%</span>
+      <span class="what">of new showtimes go on sale on a {dayNames[topDay.name]}</span>
+      <span class="detail">{fmtInt.format(totalAdded)} put on sale since {fmtShort.format(asDate(diffs.from))}</span>
+    </div>
+    <div class="tile">
+      <span class="figure">{fmtInt.format(venues.length)}</span>
+      <span class="what">venues tracked</span>
+      <span class="detail">cinemas, and the pubs, libraries and galleries that show films too</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Screenings per day across London</h2>
+    <p class="sub">
+      Every day since {fmtShort.format(asDate(screened[0].day))}; the brighter line is the seven-day average.
+    </p>
+    <Line
+      values={screened.map((d) => d.count)}
+      overlay={rolling}
+      ticks={ticks}
+      height={180}
+      label={`Screenings per day across London since ${fmtShort.format(asDate(screened[0].day))}: ${fmtInt.format(totalScreened)} in total, peaking at ${fmtInt.format(busiest.count)} on ${longDay(busiest.day)}.`}
+    />
+    <p class="more"><a href="/london/">The year in detail — openings, changeovers, and when it all goes on sale →</a></p>
+  </section>
+
+  <section class="card">
+    <h2>Most shown this week</h2>
+    <p class="sub">The films with the most showings across London over the next seven days.</p>
+    <ol class="top-films">
+      {week.films.slice(0, 8).map(({ film, count, venues: at }) => (
+        <li>
+          {film.poster
+            ? <img src={posterUrl(film.poster, "w154")} alt="" loading="lazy" width="77" height="116" />
+            : <span class="no-poster" aria-hidden="true"></span>}
+          <span class="film-name">{film.title}</span>
+          <span class="film-count">{fmtInt.format(count)} showings · {fmtInt.format(at.size)} venues</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="doors">
+    <a class="door" href="/london/">
+      <span class="door-title">London →</span>
+      <span class="door-body">The whole year in charts: every day&rsquo;s screenings, what a wide opening takes off the films already playing, and the weekly rhythm of what goes on sale.</span>
+    </a>
+    <a class="door" href="/venues/">
+      <span class="door-title">Venues →</span>
+      <span class="door-body">A page for each of {fmtInt.format(venues.length)} venues: what&rsquo;s on, when it puts showtimes on sale, and whether its listings answer.</span>
+    </a>
+    <a class="door" href="/about/">
+      <span class="door-title">Method &amp; attributions →</span>
+      <span class="door-body">Where the data comes from, what we change about it, and how each figure is defined.</span>
+    </a>
+  </section>
+</Base>
+
+<style>
+  .hero { padding: 12px 2px 0; display: flex; flex-direction: column; gap: 6px; }
+  .hero h1 { font-size: clamp(24px, 4vw, 34px); margin: 0; line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance; }
+  .hero .lede { margin: 0; color: var(--muted); font-size: 15px; max-width: 70ch; line-height: 1.5; }
+
+  .tiles {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
+  .tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 3px;
+  }
+  .figure { font-size: 32px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .what { font-size: 13px; color: var(--ink); }
+  .detail { font-size: 12px; color: var(--faint); line-height: 1.4; }
+
+  .more { margin: 14px 0 0; font-size: 13px; }
+
+  .top-films {
+    list-style: none; margin: 4px 0 0; padding: 0;
+    display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+  .top-films li { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .top-films img, .no-poster {
+    width: 100%; aspect-ratio: 2 / 3; height: auto; border-radius: 5px; object-fit: cover;
+    background: #26262b; display: block;
+  }
+  .film-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+  .film-count { font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
+  .doors { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .door {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px; display: flex; flex-direction: column; gap: 6px; color: var(--ink);
+  }
+  .door:hover { border-color: var(--accent); text-decoration: none; }
+  .door-title { font-size: 16px; font-weight: 600; color: var(--link); }
+  .door-body { font-size: 13px; color: var(--muted); line-height: 1.5; }
+</style>

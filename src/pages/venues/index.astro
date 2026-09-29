@@ -1,0 +1,162 @@
+---
+// Every venue, as one table: the way in to the venue pages. Rows are rendered
+// at build time so the page reads without JavaScript; the script below only
+// adds searching, sorting and the chain filter that venue breadcrumbs link to.
+import Base from "../../layouts/Base.astro";
+import { venueIndex, blob, fmtInt, fmtShort, asDate } from "../../lib/data.js";
+
+const { venues } = venueIndex();
+const listing = venues.filter((v) => v.listed > 0).length;
+const probed = venues.filter((v) => v.hasHealth).length;
+const diffsFrom = fmtShort.format(asDate(blob("diffs").from));
+const sorted = [...venues].sort((a, b) => b.listed - a.listed || a.name.localeCompare(b.name, "en-GB"));
+---
+
+<Base
+  title="Venues"
+  description={`All ${venues.length} London venues Clusterflick tracks — what each has on, when it puts showtimes on sale, and how reliably its listings answer.`}
+  section="venues"
+>
+  <header class="page-head">
+    <h1>Every venue</h1>
+    <p class="lede">
+      {fmtInt.format(venues.length)} venues Clusterflick tracks across London — cinemas, and the arts
+      centres, pubs, libraries and galleries that show films too. {fmtInt.format(listing)} have
+      something listed right now.
+    </p>
+  </header>
+
+  <section class="card">
+    <div class="toolbar">
+      <input class="search" id="q" type="search" placeholder="Find a venue or chain" aria-label="Find a venue or chain" autocomplete="off" />
+      <span class="filter" id="chainFilter" hidden>
+        <span id="chainName"></span>
+        <button class="button" id="clearChain" type="button">Show all</button>
+      </span>
+      <span class="count" id="count">{fmtInt.format(venues.length)} venues</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data" id="venues">
+        <thead>
+          <tr>
+            <th scope="col" data-key="name"><button class="sort" type="button">Venue</button></th>
+            <th scope="col" data-key="chain"><button class="sort" type="button">Chain</button></th>
+            <th scope="col" data-key="type"><button class="sort" type="button">Type</button></th>
+            <th scope="col" class="num" data-key="listed" aria-sort="descending"><button class="sort" type="button">Showings listed</button></th>
+            <th scope="col" class="num" data-key="films"><button class="sort" type="button">Films</button></th>
+            <th scope="col" class="num" data-key="added" title={`Future performances put on sale since ${diffsFrom}`}><button class="sort" type="button">Put on sale since {diffsFrom}</button></th>
+            <th scope="col" class="num" data-key="answered" title={`Share of hourly listing checks answered — ${probed} venues are probed`}><button class="sort" type="button">Checks answered</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          {sorted.map((v) => (
+            <tr
+              data-name={v.name}
+              data-chain={v.chainLabel ?? ""}
+              data-chain-id={v.chain}
+              data-type={v.type ?? ""}
+              data-listed={v.listed}
+              data-films={v.films}
+              data-added={v.added ?? ""}
+              data-answered={v.answered ?? ""}
+            >
+              <td class="wrap"><a href={`/venues/${v.id}/`}>{v.name}</a></td>
+              <td class="dim">{v.chainLabel ?? ""}</td>
+              <td class="dim">{v.type ?? ""}</td>
+              <td class="num">{v.listed ? fmtInt.format(v.listed) : <span class="dim">—</span>}</td>
+              <td class="num">{v.films ? fmtInt.format(v.films) : <span class="dim">—</span>}</td>
+              <td class="num">{v.added !== null ? fmtInt.format(v.added) : <span class="dim">—</span>}</td>
+              <td class="num">{v.answered !== null ? `${v.answered.toFixed(1)}%` : <span class="dim">—</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      A dash is a question the data can&rsquo;t answer for that venue, not a zero. Under
+      &ldquo;put on sale&rdquo; it means no release comparison has ever recorded a change there
+      &mdash; mostly venues whose listings have sat unchanged, plus any too new to have been
+      compared. &ldquo;Checks answered&rdquo; covers only the {probed} venues Clusterflick probes
+      hourly.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .search { width: 280px; max-width: 100%; }
+  .filter { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; }
+  .filter[hidden] { display: none; }
+  .count { margin-left: auto; font-size: 12px; color: var(--faint); }
+  .table-wrap { max-height: 70vh; }
+</style>
+
+<script>
+  // Searching, sorting and the chain filter. Everything works on the rows the
+  // build rendered, reading the raw values from data- attributes so the sort is
+  // numeric where it should be and a dash sorts last in either direction.
+  const table = document.getElementById("venues") as HTMLTableElement;
+  const body = table.tBodies[0];
+  const rows = [...body.rows];
+  const q = document.getElementById("q") as HTMLInputElement;
+  const count = document.getElementById("count")!;
+  const chainFilter = document.getElementById("chainFilter")!;
+  const chainName = document.getElementById("chainName")!;
+  const fmt = new Intl.NumberFormat("en-GB");
+  let chain: string | null = null;
+
+  function apply() {
+    const needle = q.value.trim().toLowerCase();
+    let shown = 0;
+    for (const row of rows) {
+      const d = row.dataset;
+      const match =
+        (!chain || d.chainId === chain) &&
+        (!needle || `${d.name} ${d.chain} ${d.type}`.toLowerCase().includes(needle));
+      row.hidden = !match;
+      if (match) shown += 1;
+    }
+    count.textContent = `${fmt.format(shown)} of ${fmt.format(rows.length)} venues`;
+  }
+
+  function sortBy(th: HTMLTableCellElement) {
+    const key = th.dataset.key!;
+    const numeric = th.classList.contains("num");
+    // numbers start biggest-first, text A–Z; a second click flips it
+    const current = th.getAttribute("aria-sort");
+    const dir = current ? (current === "ascending" ? -1 : 1) : numeric ? -1 : 1;
+    for (const h of table.tHead!.rows[0].cells) h.removeAttribute("aria-sort");
+    th.setAttribute("aria-sort", dir === 1 ? "ascending" : "descending");
+    const value = (row: HTMLTableRowElement) => row.dataset[key] ?? "";
+    rows.sort((a, b) => {
+      const va = value(a);
+      const vb = value(b);
+      if (va === "" && vb === "") return 0;
+      if (va === "") return 1;
+      if (vb === "") return -1;
+      return dir * (numeric ? Number(va) - Number(vb) : va.localeCompare(vb, "en-GB"));
+    });
+    body.append(...rows);
+  }
+
+  // #chain=<id>, which a venue page's breadcrumb links to
+  function readHash() {
+    const match = location.hash.match(/^#chain=(.+)$/);
+    chain = match ? decodeURIComponent(match[1]) : null;
+    const label = chain && rows.find((r) => r.dataset.chainId === chain)?.dataset.chain;
+    chainFilter.hidden = !chain;
+    chainName.textContent = label ? `Chain: ${label}` : "";
+    apply();
+  }
+
+  q.addEventListener("input", apply);
+  for (const th of table.tHead!.rows[0].cells) {
+    th.querySelector("button")?.addEventListener("click", () => sortBy(th));
+  }
+  document.getElementById("clearChain")!.addEventListener("click", () => {
+    history.replaceState(null, "", location.pathname);
+    readHash();
+  });
+  window.addEventListener("hashchange", readHash);
+  readHash();
+</script>

@@ -1,0 +1,234 @@
+---
+// London, combined: what screened and what went on sale, on one page.
+//
+// Two chart modules share it. src/scripts/history.js is the screening-history
+// page's, moved across unchanged apart from its film table; it fetches its own
+// two blobs. src/scripts/london-publishing.js is the publishing page's with the
+// scope picker taken out, and reads the estate-wide rows embedded below instead
+// of downloading every venue's diffs to sum them.
+//
+// The markup is the two old pages' cards, in reading order: the daily picture,
+// what feeds it, when London goes, who dominates, what an opening costs, the
+// publishing week, then any film's run.
+import Base from "../layouts/Base.astro";
+import { blob, publishingRows, screeningsByDay, venueIndex, fmtInt } from "../lib/data.js";
+
+const diffs = blob("diffs");
+const rows = publishingRows(Object.keys(diffs.venues));
+const screenings = Object.fromEntries(screeningsByDay().map(({ day, count }) => [day, count]));
+const embedded = JSON.stringify({ rows, screenings });
+
+const { venues } = venueIndex();
+const publishers = venues.filter((v) => v.added).sort((a, b) => b.added - a.added).slice(0, 8);
+---
+
+<Base
+  title="London"
+  description="What London's cinemas screened this year, day by day and film by film, and when they put it on sale — every opening, every changeover, every chain's publishing week."
+  section="london"
+>
+  <header class="page-head">
+    <h1>London, this year</h1>
+    <p class="lede">
+      What screened across every venue Clusterflick tracks, and when it went on sale. Screenings are
+      reconstructed from each release&rsquo;s future listings; what went on sale comes from comparing
+      consecutive releases. <a href="/about/#method">How the figures are defined</a>.
+    </p>
+    <p class="crumbs" id="meta">loading…</p>
+  </header>
+
+  <section class="card">
+    <h2>
+      <span>Screenings per day across London</span>
+      <div class="toggle-controls">
+        <label class="toggle">
+          <input type="checkbox" id="dailyHolidays" checked />
+          School holidays
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="dailyWeekends" />
+          Weekends
+        </label>
+      </div>
+    </h2>
+    <p class="sub" id="dailySub">&nbsp;</p>
+    <div class="stats" id="stats"></div>
+    <div class="chart" id="dailyChart"></div>
+    <p class="note" id="dailyNote"></p>
+  </section>
+
+  <section class="card" id="publishing">
+    <h2>What went on sale, against what screened</h2>
+    <p class="sub" id="pubDailySub">&nbsp;</p>
+    <div class="stats" id="pubStats"></div>
+    <div class="chart" id="pubDailyChart"></div>
+    <p class="note" id="pubDailyNote"></p>
+  </section>
+
+  <div class="split charts">
+    <section class="card">
+      <h2>When London goes to the cinema</h2>
+      <p class="sub">Every screening since January, by start time and day of the week.</p>
+      <div class="chart" id="hoursChart"></div>
+      <p class="note" id="hoursNote"></p>
+    </section>
+
+    <section class="card">
+      <h2>How concentrated is the programming?</h2>
+      <p class="sub">Share of each day&rsquo;s screenings taken by that day&rsquo;s eight biggest films.</p>
+      <div class="chart" id="shareChart"></div>
+      <p class="note" id="shareNote"></p>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>How big do films open?</h2>
+    <p class="sub">
+      Every film that opened in London this year, on the day it opened and at the share of that
+      day&rsquo;s screenings it took.
+    </p>
+    <div class="chart" id="releaseChart"></div>
+    <p class="note" id="releaseNote"></p>
+  </section>
+
+  <section class="card">
+    <h2>
+      <span>What an opening costs</span>
+      <label class="picker">
+        Night
+        <select id="changeDay"></select>
+      </label>
+    </h2>
+    <p class="sub">
+      London screens about the same number of films every day, so a release going wide is mostly
+      handed its screens by the films already playing. Screenings gained minus screenings given up is
+      exactly the change in the day&rsquo;s total, so this is the arithmetic of a changeover, not an
+      estimate of it.
+    </p>
+    <div class="stats" id="changeStats"></div>
+    <div class="split flow">
+      <div class="panel">
+        <p class="hint">The fortnight either side. Dashed line marks the night it moved.</p>
+        <div class="chart" id="openingRunChart"></div>
+        <p class="note" id="openingRunNote"></p>
+      </div>
+      <div class="panel">
+        <p class="hint">Biggest movers overnight, the day against the day before it.</p>
+        <div class="chart" id="flowChart"></div>
+        <p class="note" id="flowNote"></p>
+      </div>
+    </div>
+    <p class="note" id="changeSummary"></p>
+  </section>
+
+  <div class="split even">
+    <section class="card">
+      <h2>Which day of the week does London publish?</h2>
+      <p class="sub" id="weekdaySub">&nbsp;</p>
+      <div class="chart" id="weekdayChart"></div>
+      <p class="note" id="weekdayNote"></p>
+    </section>
+
+    <section class="card">
+      <h2>Week by week</h2>
+      <p class="sub" id="calendarSub">&nbsp;</p>
+      <div class="chart" id="calendarChart"></div>
+      <p class="note" id="calendarNote"></p>
+    </section>
+  </div>
+
+  <div class="split">
+    <section class="card">
+      <h2>Films by total screenings</h2>
+      <p class="sub" id="filmGridSub">Search or sort, then tick films to compare their runs.</p>
+      <div id="filmGrid"></div>
+    </section>
+
+    <section class="card">
+      <h2>
+        <span>Screenings per day, by film</span>
+        <div class="toggle-controls">
+          <label class="toggle"><input type="checkbox" id="runNormalise" /> Align to opening</label>
+          <label class="toggle"><input type="checkbox" id="runProject" /> Project decline</label>
+          <label class="toggle"><input type="checkbox" id="runTrimLeadIn" /> Trim lead-in</label>
+          <label class="toggle"><input type="checkbox" id="runTrimTail" /> Trim tail</label>
+        </div>
+      </h2>
+      <p class="sub" id="runSub">&nbsp;</p>
+      <div class="chart" id="runChart"></div>
+      <p class="note" id="runNote"></p>
+      <div class="empty" id="runEmpty">
+        <p class="empty-title" id="runEmptyTitle">No films selected</p>
+        <p id="runEmptyBody">Select a film in the list to chart its run.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Every venue</h2>
+    <p class="sub">
+      All of this, one venue at a time: what each has on, when it puts showtimes on sale, and whether
+      its listings answer. The venues that put the most on sale since January:
+    </p>
+    <ol class="publishers">
+      {publishers.map((v) => (
+        <li><a href={`/venues/${v.id}/`}>{v.name}</a> <span class="dim">{fmtInt.format(v.added)}</span></li>
+      ))}
+    </ol>
+    <p><a href="/venues/">All {fmtInt.format(venues.length)} venues →</a></p>
+  </section>
+
+  <script type="application/json" id="londonData" set:html={embedded} />
+</Base>
+
+<script>
+  import "../scripts/history.js";
+  import "../scripts/london-publishing.js";
+</script>
+
+<style is:global>
+  /* Chart heights, carried over from the two old pages. flex: none where JS sets
+     a height of its own (the heatmap is sized to keep its cells square), so the
+     card's column layout cannot override it. */
+  #dailyChart, #shareChart, #pubDailyChart { flex: none; height: 300px; }
+  #releaseChart { flex: none; height: 360px; }
+  #hoursChart { flex: none; height: 320px; width: 100%; margin-inline: auto; }
+  #runChart { height: 460px; }
+  #flowChart, #openingRunChart { flex: none; height: 420px; }
+  #weekdayChart, #calendarChart { height: 260px; }
+
+  .panel { display: flex; flex-direction: column; min-width: 0; }
+  .panel .note { margin-top: 10px; }
+  /* heatmap needs the wider half — it has 24 columns to fit */
+  .split.charts { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  /* the flow bars carry sixteen film titles and need the room */
+  .split.flow { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+  @media (max-width: 1200px) {
+    .split.charts, .split.flow { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .empty {
+    height: 460px; display: flex; flex-direction: column; gap: 4px;
+    align-items: center; justify-content: center; text-align: center;
+    border: 1px dashed var(--line); border-radius: 8px; color: var(--faint);
+  }
+  .empty p { margin: 0; font-size: 13px; }
+  .empty .empty-title { color: var(--muted); font-size: 14px; font-weight: 600; }
+  .empty[hidden] { display: none; }
+
+  .film-toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .film-toolbar .search { width: 240px; max-width: 100%; }
+  .film-count { margin-left: auto; font-size: 12px; color: var(--faint); }
+  .film-scroll { max-height: 420px; }
+  .film-more { margin: 8px 0 0; }
+  .film-scroll table.data th, .film-scroll table.data td { padding: 6px 7px; }
+  .film-scroll table.data td.wrap { min-width: 150px; }
+  .film-scroll input[type="checkbox"] { accent-color: var(--accent); margin: 0; cursor: pointer; }
+
+  .publishers {
+    margin: 4px 0 12px; padding-left: 22px; font-size: 13px;
+    columns: 2 260px; column-gap: 32px;
+  }
+  .publishers li { padding: 3px 0; break-inside: avoid; }
+  .publishers .dim { color: var(--faint); font-variant-numeric: tabular-nums; }
+</style>

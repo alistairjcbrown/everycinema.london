@@ -1,21 +1,23 @@
-// When venues publish.
+// London-wide publishing: what the estate put on sale, day by day, and against
+// it what actually screened.
 //
-// One data source: public/data/diffs.json, built by diffs.mjs from consecutive
-// clusterflick/data-combined releases. See that file's header for how two
-// release snapshots become a day's per-venue counts, and vendor/clusterflick-diff
-// for the comparison itself, which is Clusterflick's own rather than ours.
+// The data is not fetched. Everything these charts need is a few hundred rows
+// summed over every venue, so the page embeds them at build time (see
+// src/pages/london.astro) rather than downloading the 500 KB per-venue diffs
+// blob to add it up in the browser. Per-venue publishing lives on the venue
+// pages, drawn at build time too.
 //
-// Everything here answers to one control — the scope select — which resolves to
-// a set of venue ids, the same way the venue-health page works. Nothing about
-// the venue list is written down here: the chains, their venues and their names
-// all come out of the blob.
+// The chart code itself is the old "When venues publish" page's, with its scope
+// picker and venue table removed: the reasoning in the comments below is still
+// the reasoning. Its element ids are prefixed "pub" where they would otherwise
+// collide with the screening-history module sharing the page.
 //
-// The one thing worth knowing before reading any chart on this page: a day is
-// the day an interval between two releases STARTED. Releases land about twice a
-// day, so a diff usually spans an evening and the following morning, and the
-// health page's hourly probes say that is when the publishing happened — 39% of
-// everything added arrives between 19:00 and midnight against 5% between
-// midnight and 06:00. See dayOfInterval in diffs.mjs.
+// The one thing worth knowing before reading any chart here: a day is the day
+// an interval between two releases STARTED. Releases land about twice a day, so
+// a diff usually spans an evening and the following morning, and the hourly
+// listing checks say that is when the publishing happened — 39% of everything
+// added arrives between 19:00 and midnight against 5% between midnight and
+// 06:00. See dayOfInterval in diffs.mjs.
 
 import {
   AgCharts,
@@ -30,26 +32,6 @@ import {
   HeatmapSeriesModule,
   GradientLegendModule,
 } from "ag-charts-enterprise";
-import {
-  createGrid,
-  ModuleRegistry,
-  themeQuartz,
-  colorSchemeDark,
-  ClientSideRowModelModule,
-  TextFilterModule,
-  NumberFilterModule,
-  TooltipModule, // headerTooltip, where a column header needs a caveat
-  enableDevValidations,
-} from "ag-grid-community";
-
-if (import.meta.env.DEV) enableDevValidations();
-
-ModuleRegistry.registerModules([
-  ClientSideRowModelModule,
-  TextFilterModule,
-  NumberFilterModule,
-  TooltipModule,
-]);
 ChartModuleRegistry.registerModules([
   ...AllChartModules,
   HeatmapSeriesModule,
@@ -63,6 +45,9 @@ ChartModuleRegistry.registerModules([
 // re-validating the pair.
 const EXTENDED_INK = "#3b82f6"; // blue — more of something already listed
 const NEW_INK = "#199e70"; // aqua — something that was not listed at all
+// The screened line is neutral rather than a third hue: it is the reference the
+// columns are read against, not another part of the stack.
+const SCREENED_INK = "#e4e4e7";
 const SURFACE = "#1c1c20"; // the .card background these charts sit on
 const AXIS_INK = "#a1a1aa";
 const GRID_INK = "#2e2e34";
@@ -174,163 +159,15 @@ const WEEK = [
   [0, "Sun"],
 ];
 
-// ---------------------------------------------------------------------------
-// Scope
-// ---------------------------------------------------------------------------
-
-let blob;
-let scope; // { value, kind, label, venues: [id] }
-let grid;
-
-// Charts are created on first paint and updated in place after that: re-creating
-// one on every scope change would leak its canvas and throw away the enter
-// animation, and updating is what makes switching venues feel instant.
+// Charts are created once; nothing on this page changes scope, but upsert keeps
+// the same shape as the other chart modules.
 const charts = {};
 const upsert = (id, options) => {
   if (charts[id]) charts[id].update(options);
   else charts[id] = AgCharts.create(options);
 };
 
-const venuesOfChain = (chain) =>
-  Object.keys(blob.venues).filter((id) => blob.venues[id].chain === chain);
-
-function setScope(value) {
-  const [kind, id] = value.split(":");
-  const venues =
-    kind === "venue"
-      ? [id]
-      : kind === "chain"
-        ? venuesOfChain(id)
-        : Object.keys(blob.venues);
-  const label =
-    kind === "venue"
-      ? blob.venues[id].name
-      : kind === "chain"
-        ? blob.chains[id]
-        : "every venue";
-  scope = { value, kind, label, venues };
-  el("scope").value = value;
-  syncGrid();
-  render();
-}
-
-// The table is the way back out of a selection, so it narrows to the scope's
-// chain rather than to the scope itself: picking one Vue still leaves the rest
-// of the chain a click away. Written into the chain column's own filter so the
-// floating filter shows what is applied — the same behaviour as the health page.
-async function syncGrid() {
-  if (!grid) return;
-  const chain = scope.kind === "all" ? null : blob.chains[chainOfScope()];
-  const model = chain
-    ? { filterType: "text", type: "equals", filter: chain }
-    : null;
-  if (
-    JSON.stringify(grid.getColumnFilterModel("chain") ?? null) ===
-    JSON.stringify(model)
-  )
-    return;
-  await grid.setColumnFilterModel("chain", model);
-  grid.onFilterChanged();
-}
-
-const chainOfScope = () =>
-  scope.kind === "chain"
-    ? scope.value.slice(6)
-    : blob.venues[scope.venues[0]].chain;
-
-// Chains first, then their venues nested under them, both in display-name order.
-// A solo venue is a chain of one upstream and stays one here.
-// A venue that is the only one in its chain is offered once, as its chain — so
-// asking for it by venue id would set the select to a value it does not have,
-// and the picker would go blank while the charts changed under it. The table
-// hands ids, so it has to come back through here.
-const scopeValueFor = (id) =>
-  venuesOfChain(blob.venues[id].chain).length > 1
-    ? `venue:${id}`
-    : `chain:${blob.venues[id].chain}`;
-
-function buildScopeSelect() {
-  const select = el("scope");
-  select.replaceChildren();
-
-  const all = document.createElement("option");
-  all.value = "all:";
-  all.textContent = `All venues (${Object.keys(blob.venues).length})`;
-  select.append(all);
-
-  for (const [chain, name] of Object.entries(blob.chains).sort(([, a], [, b]) =>
-    a.localeCompare(b),
-  )) {
-    const venues = venuesOfChain(chain).sort((a, b) =>
-      blob.venues[a].name.localeCompare(blob.venues[b].name),
-    );
-    const group = document.createElement("optgroup");
-    group.label = name;
-    const whole = document.createElement("option");
-    whole.value = `chain:${chain}`;
-    whole.textContent =
-      venues.length > 1 ? `All ${name} (${venues.length})` : name;
-    group.append(whole);
-    if (venues.length > 1) {
-      for (const id of venues) {
-        const option = document.createElement("option");
-        option.value = `venue:${id}`;
-        option.textContent = blob.venues[id].name;
-        group.append(option);
-      }
-    }
-    select.append(group);
-  }
-
-  select.addEventListener("change", () => setScope(select.value));
-}
-
-// ---------------------------------------------------------------------------
-// Aggregation over the current scope
-// ---------------------------------------------------------------------------
-
-// One row per day in the blob, whether or not the selection moved that day — a
-// quiet day has to be a visible zero rather than a missing bar, or a venue that
-// publishes fortnightly looks like a venue that publishes weekly with half the
-// chart cropped.
-//
-// A day with `intervals: 0` is the one exception, and the opposite case: no
-// release was published that day at all, so no diff starts in it and there is
-// nothing to know. Its counts are null rather than zero, which keeps the bar
-// off the chart and the cell off the calendar instead of asserting that nobody
-// published. Six days in the first half of 2026 are like this.
-//
-// Performances are one unit across every venue here, which is the whole reason
-// this page can total a chain where the health page cannot: that page counts a
-// venue's own listing units, which are performances for some chains and film ×
-// date pairs for others.
-function dailySeries(venues) {
-  const rows = [];
-  for (const day of blob.days) {
-    const covered = day.intervals > 0;
-    let extended = 0;
-    let fresh = 0;
-    let removed = 0;
-    for (const id of venues) {
-      const entry = blob.venues[id].daily[day.day];
-      if (!entry) continue;
-      extended += entry[0];
-      fresh += entry[1];
-      removed += entry[2];
-    }
-    rows.push({
-      day: day.day,
-      date: new Date(`${day.day}T12:00:00Z`),
-      weekday: day.weekday,
-      covered,
-      extended: covered ? extended : null,
-      fresh: covered ? fresh : null,
-      removed: covered ? removed : null,
-      total: covered ? extended + fresh : null,
-    });
-  }
-  return rows;
-}
+const scope = { label: "London's venues" };
 
 // ---------------------------------------------------------------------------
 // Charts
@@ -349,7 +186,7 @@ function renderDaily(rows) {
   const busiest = covered.reduce((best, r) => (r.total > best.total ? r : best), covered[0]);
   const active = covered.filter((r) => r.total > 0).length;
 
-  el("stats").replaceChildren(
+  el("pubStats").replaceChildren(
     ...[
       [fmtInt.format(total), "performances added"],
       [fmtInt.format(busiest.total), `busiest day — ${fmtDate.format(busiest.date)}`],
@@ -376,8 +213,9 @@ function renderDaily(rows) {
     .map((row) => row.day)
     .filter((day) => day.endsWith("-01"));
 
-  el("dailySub").textContent =
-    `Future performances added by ${scope.label}, ${fmtShort.format(rows[0].date)} to ${fmtShort.format(rows.at(-1).date)}.`;
+  el("pubDailySub").textContent =
+    `Future performances ${scope.label} put on sale each day, ${fmtShort.format(rows[0].date)} to ${fmtShort.format(rows.at(-1).date)}, ` +
+    `against the screenings that actually ran that day.`;
 
   upsert("daily", {
     ...withAxisOptions({
@@ -402,7 +240,7 @@ function renderDaily(rows) {
       },
       number: { label: { formatter: ({ value }) => fmtInt.format(value) } },
     }),
-    container: el("dailyChart"),
+    container: el("pubDailyChart"),
     data: rows,
     series: [
       {
@@ -427,6 +265,27 @@ function renderDaily(rows) {
         cornerRadius: 4,
         tooltip: { renderer: dailyTooltipUpper },
       },
+      // What ran that day, on the same axis. Both series count performances, so
+      // they share a scale honestly: one axis, no second y to line up by eye.
+      // The line is the steady thing — London screens about the same number
+      // every day — and the columns are what the chains are doing to keep it
+      // fed, in bursts.
+      {
+        type: "line",
+        xKey: "day",
+        yKey: "screened",
+        yName: "Screened that day",
+        stroke: SCREENED_INK,
+        strokeWidth: 1.5,
+        marker: { enabled: false },
+        tooltip: {
+          renderer: ({ datum }) => ({
+            heading: fmtDate.format(datum.date),
+            title: "Screened that day",
+            data: [{ label: "Screenings", value: fmtInt.format(datum.screened) }],
+          }),
+        },
+      },
     ],
     axes: [
       // A category axis, one slot per day, rather than a time axis. The series
@@ -447,9 +306,12 @@ function renderDaily(rows) {
     legend: { ...legendBase, enabled: true },
   });
 
-  el("dailyNote").innerHTML =
+  el("pubDailyNote").innerHTML =
+    `The <strong>line</strong> is screenings that ran that day, from the screening history above. The columns are what went ` +
+    `on sale that day for any date ahead — so a tall column is the estate stocking up weeks of line at once, usually ` +
+    `on a Monday or Tuesday changeover. ` +
     `A day is the day a release interval <strong>started</strong>. Releases land about twice a day, so most ` +
-    `intervals span an evening and the next morning; the venue-health page's hourly checks put 39% of ` +
+    `intervals span an evening and the next morning; Clusterflick's hourly listing checks put 39% of ` +
     `everything added between 19:00 and midnight against 5% between midnight and 06:00, so the evening is ` +
     `the side to credit. Removals are charted nowhere here — at midnight every venue drops the day that ` +
     `just ended, which would swamp anything a venue actually cancelled.`;
@@ -693,123 +555,17 @@ function renderCalendar(rows) {
 }
 
 // ---------------------------------------------------------------------------
-// The venue table
-// ---------------------------------------------------------------------------
 
-// One row per venue, over the whole window rather than the current scope: the
-// table is how a reader gets from "every venue" to one of them, so it has to
-// keep offering the ones the charts are not showing.
-function venueRows() {
-  return Object.entries(blob.venues).map(([id, venue]) => {
-    const days = Object.entries(venue.daily);
-    let added = 0;
-    let best = { day: null, total: 0 };
-    const byWeekday = new Array(7).fill(0);
-    for (const [day, entry] of days) {
-      const total = entry[0] + entry[1];
-      added += total;
-      if (total > best.total) best = { day, total };
-      byWeekday[new Date(`${day}T12:00:00Z`).getUTCDay()] += total;
-    }
-    const topWeekday = byWeekday.reduce(
-      (bestIndex, value, index) => (value > byWeekday[bestIndex] ? index : bestIndex),
-      0,
-    );
-    return {
-      id,
-      name: venue.name,
-      chain: blob.chains[venue.chain] ?? venue.chain,
-      added,
-      activeDays: days.filter(([, e]) => e[0] + e[1] > 0).length,
-      busiest: best.total,
-      busiestDay: best.day,
-      // Only meaningful once a venue has actually published something; a venue
-      // that added nothing all year has no busiest weekday, and naming Sunday
-      // because zero is not less than zero would be an invented fact.
-      topWeekday: added ? WEEK.find(([index]) => index === topWeekday)[1] : null,
-    };
-  });
-}
-
-function buildGrid() {
-  grid = createGrid(el("venueGrid"), {
-    theme: themeQuartz.withPart(colorSchemeDark),
-    rowData: venueRows(),
-    defaultColDef: { sortable: true, resizable: true, flex: 1, minWidth: 110 },
-    columnDefs: [
-      { field: "name", headerName: "Venue", filter: "agTextColumnFilter", flex: 2, minWidth: 200 },
-      { colId: "chain", field: "chain", headerName: "Chain", filter: "agTextColumnFilter", floatingFilter: true, flex: 1.4 },
-      {
-        field: "added",
-        headerName: "Performances added",
-        filter: "agNumberColumnFilter",
-        sort: "desc",
-        valueFormatter: ({ value }) => fmtInt.format(value),
-      },
-      {
-        field: "activeDays",
-        headerName: "Days with additions",
-        filter: "agNumberColumnFilter",
-        valueFormatter: ({ value }) => fmtInt.format(value),
-      },
-      {
-        field: "busiest",
-        headerName: "Biggest day",
-        filter: "agNumberColumnFilter",
-        valueFormatter: ({ value, data }) =>
-          value
-            ? `${fmtInt.format(value)} · ${fmtShort.format(new Date(`${data.busiestDay}T12:00:00Z`))}`
-            : "—",
-      },
-      {
-        field: "topWeekday",
-        headerName: "Usual day",
-        headerTooltip:
-          "The weekday carrying the most of this venue's additions. A venue that has added nothing shows a dash rather than a weekday.",
-        valueFormatter: ({ value }) => value ?? "—",
-      },
-    ],
-    onRowClicked: ({ data }) => setScope(scopeValueFor(data.id)),
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Render
-// ---------------------------------------------------------------------------
-
-function render() {
-  const rows = dailySeries(scope.venues);
+function main() {
+  const data = JSON.parse(el("londonData").textContent);
+  const rows = data.rows.map((row) => ({
+    ...row,
+    date: new Date(`${row.day}T12:00:00Z`),
+    screened: data.screenings[row.day] ?? null,
+  }));
   renderDaily(rows);
   renderWeekday(rows);
   renderCalendar(rows);
-
-  el("scopeNote").textContent =
-    scope.kind === "all"
-      ? `${scope.venues.length} venues`
-      : scope.kind === "chain"
-        ? `${scope.venues.length} venue${scope.venues.length === 1 ? "" : "s"} in this chain`
-        : blob.chains[blob.venues[scope.venues[0]].chain] ?? "";
-  el("venueSub").textContent =
-    `Every venue that has added a performance since ${fmtShort.format(new Date(`${blob.from}T12:00:00Z`))}. ` +
-    `Click a row to chart it above.`;
 }
 
-async function main() {
-  const res = await fetch("data/diffs.json");
-  if (!res.ok) throw new Error(`data/diffs.json: ${res.status} ${res.statusText}`);
-  blob = await res.json();
-
-  el("meta").textContent =
-    `${fmtShort.format(new Date(`${blob.from}T12:00:00Z`))} – ${fmtShort.format(new Date(`${blob.to}T12:00:00Z`))} · ` +
-    `${Object.keys(blob.venues).length} venues`;
-
-  buildScopeSelect();
-  buildGrid();
-  setScope("all:");
-}
-
-main().catch((err) => {
-  console.error(err);
-  el("meta").textContent = "could not load data";
-  el("dailySub").textContent = String(err.message ?? err);
-});
+main();

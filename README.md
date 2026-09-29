@@ -1,53 +1,56 @@
 # Every Cinema London
 
-Every London cinema showtime in one place — browse, group, pivot and filter
-across every venue. A showcase built with [AG Grid](https://www.ag-grid.com) on
-cinema data from [Clusterflick](https://clusterflick.com).
+London cinema, by the numbers — what screened, what's on, and when it went on
+sale, across every venue [Clusterflick](https://clusterflick.com) tracks.
 
 **Live:** [everycinema.london](https://everycinema.london) · **Powered by
 Clusterflick**
 
 ## What it is
 
-A single-page [AG Grid](https://www.ag-grid.com) Enterprise showcase over ~31k
-London cinema performances, with three views over one dataset:
+Three kinds of page over one set of Clusterflick data:
 
-- **Grouped** — movie ▸ venue, with per-movie showing counts
-- **Pivot** — venues × dates, reconfigurable live from the tool panel
-- **Flat** — every performance, filterable by genre, format and accessibility
+- **`/`** — the headline figures: screenings this year, what's listed now, the
+  busiest day, the day of the week new showtimes go on sale, and the films with
+  the most showings this week.
+- **`/london/`** — the whole year combined: screenings day by day and film by
+  film, what a wide opening takes off everything already playing, and — on the
+  same axis — what the estate put on sale each day against what screened.
+- **`/venues/<id>/`** — one page per venue (~350): what's on over the next six
+  weeks, week-by-week what it put on sale since January, and whether its
+  listings answer Clusterflick's hourly checks. `/venues/` lists them all.
 
-Plus three charting pages over the same data's history: **Screening history**
-(what actually screened, day by day and film by film, and what a wide opening
-takes off everything already playing), **When venues publish** (how many new
-future performances each venue put on sale, day by day, and whether it is on a
-weekly cycle) and **Venue health** (which venues answer when we ask, and when
-they publish new showtimes).
-
-It's not a replacement for Clusterflick — it's a demonstration of what AG Grid's
-row grouping, pivoting and set-filtering can do with real, messy, real-world
-data.
+It's not a replacement for Clusterflick — it's a look at what the listings say
+about London cinema when you count them.
 
 ## Stack
 
-- [Vite](https://vitejs.dev) + vanilla JS (no framework)
-- [AG Grid Enterprise](https://www.ag-grid.com) v36 — only the modules the app
-  uses are registered (see `src/main.js`)
+- [Astro](https://astro.build), static output to `dist/`. The home and venue
+  pages are rendered entirely at build time — their charts are SVG drawn in
+  `src/components/`, and they ship no JavaScript.
+- [AG Charts](https://www.ag-charts.com) for the interactive charts on
+  `/london/` only (`src/scripts/`).
 - Data from Clusterflick's public
-  [data-combined](https://github.com/clusterflick/data-combined) release
+  [data-combined](https://github.com/clusterflick/data-combined) and
+  [data-analysed](https://github.com/clusterflick/data-analysed) releases.
+
+Build-time data access lives in `src/lib/data.js`: it reads the blobs in
+`public/data/`, unions the three sources' venue lists into one index, and
+derives each venue page's figures using the same rules the pipeline scripts
+document below.
 
 ## Data pipeline
 
-The site ships a **compact mapping blob** and denormalizes it in the browser,
-rather than shipping a fat one-row-per-performance table (~4× smaller over the
-wire):
+The current listings go through a **compact mapping blob** rather than a fat
+one-row-per-performance table:
 
 1. **`scripts/get-latest-combined-data.sh`** — downloads Clusterflick's latest
    combined release into `data-combined/` (~18 MB).
 2. **`npm run transform`** (`transform.mjs`) — trims and compacts it into
    `public/data/cinemadata.json` (~6 MB): lookups once, movie fields once per
    movie, performances as minimal id-referencing records.
-3. **`src/main.js`** — fetches the blob and expands it into flat rows in the
-   browser (~0 ms), resolving ids and computing dates in Europe/London.
+3. **`src/lib/data.js`** — reads the blob at build time and groups each venue's
+   upcoming performances by London day and film for its page.
 
 `data-combined/` and `public/data/` are generated and git-ignored — regenerate
 them with steps 1–2.
@@ -142,7 +145,7 @@ windows.
 
 ## Venue health
 
-`health.mjs` builds the data behind the venue-health page: how often each cinema
+`health.mjs` builds the listing-check data on each venue page: how often each cinema
 answers when we ask it for its listings, and what time of day new showtimes
 actually appear.
 
@@ -218,7 +221,7 @@ if two chains still end up sharing one.
 
 ## When venues publish
 
-`diffs.mjs` builds the data behind the publishing page: how many new future
+`diffs.mjs` builds the publishing data on `/london/` and each venue page: how many new future
 performances each venue added, and on which day.
 
 A release is a snapshot of what every venue was listing at one instant, so two
@@ -394,14 +397,14 @@ npm run transform                        # build the compact blob   -> public/da
 npm run history:build                    # merge history           -> public/data/
 npm run health:days && npm run health:build   # venue health       -> public/data/
 npm run diffs:days && npm run diffs:build     # publishing cadence -> public/data/
-npm run dev                              # http://localhost:5173
+npm run dev                              # http://localhost:4321
 ```
 
 ## Scripts
 
 | Command                                 | Does                                                      |
 | --------------------------------------- | --------------------------------------------------------- |
-| `npm run dev`                           | Start the Vite dev server                                 |
+| `npm run dev`                           | Start the Astro dev server                                |
 | `npm run transform`                     | Rebuild the compact data blob from `data-combined/`       |
 | `npm run history:index`                 | Refresh the cached Clusterflick release index             |
 | `npm run history:fetch`                 | Download release assets that still need a window          |
@@ -410,7 +413,7 @@ npm run dev                              # http://localhost:5173
 | `npm run history:build`                 | Merge history into `public/data/history.json`             |
 | `npm run health:days`                   | Aggregate finished venue-health days into `data-health/`  |
 | `npm run health:build`                  | Merge venue health into `public/data/health.json`         |
-| `npm run build`                         | Production build (app + attributions page)                |
+| `npm run build`                         | Production build: every page, one per venue, into `dist/` |
 | `npm run preview`                       | Preview the production build                              |
 | `npm run history:latest-tag`             | Print the release the site build pins its data to         |
 | `./scripts/get-latest-combined-data.sh` | Download the latest Clusterflick combined data (or `<tag>`) |
@@ -449,16 +452,21 @@ warns if they ever diverge anyway.
 - **Performance data** — [Clusterflick](https://clusterflick.com)
 - **Film metadata** — [TMDB](https://www.themoviedb.org) · _this product uses
   the TMDB API but is not endorsed or certified by TMDB_
-- **Grid** — [AG Grid](https://www.ag-grid.com)
+- **Charts** — [AG Charts](https://www.ag-charts.com)
 
-See the in-app attributions page (`attributions.html`) for full details and
-logos.
+See the site's [method & attributions page](https://everycinema.london/about/)
+(`src/pages/about.astro`) for full details, logos, and what we change about the
+data.
 
 ## Notes
 
-- AG Grid Enterprise runs unlicensed here (evaluation watermark). Add a key via
-  `LicenseManager.setLicenseKey(...)` in `src/main.js` to remove it.
+- Screening history is recorded per film, not per venue, so venue pages show
+  what's coming up rather than what played. Adding a venue dimension to
+  `history.mjs`'s windows is planned as its own piece of work.
+- The old `history.html`, `publishing.html`, `health.html` and
+  `attributions.html` are meta-refresh stubs in `public/`, since GitHub Pages
+  cannot redirect server-side.
 - License: [MIT](LICENSE) — covers this project's own code. It does **not**
   cover third-party data or trademarks: cinema data belongs to Clusterflick,
-  film metadata to TMDB, and the Clusterflick / TMDB / AG Grid names and logos
+  film metadata to TMDB, and the Clusterflick / TMDB / AG Charts names and logos
   to their respective owners.
