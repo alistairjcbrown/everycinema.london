@@ -4179,6 +4179,20 @@
       "publishedAt": "2026-09-30T22:49:45Z",
       "url": "https://github.com/clusterflick/data-combined/releases/download/20260930.234944/combined-data.json",
       "size": 23837283
+    },
+    {
+      "id": 400685928,
+      "tag": "20261001.065818",
+      "publishedAt": "2026-10-01T05:58:19Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20261001.065818/combined-data.json",
+      "size": 23240920
+    },
+    {
+      "id": 401271365,
+      "tag": "20261001.201040",
+      "publishedAt": "2026-10-01T19:10:41Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20261001.201040/combined-data.json",
+      "size": 22949574
     }
   ]
 }
