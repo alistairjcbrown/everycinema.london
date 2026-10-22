@@ -4536,6 +4536,34 @@
       "publishedAt": "2026-10-21T04:15:25Z",
       "url": "https://github.com/clusterflick/data-combined/releases/download/20261021.051524/combined-data.json",
       "size": 27075317
+    },
+    {
+      "id": 420467641,
+      "tag": "20261022.092254",
+      "publishedAt": "2026-10-22T08:22:55Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20261022.092254/combined-data.json",
+      "size": 26135016
+    },
+    {
+      "id": 420548161,
+      "tag": "20261022.104836",
+      "publishedAt": "2026-10-22T09:48:38Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20261022.104836/combined-data.json",
+      "size": 26132735
+    },
+    {
+      "id": 421012120,
+      "tag": "20261022.183542",
+      "publishedAt": "2026-10-22T17:35:43Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20261022.183542/combined-data.json",
+      "size": 25892279
+    },
+    {
+      "id": 421219037,
+      "tag": "20261022.222443",
+      "publishedAt": "2026-10-22T21:24:44Z",
+      "url": "https://github.com/clusterflick/data-combined/releases/download/20261022.222443/combined-data.json",
+      "size": 25887415
     }
   ]
 }
